@@ -1,0 +1,1092 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="15.0.0">
+  <help_text>// Uncomment the following line to change the fontsize and font:
+// fontsize=20
+// fontfamily=SansSerif //possible: SansSerif,Serif,Monospaced
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+// Welcome to UMLet!
+//
+// Double-click on elements to add them to the diagram, or to copy them
+// Edit elements by modifying the text in this panel
+// Hold Ctrl to select multiple elements
+// Use Ctrl+mouse to select via lasso
+//
+// Use +/- or Ctrl+mouse wheel to zoom
+// Drag a whole relation at its central square icon
+//
+// Press Ctrl+C to copy the whole diagram to the system clipboard (then just paste it to, eg, Word)
+// Edit the files in the "palettes" directory to create your own element palettes
+//
+// Select "Custom Elements &gt; New..." to create new element types
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+
+// This text will be stored with each diagram;  use it for notes.</help_text>
+  <zoom_level>12</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>5028</x>
+      <y>528</y>
+      <w>216</w>
+      <h>180</h>
+    </coordinates>
+    <panel_attributes>*Entity*
+--</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>5436</x>
+      <y>684</y>
+      <w>396</w>
+      <h>84</h>
+    </coordinates>
+    <panel_attributes>*Component*
+--
+bg=BLUE</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>5640</x>
+      <y>720</y>
+      <w>180</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>ComponentEntity</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>5448</x>
+      <y>720</y>
+      <w>180</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>ComponentDao</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>5040</x>
+      <y>564</y>
+      <w>192</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>ComponentLocation
+bg=BLUE</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>5220</x>
+      <y>564</y>
+      <w>240</w>
+      <h>180</h>
+    </coordinates>
+    <panel_attributes>lt=-
+</panel_attributes>
+    <additional_attributes>180.0;130.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>3612</x>
+      <y>504</y>
+      <w>276</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+Call</panel_attributes>
+    <additional_attributes>210.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>3612</x>
+      <y>576</y>
+      <w>276</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-
+Data</panel_attributes>
+    <additional_attributes>210.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>3624</x>
+      <y>624</y>
+      <w>240</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>lt=.
+Object</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>3624</x>
+      <y>672</y>
+      <w>240</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>Class</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>3612</x>
+      <y>468</y>
+      <w>264</w>
+      <h>360</h>
+    </coordinates>
+    <panel_attributes>*Conventions*
+--</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>5040</x>
+      <y>804</y>
+      <w>192</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>ComponentLocation
+bg=RED</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>5028</x>
+      <y>768</y>
+      <w>216</w>
+      <h>180</h>
+    </coordinates>
+    <panel_attributes>*Entity*
+--</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>5040</x>
+      <y>1044</y>
+      <w>192</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>ComponentLocation
+bg=PINK</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>5028</x>
+      <y>1008</y>
+      <w>216</w>
+      <h>180</h>
+    </coordinates>
+    <panel_attributes>*Entity*
+--</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>5436</x>
+      <y>780</y>
+      <w>396</w>
+      <h>84</h>
+    </coordinates>
+    <panel_attributes>*Component*
+--
+bg=RED</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>5640</x>
+      <y>816</y>
+      <w>180</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>ComponentEntity
+bg=RED</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>5448</x>
+      <y>816</y>
+      <w>180</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>ComponentDao
+bg=RED</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>5640</x>
+      <y>912</y>
+      <w>180</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>ComponentEntity
+bg=ORANGE</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>5448</x>
+      <y>912</y>
+      <w>180</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>ComponentDao
+bg=ORANGE</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>5436</x>
+      <y>876</y>
+      <w>396</w>
+      <h>84</h>
+    </coordinates>
+    <panel_attributes>*Component*
+--
+bg=ORANGE</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>5640</x>
+      <y>1008</y>
+      <w>180</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>ComponentEntity
+bg=PINK</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>5448</x>
+      <y>1008</y>
+      <w>180</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>ComponentDao
+bg=PINK</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>5436</x>
+      <y>972</y>
+      <w>396</w>
+      <h>84</h>
+    </coordinates>
+    <panel_attributes>*Component*
+--
+bg=PINK</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>5040</x>
+      <y>852</y>
+      <w>192</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>ComponentLocation
+bg=ORANGE</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>5040</x>
+      <y>612</y>
+      <w>192</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>ComponentLocation
+bg=RED</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>5040</x>
+      <y>900</y>
+      <w>192</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>ComponentLocation
+bg=BLUE</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>5220</x>
+      <y>612</y>
+      <w>240</w>
+      <h>228</h>
+    </coordinates>
+    <panel_attributes>lt=-
+</panel_attributes>
+    <additional_attributes>180.0;170.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>5040</x>
+      <y>1092</y>
+      <w>192</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>ComponentLocation
+bg=BLUE</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>5220</x>
+      <y>792</y>
+      <w>240</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>lt=-
+</panel_attributes>
+    <additional_attributes>180.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>5220</x>
+      <y>852</y>
+      <w>240</w>
+      <h>84</h>
+    </coordinates>
+    <panel_attributes>lt=-
+</panel_attributes>
+    <additional_attributes>180.0;50.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>5220</x>
+      <y>708</y>
+      <w>240</w>
+      <h>228</h>
+    </coordinates>
+    <panel_attributes>lt=-
+</panel_attributes>
+    <additional_attributes>180.0;10.0;10.0;170.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>5220</x>
+      <y>996</y>
+      <w>240</w>
+      <h>84</h>
+    </coordinates>
+    <panel_attributes>lt=-
+</panel_attributes>
+    <additional_attributes>180.0;10.0;10.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>5220</x>
+      <y>708</y>
+      <w>240</w>
+      <h>420</h>
+    </coordinates>
+    <panel_attributes>lt=-
+</panel_attributes>
+    <additional_attributes>180.0;10.0;10.0;330.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>5016</x>
+      <y>468</y>
+      <w>828</w>
+      <h>732</h>
+    </coordinates>
+    <panel_attributes>Logic Component
+--</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>3612</x>
+      <y>540</y>
+      <w>276</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.
+If
+</panel_attributes>
+    <additional_attributes>210.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>4104</x>
+      <y>804</y>
+      <w>204</w>
+      <h>84</h>
+    </coordinates>
+    <panel_attributes>*Entity*
+--</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>4536</x>
+      <y>804</y>
+      <w>204</w>
+      <h>132</h>
+    </coordinates>
+    <panel_attributes>*Component*
+--</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>4548</x>
+      <y>840</y>
+      <w>180</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>ComponentDao</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>4548</x>
+      <y>888</y>
+      <w>180</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>ComponentEntity</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>3948</x>
+      <y>804</y>
+      <w>120</w>
+      <h>192</h>
+    </coordinates>
+    <panel_attributes>EntityDao</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>3948</x>
+      <y>528</y>
+      <w>1008</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>JAXBHelper</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>4536</x>
+      <y>696</y>
+      <w>216</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>Singleton
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>4068</x>
+      <y>648</y>
+      <w>120</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>lt=.
+Entity</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>3900</x>
+      <y>552</y>
+      <w>132</w>
+      <h>276</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+r2=&lt;loadEntity&gt;
+r2pos=-90,0</panel_attributes>
+    <additional_attributes>90.0;10.0;90.0;210.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>4116</x>
+      <y>552</y>
+      <w>96</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>lt=-
+m2=Marshal</panel_attributes>
+    <additional_attributes>10.0;80.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>4116</x>
+      <y>696</y>
+      <w>36</w>
+      <h>132</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;90.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>4404</x>
+      <y>840</y>
+      <w>168</w>
+      <h>132</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>120.0;10.0;80.0;10.0;80.0;90.0;10.0;90.0;10.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>4632</x>
+      <y>720</y>
+      <w>168</w>
+      <h>156</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;40.0;120.0;40.0;120.0;110.0;80.0;110.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>4548</x>
+      <y>552</y>
+      <w>96</w>
+      <h>168</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.
+r1=!isLoad
+r1pos=-60,0</panel_attributes>
+    <additional_attributes>60.0;10.0;60.0;120.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>4620</x>
+      <y>552</y>
+      <w>96</w>
+      <h>168</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-
+m2=Marshal</panel_attributes>
+    <additional_attributes>10.0;120.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>4740</x>
+      <y>684</y>
+      <w>168</w>
+      <h>84</h>
+    </coordinates>
+    <panel_attributes>lt=-
+</panel_attributes>
+    <additional_attributes>120.0;50.0;120.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>4824</x>
+      <y>744</y>
+      <w>120</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>lt=.
+Component
+Entity</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>4716</x>
+      <y>792</y>
+      <w>192</w>
+      <h>132</h>
+    </coordinates>
+    <panel_attributes>lt=-</panel_attributes>
+    <additional_attributes>10.0;90.0;140.0;90.0;140.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>4116</x>
+      <y>840</y>
+      <w>180</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>ComponentLocation</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>4368</x>
+      <y>828</y>
+      <w>108</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>lt=.
+Component
+Location</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>4284</x>
+      <y>840</y>
+      <w>108</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>lt=-</panel_attributes>
+    <additional_attributes>70.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>4056</x>
+      <y>924</y>
+      <w>384</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>lt=.
+&lt;getComponent&gt;</panel_attributes>
+    <additional_attributes>10.0;20.0;300.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>3888</x>
+      <y>468</y>
+      <w>1104</w>
+      <h>552</h>
+    </coordinates>
+    <panel_attributes>Load Entity
+--</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>4056</x>
+      <y>888</y>
+      <w>516</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;70.0;390.0;70.0;390.0;10.0;410.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>5436</x>
+      <y>528</y>
+      <w>360</w>
+      <h>96</h>
+    </coordinates>
+    <panel_attributes>/В данном контексте это разные экземпляры одного и того-же компонента. К примеру наборы командных кнопок./
+bg=ORANGE
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>2244</x>
+      <y>1140</y>
+      <w>516</w>
+      <h>360</h>
+    </coordinates>
+    <panel_attributes>JAXBHelper&lt;T extends JAXBEntity&gt;
+--
+private JAXBHelper()
+--
+static JAXBHelper&lt;T&gt; createHelper(Path path, Class&lt;T&gt; target)
+static JAXBHelper&lt;T&gt; createHelper(T instance)
+void save()
+T getInstance()
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>2976</x>
+      <y>1128</y>
+      <w>408</w>
+      <h>336</h>
+    </coordinates>
+    <panel_attributes>template=Object
+/JAXBEntity/
+--
+package JAXBHelper helper
+protected Path path
+--
+JAXBEntity()
+JAXBEntity(Path path)
+--
+
+bg=GRAY</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>2976</x>
+      <y>1476</y>
+      <w>432</w>
+      <h>300</h>
+    </coordinates>
+    <panel_attributes>template=JAXBEntity
+/Component/
+--
+
+bg=GRAY</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>2556</x>
+      <y>288</y>
+      <w>120</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>/JAXBEntity/
+bg=GRAY</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>2616</x>
+      <y>396</y>
+      <w>120</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>/Component/
+bg=GRAY</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>2676</x>
+      <y>516</y>
+      <w>168</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>ComponentEntity</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>2388</x>
+      <y>516</y>
+      <w>168</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>Entity</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2604</x>
+      <y>312</y>
+      <w>96</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>60.0;70.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2664</x>
+      <y>420</y>
+      <w>120</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>80.0;80.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2460</x>
+      <y>312</y>
+      <w>180</w>
+      <h>228</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;170.0;130.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>2832</x>
+      <y>288</y>
+      <w>120</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>JAXBHelper</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2664</x>
+      <y>276</y>
+      <w>192</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-&gt;&gt;&gt;
+r1=marshel
+m2=unmarshal</panel_attributes>
+    <additional_attributes>10.0;20.0;140.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>3228</x>
+      <y>468</y>
+      <w>120</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>/AbstractClass/
+
+bg=GRAY</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>3228</x>
+      <y>420</y>
+      <w>120</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>SimpleClass</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>1740</x>
+      <y>1416</y>
+      <w>300</w>
+      <h>216</h>
+    </coordinates>
+    <panel_attributes>Сохранение существующей и новой сущности
+
+При создании новой сущности, должен использоваться конструктор JAXBEntity(Path path)
+style=wordwrap
+bg=ORANGE</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>1716</x>
+      <y>1020</y>
+      <w>300</w>
+      <h>216</h>
+    </coordinates>
+    <panel_attributes>Загрузка сущности
+
+style=wordwrap
+bg=ORANGE</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2004</x>
+      <y>1044</y>
+      <w>264</w>
+      <h>180</h>
+    </coordinates>
+    <panel_attributes>lt=-</panel_attributes>
+    <additional_attributes>10.0;10.0;200.0;130.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2028</x>
+      <y>1212</y>
+      <w>240</w>
+      <h>288</h>
+    </coordinates>
+    <panel_attributes>lt=-</panel_attributes>
+    <additional_attributes>10.0;220.0;180.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>2712</x>
+      <y>780</y>
+      <w>456</w>
+      <h>300</h>
+    </coordinates>
+    <panel_attributes>Хуйня какая то. Нужно чтобы JAXBHelper сохранялся в сущности, при том чтобы сущность была полностью отделена от логики
+style=wordwrap
+bg=PINK</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>240</x>
+      <y>564</y>
+      <w>360</w>
+      <h>192</h>
+    </coordinates>
+    <panel_attributes>template=Component
+TableDataFilters
+--
+- хранение фильтров
+- загрузка отфильтрованных данных
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>984</x>
+      <y>576</y>
+      <w>348</w>
+      <h>192</h>
+    </coordinates>
+    <panel_attributes>template=Component
+TableDataGroup
+--
+- хранение групп
+- загрузка сгруппированных данных
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>600</x>
+      <y>300</y>
+      <w>348</w>
+      <h>192</h>
+    </coordinates>
+    <panel_attributes>template=Component
+TableData
+--
+- парсинг данных
+- хранение данных
+- загрузка данных
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>876</x>
+      <y>480</y>
+      <w>132</w>
+      <h>132</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;90.0;90.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>456</x>
+      <y>480</y>
+      <w>168</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>120.0;10.0;10.0;80.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>0</x>
+      <y>228</y>
+      <w>348</w>
+      <h>192</h>
+    </coordinates>
+    <panel_attributes>template=Component
+TableDataViews
+--
+- парсинг данных
+- хранение данных
+- загрузка данных
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>

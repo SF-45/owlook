@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListCell?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<fx:root type="javafx.scene.control.ListCell" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1">
+    <graphic>
+        <VBox>
+            <children>
+                <Label fx:id="errorName" text="Error Name">
+                    <font>
+                        <Font size="17.0" />
+                    </font>
+                </Label>
+                <HBox>
+                    <children>
+                        <Label fx:id="massage" text="Massage" />
+                        <Label fx:id="date" text="Date" />
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </graphic>
+</fx:root>

@@ -1,0 +1,89 @@
+.table-view {
+-fx-background-color: #999999
+}
+.text-field {
+
+}
+.background {
+-fx-background-color: #999999
+
+}
+#searchField {
+-fx-background-radius: 20
+}
+#searchButton {
+-fx-background-radius: 15;
+-fx-background-image: url(image/search.png);
+-fx-background-size: 18;
+-fx-background-repeat: no-repeat;
+-fx-background-position: center;
+}
+
+.command-text {
+-fx-font-family: monospace;
+-fx-font-size: 20px;
+}
+
+
+.keyword {
+    -fx-fill: purple;
+    -fx-font-weight: bold;
+}
+.semicolon {
+    -fx-font-weight: bold;
+}
+.paren {
+    -fx-fill: firebrick;
+    -fx-font-weight: bold;
+}
+.bracket {
+    -fx-fill: darkgreen;
+    -fx-font-weight: bold;
+}
+.brace {
+    -fx-fill: teal;
+    -fx-font-weight: bold;
+}
+.string {
+    -fx-fill: blue;
+}
+
+.comment {
+	-fx-fill: cadetblue;
+}
+
+.paragraph-box:has-caret {
+    -fx-background-color: #f2f9fc;
+}
+
+.cmd-command-button {
+-fx-background-color: #5d5d5e;
+-fx-background-radius: 15;
+-font-family: monospace;
+-fx-text-fill: #fffff0;
+}
+.cmd-command-button:hover {
+-fx-background-color: #8a8a8a;
+}
+.cmd-command-button:pressed {
+-fx-background-color: #000000;
+}
+
+.powershell-command-button {
+-fx-background-color: #032455;
+-fx-background-radius: 15;
+-font-family: monospace;
+-fx-text-fill: #edecef;
+}
+.powershell-command-button:hover {
+-fx-background-color: #0548aa;
+}
+.powershell-command-button:pressed {
+-fx-background-color: #011a3d;
+}
+.progress-indicator .percentage {
+    -fx-fill:null;
+}
+.progress-indicator  {
+    -fx-padding: 0 0 -16 0;
+}
