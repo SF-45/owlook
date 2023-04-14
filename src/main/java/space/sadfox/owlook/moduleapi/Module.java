@@ -1,11 +1,18 @@
 package space.sadfox.owlook.moduleapi;
 
-import space.sadfox.owlook.jaxb.JAXBEntity;
+import java.util.List;
 
-public abstract class Module {
-	public abstract String getName();
-	public abstract String getDescription();
-	public abstract String getVersion();
-	public abstract Class<? extends JAXBEntity> getEntityClass();
-
+public interface Module {
+	String getModuleName();
+	String getModuleDescription();
+	String getModuleVersion();
+	default List<Service> getServices() {
+		return null;
+	}
+	default List<Utility> getUtilities() {
+		return null;
+	}
+	default List<Workspace> getWorkspaces() {
+		return null;
+	}
 }

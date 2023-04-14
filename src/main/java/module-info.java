@@ -1,3 +1,9 @@
+import space.sadfox.owlook.moduleapi.ModuleBac;
+import space.sadfox.owlook.moduleapi.Service;
+import space.sadfox.owlook.moduleapi.Utility;
+import space.sadfox.owlook.moduleapi.Workspace;
+import space.sadfox.owlook.moduleapi.Module;
+
 module space.sadfox.owlook {
 	requires transitive javafx.base;
     requires transitive javafx.controls;
@@ -38,7 +44,11 @@ module space.sadfox.owlook {
     exports space.sadfox.owlook.components.bootpatch;
     exports space.sadfox.owlook.ui.base;
     
-    uses space.sadfox.owlook.moduleapi.Module;
+    uses ModuleBac;
+    uses Module;
+    uses Workspace;
+    uses Service;
+    uses Utility;
     
     opens space.sadfox.owlook.ui to javafx.fxml;
     

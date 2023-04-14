@@ -2,7 +2,7 @@ package space.sadfox.owlook.components.bootpatch;
 
 import java.util.Arrays;
 
-import space.sadfox.owlook.moduleapi.Module;
+import space.sadfox.owlook.moduleapi.ModuleBac;
 
 public class BootPathDao {
 	
@@ -13,26 +13,26 @@ public class BootPathDao {
 	}
 	
 	
-	public ModuleBootList getModuleBootList(Module module) {
+	public ModuleBootList getModuleBootList(ModuleBac moduleBac) {
 		for (ModuleBootList moduleBootList : bootPath.getWorkspaces()) {
-			if (moduleBootList.getName().equals(module.getName()) && moduleBootList.getVersion().equals(module.getVersion())) {
+			if (moduleBootList.getName().equals(moduleBac.getName()) && moduleBootList.getVersion().equals(moduleBac.getVersion())) {
 				return moduleBootList;
 			}
 		}
 		ModuleBootList workspacePathes = new ModuleBootList();
-		workspacePathes.setName(module.getName());
-		workspacePathes.setVersion(module.getVersion());
+		workspacePathes.setName(moduleBac.getName());
+		workspacePathes.setVersion(moduleBac.getVersion());
 		bootPath.getWorkspaces().add(workspacePathes);
 		return workspacePathes;
 	}
 	
-	public void addPathToModule(Module module, String ... pathes) {
-		ModuleBootList workspacePathes = getModuleBootList(module);
+	public void addPathToModule(ModuleBac moduleBac, String ... pathes) {
+		ModuleBootList workspacePathes = getModuleBootList(moduleBac);
 		workspacePathes.getPaths().addAll(Arrays.asList(pathes));
 	}
 	
-	public void removePathToModule(Module module, String ... pathes) {
-		ModuleBootList workspacePathes = getModuleBootList(module);
+	public void removePathToModule(ModuleBac moduleBac, String ... pathes) {
+		ModuleBootList workspacePathes = getModuleBootList(moduleBac);
 		workspacePathes.getPaths().removeAll(Arrays.asList(pathes));
 	}
 }

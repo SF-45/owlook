@@ -9,6 +9,10 @@ import java.util.ServiceLoader;
 import java.util.ServiceLoader.Provider;
 import java.util.stream.Collectors;
 
+import space.sadfox.owlook.moduleapi.Utility;
+import space.sadfox.owlook.moduleapi.Workspace;
+import space.sadfox.owlook.moduleapi.Module;
+
 public enum ModuleLoader {
 	INSTANCE;
 
@@ -43,6 +47,18 @@ public enum ModuleLoader {
 			updateModuleList();
 
 		return ServiceLoader.load(moduleLayer, target).stream().map(Provider::get).collect(Collectors.toList());
+	}
+
+	public List<Module> loadModules() {
+		return loadModules(Module.class);
+	}
+	
+	public List<Workspace> loadWorkspaces() {
+		return loadModules(Workspace.class);
+	}
+	
+	public List<Utility> loadUtilities() {
+		return loadModules(Utility.class);
 	}
 
 }
