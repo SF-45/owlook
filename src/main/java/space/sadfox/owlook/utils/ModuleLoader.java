@@ -9,7 +9,7 @@ import java.util.ServiceLoader;
 import java.util.ServiceLoader.Provider;
 import java.util.stream.Collectors;
 
-import space.sadfox.owlook.moduleapi.Utility;
+import space.sadfox.owlook.moduleapi.ModuleExtension;
 import space.sadfox.owlook.moduleapi.Workspace;
 import space.sadfox.owlook.moduleapi.Module;
 
@@ -57,8 +57,8 @@ public enum ModuleLoader {
 		return loadModules(Workspace.class);
 	}
 	
-	public List<Utility> loadUtilities() {
-		return loadModules(Utility.class);
+	public List<ModuleExtension> loadModuleExtension() {
+		return loadModules(ModuleExtension.class);
 	}
 
 }

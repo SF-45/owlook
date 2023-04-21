@@ -70,12 +70,14 @@ public class JAXBHelper<T extends JAXBEntity> {
 				instance = target.getConstructor().newInstance();
 			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
-				e.printStackTrace();
+				ErrorLogger.registerException(e);
 			}
 		}
 		instance.setJaxbHelper(this);
 		instance.setPath(path);
 		instance.getChangeHistory().register(instance);
+		// AutoSave here
+		instance.getChangeHistory().addChangeListener(() -> instance.save());
 
 	}
 

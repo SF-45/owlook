@@ -6,10 +6,10 @@ public interface Module {
 	String getModuleName();
 	String getModuleDescription();
 	String getModuleVersion();
-	default List<Service> getServices() {
+	default List<Tool> getTools() {
 		return null;
 	}
-	default List<Utility> getUtilities() {
+	default List<ModuleExtension> getUtilities() {
 		return null;
 	}
 	default List<Workspace> getWorkspaces() {

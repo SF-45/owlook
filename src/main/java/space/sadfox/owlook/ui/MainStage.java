@@ -1,9 +1,6 @@
 package space.sadfox.owlook.ui;
 
 import java.io.IOException;
-import java.net.URL;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;

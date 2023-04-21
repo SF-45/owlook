@@ -1,6 +1,6 @@
 import space.sadfox.owlook.moduleapi.ModuleBac;
-import space.sadfox.owlook.moduleapi.Service;
-import space.sadfox.owlook.moduleapi.Utility;
+import space.sadfox.owlook.moduleapi.Tool;
+import space.sadfox.owlook.moduleapi.ModuleExtension;
 import space.sadfox.owlook.moduleapi.Workspace;
 import space.sadfox.owlook.moduleapi.Module;
 
@@ -47,8 +47,8 @@ module space.sadfox.owlook {
     uses ModuleBac;
     uses Module;
     uses Workspace;
-    uses Service;
-    uses Utility;
+    uses Tool;
+    uses ModuleExtension;
     
     opens space.sadfox.owlook.ui to javafx.fxml;
     

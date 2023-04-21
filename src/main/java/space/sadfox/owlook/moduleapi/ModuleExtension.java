@@ -1,10 +1,10 @@
 package space.sadfox.owlook.moduleapi;
 
-public interface Utility {
+public interface ModuleExtension {
 	default String getIdentifier() {
 		return this.getClass().getName();
 	}
-	public String getName();
-	public String getDescription();
+	String getModuleExtensionName();
+	String getModuleExtensionDescription();
 
 }
