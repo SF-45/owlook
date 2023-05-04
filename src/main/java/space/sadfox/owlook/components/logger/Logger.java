@@ -7,9 +7,7 @@ import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
-import javafx.scene.Node;
 import space.sadfox.owlook.jaxb.JAXBEntity;
-import space.sadfox.owlook.jaxb.PreLoadAction;
 
 
 @XmlAccessorType(XmlAccessType.NONE)
@@ -29,20 +27,19 @@ public class Logger extends JAXBEntity {
 	}
 
 	@Override
-	public Node getSimpleConfigNode() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public PreLoadAction getPreLoadAction() {
-		return null;
-	}
-
-	@Override
 	public String getTitle() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void initialize() {
+		
+	}
+
+	@Override
+	public boolean validate() {
+		return true;
 	}
 
 }

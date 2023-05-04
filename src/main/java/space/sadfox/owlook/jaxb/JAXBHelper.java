@@ -35,7 +35,7 @@ public class JAXBHelper<T extends JAXBEntity> {
 				}
 				time++;
 			}
-			System.out.println("Save: " + new Date(System.currentTimeMillis()));
+			System.out.println( instance.getPath() + " save: " + new Date(System.currentTimeMillis()));
 			marshalInstance();
 
 		}

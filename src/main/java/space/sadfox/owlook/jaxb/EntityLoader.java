@@ -30,9 +30,13 @@ public class EntityLoader {
 			throw new FileNotFoundException(path + " not found");
 		if (!loaded.containsKey(path)) {
 			T instance = new JAXBHelper<>(path, target).getInstance();
-			if (instance.getPreLoadAction() != null) {
-				instance.getPreLoadAction().action(instance);
+//			if (instance.getPreLoadAction() != null) {
+//				instance.getPreLoadAction().action(instance);
+//			} TODO: Удалить потом
+			if (!instance.validate()) {
+				throw new JAXBException("An exception occurred during initialization. See log for details");
 			}
+			instance.initialize();
 			loaded.put(path, instance);
 			return instance;
 		}

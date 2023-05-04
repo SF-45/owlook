@@ -51,8 +51,8 @@ public class LoggerEntry {
         this.stackTrace = stackTrace;
     }
 
-    public void setMassage(String massage) {
-        this.massage = massage;
+    public void setMessage(String message) {
+        this.massage = message;
     }
 
     public void setTime(long time) {

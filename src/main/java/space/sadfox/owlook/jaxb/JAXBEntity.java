@@ -47,8 +47,9 @@ public abstract class JAXBEntity implements ChangeHistoryKeeping {
 	}
 	public abstract String getTitle();
 	public abstract String getExtension();
-	public abstract Node getSimpleConfigNode();
-	public abstract PreLoadAction getPreLoadAction();
+	//public abstract PreLoadAction getPreLoadAction();
+	public abstract void initialize();
+	public abstract boolean validate();
 	
 	
 	

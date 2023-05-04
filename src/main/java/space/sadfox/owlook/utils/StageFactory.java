@@ -8,9 +8,11 @@ import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import space.sadfox.owlook.ResourceTarget;
 
 public enum StageFactory {
     INSTANCE;
@@ -59,6 +61,7 @@ public enum StageFactory {
                 stage.removeEventFilter(change.getValueAdded(), change.getKey());
             }
         });
+        stage.getIcons().add(new Image(ResourceTarget.class.getResourceAsStream("image/owl2.png")));
     }
 
     public Stage createStage() {

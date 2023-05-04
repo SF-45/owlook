@@ -40,8 +40,10 @@ module space.sadfox.owlook {
     
     exports space.sadfox.owlook.moduleapi;
     exports space.sadfox.owlook.jaxb;
+    exports space.sadfox.owlook.jaxb.adapters;
     exports space.sadfox.owlook.utils;
     exports space.sadfox.owlook.components.bootpatch;
+    exports space.sadfox.owlook.components.logger;
     exports space.sadfox.owlook.ui.base;
     
     uses ModuleBac;

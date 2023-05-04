@@ -2,6 +2,7 @@ package space.sadfox.owlook;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import space.sadfox.owlook.ui.MainStage;
 import space.sadfox.owlook.utils.StageFactory;
@@ -14,6 +15,7 @@ public class App extends Application {
 		
 		MainStage mainStage = new MainStage();
 		primaryStage.setScene(new Scene(mainStage.getParent()));
+		primaryStage.setTitle("Owlook");
 		primaryStage.show();
 		
 	}

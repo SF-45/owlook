@@ -18,19 +18,30 @@ public class ErrorLogger implements Thread.UncaughtExceptionHandler {
 
 	public static void registerException(Throwable e) {
 		Logger logger = getErrorLogger();
-		LoggerDAO loggerDAO = null;
-		loggerDAO = new LoggerDAO(logger);
+		LoggerDAO loggerDAO = new LoggerDAO(logger);
 		LoggerEntry entry = loggerDAO.addNewLoggerEntry();
 		entry.setName(e.getClass().getName());
-		entry.setMassage(e.getMessage());
+		entry.setMessage(e.getMessage());
 		entry.setTime(System.currentTimeMillis());
 		StringWriter writer = new StringWriter();
 		e.printStackTrace(new PrintWriter(writer));
 		entry.setStackTrace(writer.toString());
 		entry.setLogLevel(LogLevel.ERROR);
-		logger.save();
 
 		e.printStackTrace();
+	}
+	
+	public static void registerMessage(LoggerMessage message) {
+		Logger logger = getErrorLogger();
+		LoggerDAO loggerDAO = new LoggerDAO(logger);
+		LoggerEntry entry = loggerDAO.addNewLoggerEntry();
+		entry.setName(message.getName());
+		entry.setMessage(message.getMessage());
+		entry.setLogLevel(message.getLogLevel());
+		entry.setTime(System.currentTimeMillis());
+		System.out.println(message.getLogLevel());
+		System.out.println(message.getName());
+		System.out.println(message.getMessage());
 	}
 
 	public static void registerException(Thread t, Throwable e) {
