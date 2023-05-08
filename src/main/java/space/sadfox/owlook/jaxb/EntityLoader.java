@@ -74,7 +74,7 @@ public class EntityLoader {
 		path = validatePath(fileName, target);
 
 		if (Files.exists(path))
-			throw new JAXBException(path + "] alredy exist");
+			throw new JAXBException("[" + path + "] alredy exist");
 		T instance = new JAXBHelper<>(path, target).getInstance();
 		loaded.put(path, instance);
 		instance.saveImmediately();
