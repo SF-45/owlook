@@ -11,13 +11,25 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import jakarta.xml.bind.JAXBException;
+import space.sadfox.owlook.jaxb.EntityChangeListener.Change;
 import space.sadfox.owlook.utils.ErrorLogger;
 import space.sadfox.owlook.utils.ProjectPath;
 
 public class EntityLoader {
+	
+	@FunctionalInterface
+	public static interface CreateEntityListener {
+		void create(JAXBEntity entity);
+	}
 
-	private static Map<Path, JAXBEntity> loaded = new HashMap<>();
+	private static Map<Path, JAXBEntity> loaded;
+	private static List<CreateEntityListener> createListeners;
 	private static final String extension = ".owl";
+
+	static {
+		loaded = new HashMap<>();
+		createListeners = new ArrayList<>();
+	}
 
 	public boolean isLoad(Path path) {
 		return loaded.containsKey(path.toAbsolutePath());
@@ -50,8 +62,7 @@ public class EntityLoader {
 		Path path = validatePath(target);
 		entityPaths = Files.find(path, 1, (p, basicFileAttributes) -> {
 			return p.getFileName().toString().endsWith(extension);
-		})
-				.collect(Collectors.toList());
+		}).collect(Collectors.toList());
 		for (Path entityPath : entityPaths) {
 			try {
 				entitiesList.add(loadEntity(entityPath.getFileName().toString(), target));
@@ -64,7 +75,7 @@ public class EntityLoader {
 
 	}
 
-	public <T extends JAXBEntity> T createEntity(String fileName, Class<T> target) throws JAXBException, IOException {
+	private <T extends JAXBEntity> T createEntity(String fileName, Class<T> target) throws JAXBException, IOException {
 		Path path = validatePath(target);
 
 		if (Files.isDirectory(path) && Files.notExists(path)) {
@@ -78,7 +89,13 @@ public class EntityLoader {
 		T instance = new JAXBHelper<>(path, target).getInstance();
 		loaded.put(path, instance);
 		instance.saveImmediately();
+		notifyEntityChangeListeners(instance);
+
 		return instance;
+	}
+
+	public <T extends JAXBEntity> T createEntity(Class<T> target) throws JAXBException, IOException {
+		return createEntity(generateFileName(), target);
 	}
 
 	public <T extends JAXBEntity> T createOrLoadEntity(String fileName, Class<T> target)
@@ -92,23 +109,47 @@ public class EntityLoader {
 		}
 		return instance;
 	}
-	
+
 	public boolean entityExist(String fileName, Class<?> target) {
 		Path path = validatePath(fileName, target);
 		return Files.exists(path);
 	}
-	
+
 	public <T extends JAXBEntity> boolean deleteEntity(T entity) {
 		try {
 			Files.delete(entity.getPath());
 			loaded.remove(entity.getPath());
+			entity.notifyEntityChangeListeners(new Change() {
+				
+				@Override
+				public boolean wasRemoved() {
+					return true;
+				}
+				
+				@Override
+				public boolean wasModify() {
+					return false;
+				}
+			});
 			return true;
 		} catch (IOException e) {
 			ErrorLogger.registerException(e);
 		}
 		return false;
 	}
-	
+
+	public void addCreateChangeListener(CreateEntityListener listener) {
+		createListeners.add(listener);
+	}
+
+	public void removeCreateChangeListener(CreateEntityListener listener) {
+		createListeners.remove(listener);
+	}
+
+	private void notifyEntityChangeListeners(JAXBEntity entity) {
+		createListeners.forEach(i -> i.create(entity));
+	}
+
 	private Path validatePath(String fileName, Class<?> target) {
 		Path path = ProjectPath.CONFiG.getPath().resolve(target.getPackageName()).toAbsolutePath();
 		if (!fileName.endsWith(extension)) {
@@ -117,11 +158,15 @@ public class EntityLoader {
 			return path.resolve(fileName);
 		}
 	}
-	
+
 	private Path validatePath(Class<?> target) {
 		Path path = ProjectPath.CONFiG.getPath().resolve(target.getPackageName()).toAbsolutePath();
-		
+
 		return path;
+	}
+
+	private String generateFileName() {
+		return String.valueOf(System.currentTimeMillis());
 	}
 
 }

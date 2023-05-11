@@ -1,7 +1,5 @@
 package space.sadfox.owlook.jaxb;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Stack;
 
 import javafx.beans.property.BooleanProperty;
@@ -13,16 +11,22 @@ import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
+import space.sadfox.owlook.jaxb.EntityChangeListener.Change;
 import space.sadfox.owlook.moduleapi.ChangeHistoryKeeping;
 
 public class ChangeHistory {
 
+	private JAXBEntity parent;
 	private Stack<Changer> back = new Stack<>();
 	private Stack<Changer> forward = new Stack<>();
 	private BooleanProperty dontlisen = new SimpleBooleanProperty(false);
-	private List<ChangeListener> changeListeners = new ArrayList<>();
+	
+	public ChangeHistory(JAXBEntity parent) {
+		this.parent = parent;
+		register(parent);
+	}
 
-	public <T> void register(Property<T> property) {
+	private <T> void register(Property<T> property) {
 
 		checkAndRegister(property.getValue());
 		property.addListener((property2, oldValue, newValue) -> {
@@ -48,7 +52,7 @@ public class ChangeHistory {
 		});
 	}
 
-	public <T> void register(ObservableList<T> observableList) {
+	private <T> void register(ObservableList<T> observableList) {
 
 		observableList.forEach(this::checkAndRegister);
 
@@ -101,7 +105,7 @@ public class ChangeHistory {
 		});
 	}
 
-	public <K, V> void register(ObservableMap<K, V> observableMap) {
+	private <K, V> void register(ObservableMap<K, V> observableMap) {
 
 		observableMap.forEach((k, v) -> {
 			checkAndRegister(k);
@@ -153,7 +157,7 @@ public class ChangeHistory {
 		});
 	}
 
-	public <T> void register(ObservableSet<T> observableSet) {
+	private <T> void register(ObservableSet<T> observableSet) {
 
 		observableSet.forEach(this::checkAndRegister);
 		observableSet.addListener((SetChangeListener<Object>) change -> {
@@ -200,7 +204,7 @@ public class ChangeHistory {
 		});
 	}
 
-	public void register(ChangeHistoryKeeping entity) {
+	private void register(ChangeHistoryKeeping entity) {
 		if (entity.getProperties() != null) {
 			entity.getProperties().forEach(this::checkAndRegister);
 		}
@@ -268,17 +272,18 @@ public class ChangeHistory {
 	}
 
 	private void notifyListeners() {
-		for (int i = 0; i < changeListeners.size(); i++) {
-			changeListeners.get(i).change();
-		}
-	}
-
-	public void addChangeListener(ChangeListener changeListener) {
-		changeListeners.add(changeListener);
-	}
-
-	public void removeChangeListener(ChangeListener changeListener) {
-		changeListeners.remove(changeListener);
+		parent.notifyEntityChangeListeners(new Change() {
+			
+			@Override
+			public boolean wasRemoved() {
+				return false;
+			}
+			
+			@Override
+			public boolean wasModify() {
+				return true;
+			}
+		});
 	}
 
 }

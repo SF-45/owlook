@@ -1,8 +1,8 @@
 package space.sadfox.owlook.jaxb;
 
 import java.nio.file.Path;
+import java.util.List;
 
-import javafx.scene.Node;
 import space.sadfox.owlook.moduleapi.ChangeHistoryKeeping;
 
 
@@ -10,6 +10,7 @@ public abstract class JAXBEntity implements ChangeHistoryKeeping {
 	
 	private JAXBHelper<?> jaxbHelper;
 	private ChangeHistory changeHistory;
+	private List<EntityChangeListener> changeListeners;
 	private Path path;
 
 	public JAXBHelper<?> getJaxbHelper() {
@@ -29,7 +30,7 @@ public abstract class JAXBEntity implements ChangeHistoryKeeping {
 	}
 	
 	public ChangeHistory getChangeHistory() {
-		if (changeHistory == null) changeHistory = new ChangeHistory();
+		if (changeHistory == null) changeHistory = new ChangeHistory(this);
 		return changeHistory;
 	}
 	
@@ -51,7 +52,17 @@ public abstract class JAXBEntity implements ChangeHistoryKeeping {
 	public abstract void initialize();
 	public abstract boolean validate();
 	
-	
+	public void addEntityChangeListener(EntityChangeListener listener) {
+		changeListeners.add(listener);
+	}
+
+	public void removeEntityChangeListener(EntityChangeListener listener) {
+		changeListeners.remove(listener);
+	}
+
+	void notifyEntityChangeListeners(EntityChangeListener.Change change) {
+		changeListeners.forEach(l -> l.change(change));
+	}
 	
 	
 	

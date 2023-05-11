@@ -75,9 +75,13 @@ public class JAXBHelper<T extends JAXBEntity> {
 		}
 		instance.setJaxbHelper(this);
 		instance.setPath(path);
-		instance.getChangeHistory().register(instance);
+		instance.getChangeHistory();
 		// AutoSave here
-		instance.getChangeHistory().addChangeListener(() -> instance.save());
+		instance.addEntityChangeListener(change -> {
+			if (change.wasModify()) {
+				instance.save();
+			}
+		});
 
 	}
 
