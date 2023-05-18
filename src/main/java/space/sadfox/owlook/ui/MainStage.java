@@ -12,6 +12,7 @@ import space.sadfox.owlook.Main;
 import space.sadfox.owlook.moduleapi.Module;
 import space.sadfox.owlook.moduleapi.Workspace;
 import space.sadfox.owlook.ui.base.Controller;
+import space.sadfox.owlook.ui.tools.EntityManager;
 import space.sadfox.owlook.utils.ModuleLoader;
 
 public class MainStage extends Controller {
@@ -57,6 +58,19 @@ public class MainStage extends Controller {
 				
 			});
 			contextMenu.getItems().add(open);
+			
+			// TODO: Удалить
+			MenuItem openEntityManager = new MenuItem("Open Entity Manager");
+			openEntityManager.setOnAction(event -> {
+				try {
+					new EntityManager().show();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			});
+			contextMenu.getItems().add(openEntityManager);
+			
+			
 			cell.setContextMenu(contextMenu);
 			return cell;
 		});

@@ -54,7 +54,7 @@ public class ErrorLogger implements Thread.UncaughtExceptionHandler {
 		Path path = ProjectPath.LOG.getPath()
 				.resolve(new SimpleDateFormat("dd-MM-yyyy").format(new Date(System.currentTimeMillis())));
 		try {
-			return new EntityLoader().createOrLoadEntity(path.getFileName().toString(), Logger.class);
+			return EntityLoader.INSTANCE.createOrLoadEntity(path.getFileName().toString(), Logger.class);
 		} catch (IOException | JAXBException e) {
 			e.printStackTrace();
 		}

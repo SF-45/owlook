@@ -1,5 +1,6 @@
 package space.sadfox.owlook.components.bootpatch;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -10,6 +11,8 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import space.sadfox.owlook.jaxb.JAXBEntity;
+import space.sadfox.owlook.ui.base.Controller;
+import space.sadfox.owlook.utils.Nullable;
 
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement
@@ -48,8 +51,25 @@ public class BootPath extends JAXBEntity {
 	}
 
 	@Override
-	public boolean validate() {
-		return true;
+	public void validate() {
+		
+	}
+
+	@Override
+	public Controller getConfigController() throws IOException, Nullable {
+		throw new Nullable();
+	}
+
+	@Override
+	public void syncWith(JAXBEntity entity) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setTitle(String title) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

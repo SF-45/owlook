@@ -1,5 +1,6 @@
 package space.sadfox.owlook.components.logger;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,6 +9,8 @@ import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import space.sadfox.owlook.jaxb.JAXBEntity;
+import space.sadfox.owlook.ui.base.Controller;
+import space.sadfox.owlook.utils.Nullable;
 
 
 @XmlAccessorType(XmlAccessType.NONE)
@@ -33,13 +36,34 @@ public class Logger extends JAXBEntity {
 	}
 
 	@Override
+	public void setTitle(String title) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
 	public void initialize() {
 		
 	}
 
 	@Override
-	public boolean validate() {
-		return true;
+	public void validate() {
 	}
+
+	@Override
+	public Controller getConfigController() throws IOException, Nullable {
+		throw new Nullable();
+	}
+
+	@Override
+	public void syncWith(JAXBEntity entity) {
+		if (!(entity instanceof Logger)) {
+			return;
+		}	
+		Logger l = (Logger) entity;
+		getLogs().addAll(l.getLogs());
+	}
+	
+	
 
 }

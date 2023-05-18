@@ -11,6 +11,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.cell.PropertyValueFactory;
 import space.sadfox.owlook.ResourceTarget;
 import space.sadfox.owlook.jaxb.EntityLoader;
 import space.sadfox.owlook.jaxb.JAXBEntity;
@@ -27,14 +28,10 @@ public class OpenEntityDialog<T extends JAXBEntity> extends Controller {
 	@FXML
     private TextArea previewArea;
 	
-	private EntityLoader loader;
-	
 	private boolean isOpened = false;
 
 	public OpenEntityDialog(Class<T> target, List<T> alredyOpenned) throws IOException {
 		super(ResourceTarget.class.getResource("fxml/open-entity-dialog.fxml"));
-		
-		loader = new EntityLoader();
 		
 		TableColumn<T, String> fileName = new TableColumn<>("ID");
 		fileName.setCellValueFactory(call -> {
@@ -42,9 +39,7 @@ public class OpenEntityDialog<T extends JAXBEntity> extends Controller {
 		});
 		
 		TableColumn<T, String> title = new TableColumn<>("Title");
-		title.setCellValueFactory(call -> {
-			return new SimpleStringProperty(call.getValue().getTitle());
-		});
+		title.setCellValueFactory(new PropertyValueFactory<>("title"));
 		
 		tableView.getColumns().addAll(fileName, title);
 		
@@ -52,7 +47,7 @@ public class OpenEntityDialog<T extends JAXBEntity> extends Controller {
 			previewArea.setText(newValue.toString());
 		});
 		
-		ObservableList<T> allEntities = FXCollections.observableList(loader.loadAllEntities(target));
+		ObservableList<T> allEntities = FXCollections.observableList(EntityLoader.INSTANCE.loadAllEntities(target));
 		
 		if (alredyOpenned != null) {
 			allEntities = allEntities.filtered(f -> {

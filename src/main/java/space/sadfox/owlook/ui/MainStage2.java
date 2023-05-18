@@ -60,9 +60,8 @@ public class MainStage2 extends Controller {
 //		FXMLLoader loader = new FXMLLoader(Main.class.getResource("fxml/main-scene2.fxml"));
 //		loader.setController(this);
 //		root = loader.load();
-		EntityLoader entityLoader = new EntityLoader();
 		for (ModuleBac moduleBac : moduleBacs) {
-			List<? extends JAXBEntity> entities = entityLoader.loadAllEntities(moduleBac.getEntityClass());
+			List<? extends JAXBEntity> entities = EntityLoader.INSTANCE.loadAllEntities(moduleBac.getEntityClass());
 
 			if (entities.size() == 0)
 				continue;
