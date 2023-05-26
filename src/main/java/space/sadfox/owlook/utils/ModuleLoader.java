@@ -19,7 +19,7 @@ public enum ModuleLoader {
 
 	private ModuleLayer moduleLayer;
 
-	public void updateModuleList() {
+	private void updateModuleList() {
 		// Будем искать плагины в папке plugins
 		ModuleFinder pluginsFinder = ModuleFinder.of(ProjectPath.MODULE.getPath());
 		ModuleFinder libFinder = ModuleFinder.of(ProjectPath.MODULE_LIB.getPath());
@@ -45,8 +45,12 @@ public enum ModuleLoader {
 	}
 
 	public <T> List<T> loadModules(Class<T> target) {
-		if (moduleLayer == null)
+		if (moduleLayer == null) {
 			updateModuleList();
+			
+			List<Module> modules = ServiceLoader.load(moduleLayer, Module.class).stream().map(Provider::get).collect(Collectors.toList());
+			modules.forEach(Module::initModule);
+		}
 
 		return ServiceLoader.load(moduleLayer, target).stream().map(Provider::get).collect(Collectors.toList());
 	}

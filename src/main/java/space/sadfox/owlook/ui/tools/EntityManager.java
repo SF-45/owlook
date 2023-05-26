@@ -1,27 +1,36 @@
 package space.sadfox.owlook.ui.tools;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import jakarta.xml.bind.JAXBException;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TableView.TableViewSelectionModel;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import space.sadfox.owlook.ResourceTarget;
 import space.sadfox.owlook.jaxb.EntityLoader;
 import space.sadfox.owlook.jaxb.JAXBEntity;
+import space.sadfox.owlook.jaxb.JAXBEntityValidateException;
 import space.sadfox.owlook.ui.base.Controller;
 import space.sadfox.owlook.utils.ErrorLogger;
 import space.sadfox.owlook.utils.ModuleLoader;
@@ -43,11 +52,9 @@ public class EntityManager extends Controller {
 
 	public EntityManager() throws IOException {
 		super(ResourceTarget.class.getResource("fxml/entity-manager.fxml"));
-		
+
 		init();
-		initEntityTable();
-		initDirTable();
-		initKeyBind();
+		initEntityManagerButtons();
 
 		ModuleLoader.INSTANCE.loadModules().forEach(module -> {
 			try {
@@ -56,7 +63,18 @@ public class EntityManager extends Controller {
 			}
 		});
 	}
-	
+
+	public EntityManager(Class<? extends JAXBEntity> targetClass) throws IOException {
+		super(ResourceTarget.class.getResource("fxml/entity-manager.fxml"));
+
+		init();
+		
+		dirTable.setVisible(false);
+
+		dirTable.getItems().add(targetClass);
+
+	}
+
 	private void init() {
 		getStage().setTitle("Entity Manager");
 		EntityLoader.INSTANCE.addCreateChangeListener(entity -> {
@@ -73,6 +91,10 @@ public class EntityManager extends Controller {
 				entityTable.getItems().remove(entity);
 			}
 		});
+		
+		initEntityTable();
+		initDirTable();
+		initKeyBind();
 	}
 
 	private void initEntityTable() {
@@ -122,25 +144,14 @@ public class EntityManager extends Controller {
 			deleteEntityAction(selectionModel.getSelectedItems());
 		});
 
-		MenuItem copy = new MenuItem("Copy");
-		copy.setOnAction(event -> {
-			copyEntityAction(selectionModel.getSelectedItems());
-		});
-		MenuItem paste = new MenuItem("Paste");
-		paste.setOnAction(event -> {
-			pasteEntityAction();
-		});
-
-		contextMenu.getItems().addAll(create, edit, duplicate, delete, copy, paste);
+		contextMenu.getItems().addAll(create, edit, duplicate, delete);
 
 		contextMenu.setOnShowing(event -> {
 			boolean visible = !selectionModel.isEmpty();
 			edit.setVisible(visible);
 			duplicate.setVisible(visible);
 			delete.setVisible(visible);
-			copy.setVisible(visible);
 		});
-		
 
 	}
 
@@ -161,6 +172,22 @@ public class EntityManager extends Controller {
 
 	private void initKeyBind() {
 		var selectionModel = entityTable.getSelectionModel();
+		entityTable.addEventHandler(KeyEvent.KEY_PRESSED, keyEvent -> {
+			switch (keyEvent.getCode()) {
+			case DELETE:
+				if (selectionModel.isEmpty())
+					return;
+				deleteEntityAction(selectionModel.getSelectedItems());
+				break;
+			case A:
+				if (keyEvent.isControlDown()) {
+					selectionModel.selectAll();
+				}
+				break;
+			default:
+				break;
+			}
+		});
 		entityTable.addEventHandler(MouseEvent.MOUSE_CLICKED, mouseEvent -> {
 			switch (mouseEvent.getButton()) {
 			case PRIMARY:
@@ -175,42 +202,42 @@ public class EntityManager extends Controller {
 				break;
 			}
 		});
-		entityTable.addEventHandler(KeyEvent.KEY_PRESSED, keyEvent -> {
-			switch (keyEvent.getCode()) {
-			case DELETE:
-				if (selectionModel.isEmpty())
-					return;
-				deleteEntityAction(selectionModel.getSelectedItems());
-				break;
-			case A:
-				if (keyEvent.isControlDown()) {
-					selectionModel.selectAll();
-				}
-				break;
-			case C:
-				if (selectionModel.isEmpty())
-					return;
-				if (keyEvent.isControlDown()) {
-					copyEntityAction(selectionModel.getSelectedItems());
-				}
-				break;
-			case V:
-				if (selectionModel.isEmpty())
-					return;
-				if (keyEvent.isControlDown()) {
-					// TODO:
-					pasteEntityAction();
-				}
-				break;
-			default:
-				break;
-			}
+	}
+
+	private void initEntityManagerButtons() {
+		Button importEntity = new Button("Import");
+		importEntity.setOnAction(event -> {
+			FileChooser chooser = new FileChooser();
+			chooser.setTitle("Import");
+			chooser.getExtensionFilters().add(new ExtensionFilter("Owl", "*.owl"));
+			List<File> filesChoose = chooser.showOpenMultipleDialog(getStage());
+
+			if (filesChoose == null || filesChoose.size() == 0)
+				return;
+			List<Path> paths = filesChoose.stream().map(f -> f.toPath()).collect(Collectors.toList());
+			importEntitiesAction(paths);
 		});
+		buttonBar.getButtons().add(importEntity);
+
+		Button exportEntity = new Button("Export");
+		exportEntity.setOnAction(event -> {
+			DirectoryChooser chooser = new DirectoryChooser();
+			chooser.setTitle("Export");
+			File targetDir = chooser.showDialog(getStage());
+			if (targetDir == null)
+				return;
+
+			exportEntitiesAction(targetDir.toPath());
+		});
+		exportEntity.setDisable(true);
+		entityTable.getSelectionModel().selectedItemProperty().addListener((property, oldValue, newValue) -> {
+			exportEntity.setDisable(entityTable.getSelectionModel().isEmpty());
+		});
+		buttonBar.getButtons().add(exportEntity);
 
 	}
 
 	private void deleteEntityAction(List<JAXBEntity> jaxbEntities) {
-		// TODO:
 		List<JAXBEntity> entities = new ArrayList<>(jaxbEntities);
 		for (JAXBEntity entity : entities) {
 			EntityLoader.INSTANCE.deleteEntity(entity);
@@ -226,10 +253,6 @@ public class EntityManager extends Controller {
 		}
 	}
 
-	private void copyEntityAction(List<JAXBEntity> jaxbEntities) {
-		// TODO:
-	}
-
 	private void duplicateEntityAction(List<JAXBEntity> jaxbEntities) {
 		jaxbEntities.forEach(entity -> {
 			try {
@@ -241,19 +264,56 @@ public class EntityManager extends Controller {
 		});
 	}
 
-	private void pasteEntityAction() {
-		// TODO:
-	}
-
-	private void openEntityDir(Class<? extends JAXBEntity> target) {
-		// TODO:
-	}
-
 	private void createEntityAction(Class<? extends JAXBEntity> target) {
 		try {
 			EntityLoader.INSTANCE.createEntity(target);
 		} catch (JAXBException | IOException e) {
 			ErrorLogger.registerException(e);
+		}
+	}
+
+	private void importEntitiesAction(List<Path> paths) {
+		for (Path path : paths) {
+			try {
+				JAXBEntity entity = EntityLoader.INSTANCE.tryParseEntity(path);
+				try {
+					JAXBEntity newEntity = EntityLoader.INSTANCE.createEntity(entity.getClass());
+					newEntity.syncWith(entity);
+				} catch (JAXBException | IOException e) {
+					ErrorLogger.registerException(e);
+				}
+
+			} catch (FileNotFoundException e) {
+				ErrorLogger.registerException(e);
+			} catch (JAXBEntityValidateException e) {
+			} catch (Nullable e) {
+			}
+		}
+
+	}
+
+	private void exportEntitiesAction(Path dir) {
+		TableViewSelectionModel<JAXBEntity> selection = entityTable.getSelectionModel();
+		if (selection.isEmpty())
+			return;
+
+		for (JAXBEntity entity : selection.getSelectedItems()) {
+			Path out;
+			if (entity.getTitle() != null && entity.getTitle() != "") {
+				String fileName = entity.getTitle().replace(" ", "_").toLowerCase();
+				out = dir.resolve(fileName + ".owl");
+				if (Files.exists(out)) {
+					out = dir.resolve(fileName + "_" + System.currentTimeMillis() + ".owl");
+				}
+			} else {
+				out = dir.resolve(System.currentTimeMillis() + ".owl");
+			}
+
+			try {
+				Files.copy(entity.getPath(), out);
+			} catch (IOException e) {
+				ErrorLogger.registerException(e);
+			}
 		}
 	}
 

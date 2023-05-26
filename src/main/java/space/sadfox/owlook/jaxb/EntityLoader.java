@@ -31,17 +31,17 @@ public enum EntityLoader {
 	public static interface DeleteEntityListener {
 		void delete(JAXBEntity entity);
 	}
-
-	private Map<Path, JAXBEntity> loaded;
-	private List<CreateEntityListener> createListeners;
-	private List<DeleteEntityListener> deleteListeners;
-	private final String extension = ".owl";
-
-	EntityLoader() {
-		loaded = new HashMap<>();
-		createListeners = new ArrayList<>();
-		deleteListeners = new ArrayList<>();
+	
+	@FunctionalInterface
+	public static interface DuplicateEntityListener<T extends JAXBEntity> {
+		void duplicate(T oldEntity, T newEntity);
 	}
+
+	private final Map<Path, JAXBEntity> loaded = new HashMap<>();;
+	private final List<CreateEntityListener> createListeners = new ArrayList<>();
+	private final List<DeleteEntityListener> deleteListeners = new ArrayList<>();
+	private final List<DuplicateEntityListener> duplicateListeners = new ArrayList<>();
+	private final String extension = ".owl";
 
 	public boolean isLoad(Path path) {
 		return loaded.containsKey(path.toAbsolutePath());
@@ -158,15 +158,29 @@ public enum EntityLoader {
 	}
 
 	public <T extends JAXBEntity> T duplicateEntity(T entity) throws JAXBException, IOException {
+		@SuppressWarnings("unchecked")
 		T newEntity = (T) createEntity(entity.getClass());
 		newEntity.syncWith(entity);
+		notifyDuplicateChangeListeners(entity, newEntity);
 		return newEntity;
 	}
 
+	//TODO: Добавить логирование
 	public <T extends JAXBEntity> boolean deleteEntity(T entity) {
 		try {
 			Files.delete(entity.getPath());
 			loaded.remove(entity.getPath());
+			try {
+				Files.find(entity.getPath().getParent(), 1, (p, basicFileAttributes) -> {
+					return p.getFileName().toString().startsWith(entity.getFileName() + ".owl");
+				}).forEach(p -> {
+					try {
+						Files.delete(p);
+					} catch (IOException e) {
+					}
+				});
+			} catch (IOException e) {
+			}
 			entity.notifyEntityChangeListeners(new Change() {
 
 				@Override
@@ -209,6 +223,24 @@ public enum EntityLoader {
 
 	private void notifyDeleteChangeListeners(JAXBEntity entity) {
 		deleteListeners.forEach(i -> i.delete(entity));
+	}
+	
+	
+	
+	
+	
+	
+	
+	public void addDuplicateChangeListener(DuplicateEntityListener listener) {
+		duplicateListeners.add(listener);
+	}
+
+	public void removeDuplicateChangeListener(DuplicateEntityListener listener) {
+		duplicateListeners.remove(listener);
+	}
+
+	private <T extends JAXBEntity> void notifyDuplicateChangeListeners(T oldEntity, T newEntity) {
+		duplicateListeners.forEach(i -> i.duplicate(oldEntity, newEntity));
 	}
 
 	private Path validatePath(String fileName, Class<?> target) {

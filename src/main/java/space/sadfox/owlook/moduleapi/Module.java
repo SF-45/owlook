@@ -9,6 +9,7 @@ public interface Module {
 	String getModuleName();
 	String getModuleDescription();
 	String getModuleVersion();
+	void initModule();
 	List<Class<? extends JAXBEntity>> getJaxbEntities() throws Nullable;
 	
 	default List<Tool> getTools() {
