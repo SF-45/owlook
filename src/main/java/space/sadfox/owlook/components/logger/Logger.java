@@ -8,6 +8,7 @@ import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
+import space.sadfox.owlook.jaxb.ControllerNotDefined;
 import space.sadfox.owlook.jaxb.JAXBEntity;
 import space.sadfox.owlook.ui.base.Controller;
 import space.sadfox.owlook.utils.Nullable;
@@ -51,8 +52,8 @@ public class Logger extends JAXBEntity {
 	}
 
 	@Override
-	public Controller getConfigController() throws IOException, Nullable {
-		throw new Nullable();
+	public Controller getConfigController() throws IOException, ControllerNotDefined {
+		throw new ControllerNotDefined();
 	}
 
 	@Override

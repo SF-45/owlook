@@ -56,7 +56,7 @@ public abstract class JAXBEntity implements ChangeHistoryKeeping {
 	}
 	public abstract String getTitle();
 	public abstract void setTitle(String title);
-	public abstract Controller getConfigController() throws IOException, Nullable;
+	public abstract Controller getConfigController() throws IOException, ControllerNotDefined;
 	public abstract String getExtension();
 	public abstract void validate() throws JAXBEntityValidateException;
 	public abstract void initialize();

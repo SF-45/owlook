@@ -28,6 +28,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import space.sadfox.owlook.ResourceTarget;
+import space.sadfox.owlook.jaxb.ControllerNotDefined;
 import space.sadfox.owlook.jaxb.EntityLoader;
 import space.sadfox.owlook.jaxb.JAXBEntity;
 import space.sadfox.owlook.jaxb.JAXBEntityValidateException;
@@ -249,7 +250,7 @@ public class EntityManager extends Controller {
 			jaxbEntitiy.getConfigController().show();
 		} catch (IOException e) {
 			ErrorLogger.registerException(e);
-		} catch (Nullable e) {
+		} catch (ControllerNotDefined e) {
 		}
 	}
 
