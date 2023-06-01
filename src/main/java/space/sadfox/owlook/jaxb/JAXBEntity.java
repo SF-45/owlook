@@ -70,7 +70,7 @@ public abstract class JAXBEntity implements ChangeHistoryKeeping {
 		changeListeners.remove(listener);
 	}
 
-	void notifyEntityChangeListeners(EntityChangeListener.Change change) {
+	protected void notifyEntityChangeListeners(EntityChangeListener.Change change) {
 		changeListeners.forEach(l -> l.change(change));
 	}
 	

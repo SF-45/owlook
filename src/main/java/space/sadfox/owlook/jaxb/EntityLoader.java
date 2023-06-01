@@ -181,6 +181,7 @@ public enum EntityLoader {
 				});
 			} catch (IOException e) {
 			}
+			
 			entity.notifyEntityChangeListeners(new Change() {
 
 				@Override
