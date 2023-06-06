@@ -177,6 +177,7 @@ public enum EntityLoader {
 					try {
 						Files.delete(p);
 					} catch (IOException e) {
+						e.printStackTrace();
 					}
 				});
 			} catch (IOException e) {

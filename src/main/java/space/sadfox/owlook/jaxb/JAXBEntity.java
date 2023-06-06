@@ -14,13 +14,9 @@ public abstract class JAXBEntity implements ChangeHistoryKeeping {
 	
 	private JAXBHelper<?> jaxbHelper;
 	private ChangeHistory changeHistory;
-	private List<EntityChangeListener> changeListeners;
+	private List<EntityChangeListener> changeListeners = new ArrayList<>();
 	private Path path;
 
-	public JAXBEntity() {
-		changeListeners = new ArrayList<>();
-	}
-	
 	public JAXBHelper<?> getJaxbHelper() {
 		return jaxbHelper;
 	}
@@ -71,7 +67,7 @@ public abstract class JAXBEntity implements ChangeHistoryKeeping {
 	}
 
 	protected void notifyEntityChangeListeners(EntityChangeListener.Change change) {
-		changeListeners.forEach(l -> l.change(change));
+		changeListeners.forEach(listener -> listener.change(change));
 	}
 	
 	
