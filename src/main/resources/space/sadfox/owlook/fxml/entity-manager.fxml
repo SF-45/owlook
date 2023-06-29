@@ -9,7 +9,7 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="546.0" prefWidth="998.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <SplitPane dividerPositions="0.20682730923694778, 0.643574297188755" layoutX="202.0" layoutY="41.0" prefHeight="502.0" prefWidth="998.0" AnchorPane.bottomAnchor="44.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <SplitPane dividerPositions="0.20682730923694778, 0.643574297188755" layoutX="202.0" layoutY="41.0" prefHeight="502.0" prefWidth="998.0" AnchorPane.bottomAnchor="45.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <items>
             <TableView fx:id="dirTable" prefHeight="449.0" prefWidth="200.0">
                <columnResizePolicy>
@@ -20,7 +20,7 @@
             <TextArea fx:id="previewArea" editable="false" prefHeight="449.0" prefWidth="634.0" />
          </items>
       </SplitPane>
-      <ButtonBar fx:id="buttonBar" buttonMinWidth="1.0" buttonOrder="" layoutX="798.0" layoutY="500.0" prefHeight="46.0" prefWidth="998.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="500.0">
+      <ButtonBar fx:id="buttonBar" buttonMinWidth="1.0" buttonOrder="" layoutX="798.0" layoutY="500.0" prefHeight="45.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
          <padding>
             <Insets left="5.0" right="5.0" />
          </padding>

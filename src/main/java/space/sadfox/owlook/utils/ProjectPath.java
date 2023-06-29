@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 
 public enum ProjectPath {
     CONFiG("conf",false),
+    RESOURCES("res",false),
     DATA("data", false),
     TEMP("temp", true),
     LOG("log", false),

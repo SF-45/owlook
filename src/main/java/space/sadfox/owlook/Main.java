@@ -1,5 +1,6 @@
 package space.sadfox.owlook;
 
+
 import space.sadfox.owlook.utils.ErrorLogger;
 
 public class Main {

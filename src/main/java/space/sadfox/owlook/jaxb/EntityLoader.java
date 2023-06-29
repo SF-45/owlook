@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import jakarta.xml.bind.JAXBException;
@@ -47,7 +48,7 @@ public enum EntityLoader {
 		return loaded.containsKey(path.toAbsolutePath());
 	}
 
-	public boolean entityExist(String fileName, Class<?> target) {
+	public boolean entityExist(String fileName, Class<? extends JAXBEntity> target) {
 		Path path = validatePath(fileName, target);
 		return Files.exists(path);
 	}
@@ -101,7 +102,7 @@ public enum EntityLoader {
 		List<T> entitiesList = new ArrayList<>();
 		List<Path> entityPaths;
 
-		Path path = validatePath(target);
+		Path path = JAXBEntity.getConfigPath(target);
 
 		try {
 			entityPaths = Files.find(path, 1, (p, basicFileAttributes) -> {
@@ -123,7 +124,7 @@ public enum EntityLoader {
 	}
 
 	private <T extends JAXBEntity> T createEntity(String fileName, Class<T> target) throws JAXBException, IOException {
-		Path path = validatePath(target);
+		Path path = JAXBEntity.getConfigPath(target);
 
 		if (Files.isDirectory(path) && Files.notExists(path)) {
 			Files.createDirectories(path);
@@ -183,6 +184,10 @@ public enum EntityLoader {
 			} catch (IOException e) {
 			}
 			
+			if (entity.resourcesExist()) {
+				Files.delete(entity.getResourcesPath());
+			}
+			
 			entity.notifyEntityChangeListeners(new Change() {
 
 				@Override
@@ -227,12 +232,6 @@ public enum EntityLoader {
 		deleteListeners.forEach(i -> i.delete(entity));
 	}
 	
-	
-	
-	
-	
-	
-	
 	public void addDuplicateChangeListener(DuplicateEntityListener listener) {
 		duplicateListeners.add(listener);
 	}
@@ -245,19 +244,13 @@ public enum EntityLoader {
 		duplicateListeners.forEach(i -> i.duplicate(oldEntity, newEntity));
 	}
 
-	private Path validatePath(String fileName, Class<?> target) {
-		Path path = ProjectPath.CONFiG.getPath().resolve(target.getPackageName()).toAbsolutePath();
+	private Path validatePath(String fileName, Class<? extends JAXBEntity> target) {
+		Path path = JAXBEntity.getConfigPath(target);
 		if (!fileName.endsWith(extension)) {
 			return path.resolve(fileName + extension);
 		} else {
 			return path.resolve(fileName);
 		}
-	}
-
-	private Path validatePath(Class<?> target) {
-		Path path = ProjectPath.CONFiG.getPath().resolve(target.getPackageName()).toAbsolutePath();
-
-		return path;
 	}
 
 	private String generateFileName() {
