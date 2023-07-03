@@ -167,7 +167,11 @@ public class EntityManager extends Controller {
 
 			entityTable.getItems().clear();
 			previewArea.setText("");
-			entityTable.getItems().addAll(EntityLoader.INSTANCE.loadAllEntities(newValue));
+			try {
+				entityTable.getItems().addAll(EntityLoader.INSTANCE.loadAllEntities(newValue));
+			} catch (IOException e) {
+				ErrorLogger.registerException(e);
+			}
 		});
 	}
 

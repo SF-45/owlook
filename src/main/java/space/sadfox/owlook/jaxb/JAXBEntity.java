@@ -4,9 +4,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import jakarta.xml.bind.JAXBException;
 import space.sadfox.owlook.moduleapi.ChangeHistoryKeeping;
 import space.sadfox.owlook.ui.base.Controller;
 import space.sadfox.owlook.utils.ErrorLogger;
@@ -17,7 +23,7 @@ public abstract class JAXBEntity implements ChangeHistoryKeeping {
 	private JAXBHelper<?> jaxbHelper;
 	private ChangeHistory changeHistory;
 	private List<EntityChangeListener> changeListeners = new ArrayList<>();
-	private Path path;
+	private boolean externalEntity;
 
 	public JAXBHelper<?> getJaxbHelper() {
 		return jaxbHelper;
@@ -26,13 +32,17 @@ public abstract class JAXBEntity implements ChangeHistoryKeeping {
 	void setJaxbHelper(JAXBHelper<?> jaxbHelper) {
 		this.jaxbHelper = jaxbHelper;
 	}
-
-	public Path getPath() {
-		return path;
+	
+	public boolean isExternalEntity() {
+		return externalEntity;
+	}
+	
+	void setExternalEnity(boolean externalEntity) {
+		this.externalEntity = externalEntity;
 	}
 
-	void setPath(Path path) {
-		this.path = path;
+	public Path getPath() {
+		return getJaxbHelper().getPath();
 	}
 
 	public ChangeHistory getChangeHistory() {
@@ -50,9 +60,14 @@ public abstract class JAXBEntity implements ChangeHistoryKeeping {
 	}
 
 	public String getFileName() {
-		String fileName = path.getFileName().toString();
+		String fileName = getPath().getFileName().toString();
 		int ind = fileName.lastIndexOf(".");
 		return fileName.substring(0, ind);
+	}
+
+	public UUID getId() {
+		return UUID.fromString(getFileName());
+
 	}
 
 	public abstract String getTitle();
@@ -81,8 +96,18 @@ public abstract class JAXBEntity implements ChangeHistoryKeeping {
 		changeListeners.forEach(listener -> listener.change(change));
 	}
 
-	public static Path getConfigPath(Class<? extends JAXBEntity> target) {
-		return ProjectPath.CONFiG.getPath().resolve(target.getPackageName()).toAbsolutePath();
+	static Path getConfigPath(Class<? extends JAXBEntity> target) {
+		Path path = ProjectPath.CONFiG.getPath().resolve(target.getPackageName()).toAbsolutePath();
+
+		if (Files.isDirectory(path) && Files.notExists(path)) {
+			try {
+				Files.createDirectories(path);
+			} catch (IOException e) {
+				ErrorLogger.registerException(e);
+			}
+		}
+
+		return path;
 	}
 
 	public Path getResourcesPath() {

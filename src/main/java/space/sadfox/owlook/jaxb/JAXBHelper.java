@@ -8,12 +8,15 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Date;
+import java.util.UUID;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
+import space.sadfox.owlook.components.logger.LogLevel;
 import space.sadfox.owlook.utils.ErrorLogger;
+import space.sadfox.owlook.utils.LoggerMessage;
 
 public class JAXBHelper<T extends JAXBEntity> {
 
@@ -74,8 +77,9 @@ public class JAXBHelper<T extends JAXBEntity> {
 			}
 		}
 		instance.setJaxbHelper(this);
-		instance.setPath(path);
 		instance.getChangeHistory();
+		instance.validate();
+		instance.initialize();
 		// AutoSave here
 		instance.addEntityChangeListener(change -> {
 			if (change.wasModify()) {
@@ -117,5 +121,27 @@ public class JAXBHelper<T extends JAXBEntity> {
 		} catch (JAXBException | IOException e) {
 			ErrorLogger.registerException(e);
 		}
+	}
+	
+	void validateAndfixID() {
+		try {
+			getInstance().getId();
+		} catch (IllegalArgumentException e) {
+			try {
+				Files.deleteIfExists(path);
+			} catch (IOException e1) {}
+			String oldName = path.getFileName().toString();
+			path = path.getParent().resolve(EntityLoader.INSTANCE.generateFileName());
+			saveImmediately();
+			
+			LoggerMessage massage = new LoggerMessage(LogLevel.WARNING);
+			massage.setName("Bad ID instance [" + oldName + "]");
+			massage.setMessage("Instance [" + oldName+ "] is bad ID. New ID=[" + instance.getId() + "]");
+			ErrorLogger.registerMessage(massage);
+		}
+	}
+
+	public Path getPath() {
+		return path;
 	}
 }
