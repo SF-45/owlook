@@ -111,7 +111,7 @@ public abstract class JAXBEntity implements ChangeHistoryKeeping {
 	}
 
 	public Path getResourcesPath() {
-		Path entityResPath = ProjectPath.RESOURCES.getPath().resolve(getClass().getPackageName()).resolve(getFileName())
+		Path entityResPath = ProjectPath.RESOURCES.getPath().resolve(getFileName())
 				.toAbsolutePath();
 		if (Files.notExists(entityResPath)) {
 			try {
@@ -125,7 +125,7 @@ public abstract class JAXBEntity implements ChangeHistoryKeeping {
 	}
 
 	public boolean resourcesExist() {
-		Path resPath = ProjectPath.RESOURCES.getPath().resolve(getClass().getPackageName()).toAbsolutePath();
+		Path resPath = ProjectPath.RESOURCES.getPath().toAbsolutePath();
 		Path entityResPath = resPath.resolve(getFileName()).toAbsolutePath();
 
 		if (Files.exists(resPath)) {

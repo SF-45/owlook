@@ -6,19 +6,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.FileUtils;
+
 import jakarta.xml.bind.JAXBException;
-import space.sadfox.owlook.components.logger.LogLevel;
 import space.sadfox.owlook.jaxb.EntityChangeListener.Change;
 import space.sadfox.owlook.moduleapi.Module;
 import space.sadfox.owlook.utils.ErrorLogger;
-import space.sadfox.owlook.utils.LoggerMessage;
 import space.sadfox.owlook.utils.ModuleLoader;
 import space.sadfox.owlook.utils.Nullable;
 
@@ -83,19 +81,20 @@ public enum EntityLoader {
 
 		return instance;
 	}
-	
+
 	@SuppressWarnings("unchecked")
-	public synchronized <T extends JAXBEntity> T createOrLoadExternalEntity(Path path, Class<T> target) throws JAXBException, IOException {
+	public synchronized <T extends JAXBEntity> T createOrLoadExternalEntity(Path path, Class<T> target)
+			throws JAXBException, IOException {
 		if (externalLoaded.containsKey(path)) {
 			return (T) externalLoaded.get(path);
 		}
-		
+
 		T instance = new JAXBHelper<>(path, target).getInstance();
 		instance.setExternalEnity(true);
 		externalLoaded.put(path, instance);
 		instance.saveImmediately();
 		notifyCreateChangeListeners(instance);
-		
+
 		return instance;
 	}
 
@@ -208,7 +207,8 @@ public enum EntityLoader {
 			}
 
 			if (entity.resourcesExist()) {
-				Files.delete(entity.getResourcesPath());
+				FileUtils.deleteDirectory(entity.getResourcesPath().toFile());
+				//Files.delete(entity.getResourcesPath());
 			}
 
 			entity.notifyEntityChangeListeners(new Change() {

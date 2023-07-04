@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>space.sadfox</groupId>
 	<artifactId>owlook</artifactId>
@@ -12,13 +14,15 @@
 	</properties>
 	<dependencies>
 		<!-- JPA -->
-		<!-- https://mvnrepository.com/artifact/javax.persistence/javax.persistence-api -->
+		<!--
+		https://mvnrepository.com/artifact/javax.persistence/javax.persistence-api -->
 		<dependency>
 			<groupId>javax.persistence</groupId>
 			<artifactId>javax.persistence-api</artifactId>
 			<version>2.2</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/javax.annotation/javax.annotation-api -->
+		<!--
+		https://mvnrepository.com/artifact/javax.annotation/javax.annotation-api -->
 		<dependency>
 			<groupId>javax.annotation</groupId>
 			<artifactId>javax.annotation-api</artifactId>
@@ -43,7 +47,8 @@
 		<!--            <version>4.0.0</version>-->
 		<!--            <scope>runtime</scope>-->
 		<!--        </dependency>-->
-		<!--         https://mvnrepository.com/artifact/jakarta.xml.bind/jakarta.xml.bind-api-->
+		<!--
+		https://mvnrepository.com/artifact/jakarta.xml.bind/jakarta.xml.bind-api-->
 		<dependency>
 			<groupId>jakarta.xml.bind</groupId>
 			<artifactId>jakarta.xml.bind-api</artifactId>
@@ -74,7 +79,8 @@
 			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<!--        &lt;!&ndash; https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc &ndash;&gt;-->
+		<!--        &lt;!&ndash;
+		https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc &ndash;&gt;-->
 		<!--        <dependency>-->
 		<!--            <groupId>org.xerial</groupId>-->
 		<!--            <artifactId>sqlite-jdbc</artifactId>-->
@@ -141,7 +147,8 @@
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/eu.hansolo/tilesfx -->
 		<!-- https://github.com/HanSolo/tilesfx/wiki  -->
-		<!-- TilesFX — это библиотека JavaFX, содержащая плитки для информационных панелей. -->
+		<!-- TilesFX — это библиотека JavaFX, содержащая плитки для
+		информационных панелей. -->
 		<dependency>
 			<groupId>eu.hansolo</groupId>
 			<artifactId>tilesfx</artifactId>
@@ -160,7 +167,15 @@
 			<artifactId>richtextfx</artifactId>
 			<version>0.10.9</version>
 		</dependency>
+
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.13.0</version>
+		</dependency>
 	</dependencies>
+
+
 	<build>
 		<plugins>
 			<plugin>
@@ -282,7 +297,8 @@
 					<execution>
 						<id>default-cli</id>
 						<configuration>
-							<mainClass>space.sadfox.owlook/space.sadfox.owlook.Main</mainClass>
+							<mainClass>
+								space.sadfox.owlook/space.sadfox.owlook.Main</mainClass>
 						</configuration>
 					</execution>
 				</executions>
