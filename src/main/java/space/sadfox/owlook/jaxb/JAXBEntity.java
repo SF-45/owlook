@@ -4,18 +4,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import jakarta.xml.bind.JAXBException;
 import space.sadfox.owlook.moduleapi.ChangeHistoryKeeping;
 import space.sadfox.owlook.ui.base.Controller;
-import space.sadfox.owlook.utils.ErrorLogger;
+import space.sadfox.owlook.utils.OwlLogger;
 import space.sadfox.owlook.utils.ProjectPath;
 
 public abstract class JAXBEntity implements ChangeHistoryKeeping {
@@ -33,7 +28,7 @@ public abstract class JAXBEntity implements ChangeHistoryKeeping {
 		this.jaxbHelper = jaxbHelper;
 	}
 	
-	public boolean isExternalEntity() {
+	public final boolean isExternalEntity() {
 		return externalEntity;
 	}
 	
@@ -41,31 +36,31 @@ public abstract class JAXBEntity implements ChangeHistoryKeeping {
 		this.externalEntity = externalEntity;
 	}
 
-	public Path getPath() {
+	public final Path getPath() {
 		return getJaxbHelper().getPath();
 	}
 
-	public ChangeHistory getChangeHistory() {
+	public final ChangeHistory getChangeHistory() {
 		if (changeHistory == null)
 			changeHistory = new ChangeHistory(this);
 		return changeHistory;
 	}
 
-	public void save() {
+	public final void save() {
 		getJaxbHelper().save();
 	}
 
-	public void saveImmediately() {
+	public final void saveImmediately() {
 		getJaxbHelper().saveImmediately();
 	}
 
-	public String getFileName() {
+	public final String getFileName() {
 		String fileName = getPath().getFileName().toString();
 		int ind = fileName.lastIndexOf(".");
 		return fileName.substring(0, ind);
 	}
 
-	public UUID getId() {
+	public final UUID getId() {
 		return UUID.fromString(getFileName());
 
 	}
@@ -76,23 +71,21 @@ public abstract class JAXBEntity implements ChangeHistoryKeeping {
 
 	public abstract Controller getConfigController() throws IOException, ControllerNotDefined;
 
-	public abstract String getExtension();
-
 	public abstract void validate() throws JAXBEntityValidateException;
 
 	public abstract void initialize();
 
 	public abstract void syncWith(JAXBEntity entity);
 
-	public void addEntityChangeListener(EntityChangeListener listener) {
+	public final void addEntityChangeListener(EntityChangeListener listener) {
 		changeListeners.add(listener);
 	}
 
-	public void removeEntityChangeListener(EntityChangeListener listener) {
+	public final void removeEntityChangeListener(EntityChangeListener listener) {
 		changeListeners.remove(listener);
 	}
 
-	protected void notifyEntityChangeListeners(EntityChangeListener.Change change) {
+	protected final void notifyEntityChangeListeners(EntityChangeListener.Change change) {
 		changeListeners.forEach(listener -> listener.change(change));
 	}
 
@@ -103,28 +96,28 @@ public abstract class JAXBEntity implements ChangeHistoryKeeping {
 			try {
 				Files.createDirectories(path);
 			} catch (IOException e) {
-				ErrorLogger.registerException(e);
+				OwlLogger.registerException(1, e);
 			}
 		}
 
 		return path;
 	}
 
-	public Path getResourcesPath() {
+	public final Path getResourcesPath() {
 		Path entityResPath = ProjectPath.RESOURCES.getPath().resolve(getFileName())
 				.toAbsolutePath();
 		if (Files.notExists(entityResPath)) {
 			try {
 				Files.createDirectory(entityResPath);
 			} catch (IOException e) {
-				ErrorLogger.registerException(e);
+				OwlLogger.registerException(1, e);
 			}
 		}
 
 		return entityResPath;
 	}
 
-	public boolean resourcesExist() {
+	public final boolean resourcesExist() {
 		Path resPath = ProjectPath.RESOURCES.getPath().toAbsolutePath();
 		Path entityResPath = resPath.resolve(getFileName()).toAbsolutePath();
 

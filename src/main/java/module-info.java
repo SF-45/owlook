@@ -1,8 +1,7 @@
 import space.sadfox.owlook.moduleapi.ModuleBac;
-import space.sadfox.owlook.moduleapi.Tool;
 import space.sadfox.owlook.moduleapi.ModuleExtension;
+import space.sadfox.owlook.moduleapi.Tool;
 import space.sadfox.owlook.moduleapi.Workspace;
-import space.sadfox.owlook.moduleapi.Module;
 
 module space.sadfox.owlook {
 	requires transitive javafx.base;
@@ -31,8 +30,7 @@ module space.sadfox.owlook {
     requires org.fxmisc.flowless;
     requires reactfx;
     
-    opens space.sadfox.owlook.components.logger to jakarta.xml.bind;
-    opens space.sadfox.owlook.components.bootpatch to jakarta.xml.bind;
+    opens space.sadfox.owlook.logger to jakarta.xml.bind;
     opens space.sadfox.owlook.ui to javafx.fxml;
     opens space.sadfox.owlook.ui.tools to javafx.fxml;
     
@@ -45,8 +43,7 @@ module space.sadfox.owlook {
     exports space.sadfox.owlook.jaxb;
     exports space.sadfox.owlook.jaxb.adapters;
     exports space.sadfox.owlook.utils;
-    exports space.sadfox.owlook.components.bootpatch;
-    exports space.sadfox.owlook.components.logger;
+    exports space.sadfox.owlook.logger;
     exports space.sadfox.owlook.ui.base;
     exports space.sadfox.owlook.ui.tools;
     

@@ -10,14 +10,14 @@ import java.util.ServiceLoader.Provider;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import space.sadfox.owlook.moduleapi.Module;
 import space.sadfox.owlook.moduleapi.ModuleExtension;
 import space.sadfox.owlook.moduleapi.Workspace;
-import space.sadfox.owlook.moduleapi.Module;
 
 public enum ModuleLoader {
 	INSTANCE;
 
-	private ModuleLayer moduleLayer;
+	private ModuleLayer moduleLayer;	
 
 	private void updateModuleList() {
 		// Будем искать плагины в папке plugins

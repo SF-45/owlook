@@ -17,11 +17,11 @@ import javafx.scene.layout.BorderPane;
 import space.sadfox.owlook.Main;
 import space.sadfox.owlook.jaxb.EntityLoader;
 import space.sadfox.owlook.jaxb.JAXBEntity;
+import space.sadfox.owlook.moduleapi.ModuleBac;
 import space.sadfox.owlook.moduleapi.WorkspaceAPI;
 import space.sadfox.owlook.moduleapi.WorkspaceUI;
 import space.sadfox.owlook.ui.base.Controller;
-import space.sadfox.owlook.utils.ErrorLogger;
-import space.sadfox.owlook.moduleapi.ModuleBac;
+import space.sadfox.owlook.utils.OwlLogger;
 
 public class MainStage2 extends Controller {
 
@@ -86,7 +86,7 @@ public class MainStage2 extends Controller {
 							tableTabPane.getTabs().add(tab);
 							tableTabPane.getSelectionModel().select(tab);
 						} catch (JAXBException e) {
-							ErrorLogger.registerException(e);
+							OwlLogger.registerException(1, e);
 						}
 					});
 					menu.getItems().add(wsMenu);

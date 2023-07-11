@@ -1,4 +1,4 @@
-package space.sadfox.owlook.components.logger;
+package space.sadfox.owlook.logger;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -11,7 +11,6 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 import space.sadfox.owlook.jaxb.ControllerNotDefined;
 import space.sadfox.owlook.jaxb.JAXBEntity;
 import space.sadfox.owlook.ui.base.Controller;
-import space.sadfox.owlook.utils.Nullable;
 
 
 @XmlAccessorType(XmlAccessType.NONE)
@@ -23,11 +22,6 @@ public class Logger extends JAXBEntity {
 	@XmlElement(name = "log")
 	public List<LoggerEntry> getLogs() {
 		return logs;
-	}
-
-	@Override
-	public String getExtension() {
-		return ".log";
 	}
 
 	@Override

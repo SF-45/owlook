@@ -15,10 +15,14 @@ import org.apache.commons.io.FileUtils;
 
 import jakarta.xml.bind.JAXBException;
 import space.sadfox.owlook.jaxb.EntityChangeListener.Change;
+import space.sadfox.owlook.logger.LogLevel;
+import space.sadfox.owlook.moduleapi.ModuleHasNoConfiguration;
 import space.sadfox.owlook.moduleapi.Module;
-import space.sadfox.owlook.utils.ErrorLogger;
+import space.sadfox.owlook.utils.LoggerMessage;
 import space.sadfox.owlook.utils.ModuleLoader;
 import space.sadfox.owlook.utils.Nullable;
+import space.sadfox.owlook.utils.OwlLogger;
+import space.sadfox.owlook.utils.ProjectPath;
 
 public enum EntityLoader {
 
@@ -48,8 +52,7 @@ public enum EntityLoader {
 	private final String extension = ".owl";
 
 	@SuppressWarnings("unchecked")
-	public synchronized <T extends JAXBEntity> T loadEntity(String fileName, Class<T> target) throws JAXBException {
-		try {
+	public synchronized <T extends JAXBEntity> T loadEntity(String fileName, Class<T> target) throws JAXBException, FileNotFoundException {
 			Path path = generatePath(fileName, target);
 			if (Files.notExists(path))
 				throw new FileNotFoundException(path + " not found");
@@ -63,10 +66,6 @@ public enum EntityLoader {
 			instance.getJaxbHelper().validateAndfixID();
 			loaded.put(instance.getId(), instance);
 			return instance;
-
-		} catch (FileNotFoundException e) {
-			throw new JAXBException(e);
-		}
 	}
 
 	public synchronized <T extends JAXBEntity> T createEntity(Class<T> target) throws JAXBException, IOException {
@@ -96,6 +95,16 @@ public enum EntityLoader {
 		notifyCreateChangeListeners(instance);
 
 		return instance;
+	}
+	
+	public synchronized <T extends JAXBEntity> T createOrLoadModuleConfiguration(Module module, Class<T> target) throws JAXBException, IOException {
+		Path path = ProjectPath.MODULE_LIB.getPath().resolve(module.getModuleName() + ".owl");
+		return createOrLoadExternalEntity(path, target);
+	}
+	
+	public synchronized JAXBEntity createOrLoadModuleConfiguration(Module module) throws JAXBException, IOException, ModuleHasNoConfiguration {
+		Path path = ProjectPath.MODULE_LIB.getPath().resolve(module.getModuleName() + ".owl");
+		return createOrLoadExternalEntity(path, module.getConfigTarget());
 	}
 
 //	public synchronized <T extends JAXBEntity> T loadEntityAndValidateID(String fileName, Class<T> target)
@@ -127,9 +136,14 @@ public enum EntityLoader {
 			try {
 				return loadEntity(p.getFileName().toString(), target);
 			} catch (JAXBException e) {
-				ErrorLogger.registerException(e);
-				return null;
+				OwlLogger.registerException(1, e);
+			} catch (FileNotFoundException e) {
+				LoggerMessage message = new LoggerMessage(LogLevel.WARNING);
+				message.setName("Instance Not Found");
+				message.setMessage("Instance [" + p.getFileName() + "] not found in " + target.getPackageName());
+				OwlLogger.registerMessage(message);
 			}
+			return null;
 		}).collect(Collectors.toList());
 
 //		Set<UUID> uuids = new HashSet<>();
@@ -226,7 +240,7 @@ public enum EntityLoader {
 			notifyDeleteChangeListeners(entity);
 			return true;
 		} catch (IOException e) {
-			ErrorLogger.registerException(e);
+			OwlLogger.registerException(1, e);
 		}
 		return false;
 	}

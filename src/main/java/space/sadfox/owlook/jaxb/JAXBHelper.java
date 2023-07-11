@@ -8,15 +8,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Date;
-import java.util.UUID;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
-import space.sadfox.owlook.components.logger.LogLevel;
-import space.sadfox.owlook.utils.ErrorLogger;
+import space.sadfox.owlook.logger.LogLevel;
 import space.sadfox.owlook.utils.LoggerMessage;
+import space.sadfox.owlook.utils.OwlLogger;
 
 public class JAXBHelper<T extends JAXBEntity> {
 
@@ -34,7 +33,7 @@ public class JAXBHelper<T extends JAXBEntity> {
 				try {
 					Thread.sleep(1000);
 				} catch (InterruptedException e) {
-					ErrorLogger.registerException(e);
+					OwlLogger.registerException(1, e);
 				}
 				time++;
 			}
@@ -73,7 +72,7 @@ public class JAXBHelper<T extends JAXBEntity> {
 				instance = target.getConstructor().newInstance();
 			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
-				ErrorLogger.registerException(e);
+				OwlLogger.registerException(1, e);
 			}
 		}
 		instance.setJaxbHelper(this);
@@ -119,7 +118,7 @@ public class JAXBHelper<T extends JAXBEntity> {
 				marshaller.marshal(instance, outputStream);
 			}
 		} catch (JAXBException | IOException e) {
-			ErrorLogger.registerException(e);
+			OwlLogger.registerException(1, e);
 		}
 	}
 	
@@ -137,7 +136,7 @@ public class JAXBHelper<T extends JAXBEntity> {
 			LoggerMessage massage = new LoggerMessage(LogLevel.WARNING);
 			massage.setName("Bad ID instance [" + oldName + "]");
 			massage.setMessage("Instance [" + oldName+ "] is bad ID. New ID=[" + instance.getId() + "]");
-			ErrorLogger.registerMessage(massage);
+			OwlLogger.registerMessage(massage);
 		}
 	}
 

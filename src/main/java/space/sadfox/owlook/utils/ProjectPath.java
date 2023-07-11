@@ -13,7 +13,8 @@ public enum ProjectPath {
     TEMP("temp", true),
     LOG("log", false),
     MODULE("module", false),
-    MODULE_LIB("module-lib", false);
+    MODULE_LIB("module-lib", false),
+    MODULE_CONFIG("module-conf", false);
 
     private Path path;
     private boolean isTemp;
@@ -29,7 +30,7 @@ public enum ProjectPath {
                 Files.createDirectory(path);
                 if (isTemp) path.toFile().deleteOnExit();
             } catch (IOException e) {
-                ErrorLogger.registerException(e);
+                OwlLogger.registerException(1, e);
             }
         }
         return path;

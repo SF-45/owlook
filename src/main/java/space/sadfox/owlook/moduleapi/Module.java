@@ -11,14 +11,5 @@ public interface Module {
 	String getModuleVersion();
 	void initModule();
 	List<Class<? extends JAXBEntity>> getJaxbEntities() throws Nullable;
-	
-	default List<Tool> getTools() {
-		return null;
-	}
-	default List<ModuleExtension> getUtilities() {
-		return null;
-	}
-	default List<Workspace> getWorkspaces() {
-		return null;
-	}
+	Class<? extends JAXBEntity> getConfigTarget() throws ModuleHasNoConfiguration;
 }

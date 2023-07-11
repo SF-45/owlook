@@ -1,6 +1,6 @@
 package space.sadfox.owlook.utils;
 
-import space.sadfox.owlook.components.logger.LogLevel;
+import space.sadfox.owlook.logger.LogLevel;
 
 public class LoggerMessage {
 	private String name;

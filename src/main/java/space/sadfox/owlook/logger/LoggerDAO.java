@@ -1,4 +1,4 @@
-package space.sadfox.owlook.components.logger;
+package space.sadfox.owlook.logger;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

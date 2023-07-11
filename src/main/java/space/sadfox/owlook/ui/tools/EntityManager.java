@@ -33,9 +33,9 @@ import space.sadfox.owlook.jaxb.EntityLoader;
 import space.sadfox.owlook.jaxb.JAXBEntity;
 import space.sadfox.owlook.jaxb.JAXBEntityValidateException;
 import space.sadfox.owlook.ui.base.Controller;
-import space.sadfox.owlook.utils.ErrorLogger;
 import space.sadfox.owlook.utils.ModuleLoader;
 import space.sadfox.owlook.utils.Nullable;
+import space.sadfox.owlook.utils.OwlLogger;
 
 public class EntityManager extends Controller {
 
@@ -170,7 +170,7 @@ public class EntityManager extends Controller {
 			try {
 				entityTable.getItems().addAll(EntityLoader.INSTANCE.loadAllEntities(newValue));
 			} catch (IOException e) {
-				ErrorLogger.registerException(e);
+				OwlLogger.registerException(1, e);
 			}
 		});
 	}
@@ -253,7 +253,7 @@ public class EntityManager extends Controller {
 		try {
 			jaxbEntitiy.getConfigController().show();
 		} catch (IOException e) {
-			ErrorLogger.registerException(e);
+			OwlLogger.registerException(1, e);
 		} catch (ControllerNotDefined e) {
 		}
 	}
@@ -264,7 +264,7 @@ public class EntityManager extends Controller {
 				JAXBEntity copyEntity = EntityLoader.INSTANCE.duplicateEntity(entity);
 				copyEntity.setTitle(entity.getTitle() + "_(copy)");
 			} catch (JAXBException | IOException e) {
-				ErrorLogger.registerException(e);
+				OwlLogger.registerException(1, e);
 			}
 		});
 	}
@@ -273,7 +273,7 @@ public class EntityManager extends Controller {
 		try {
 			EntityLoader.INSTANCE.createEntity(target);
 		} catch (JAXBException | IOException e) {
-			ErrorLogger.registerException(e);
+			OwlLogger.registerException(1, e);
 		}
 	}
 
@@ -285,12 +285,13 @@ public class EntityManager extends Controller {
 					JAXBEntity newEntity = EntityLoader.INSTANCE.createEntity(entity.getClass());
 					newEntity.syncWith(entity);
 				} catch (JAXBException | IOException e) {
-					ErrorLogger.registerException(e);
+					OwlLogger.registerException(1, e);
 				}
 
 			} catch (FileNotFoundException e) {
-				ErrorLogger.registerException(e);
+				OwlLogger.registerException(1, e);
 			} catch (JAXBEntityValidateException e) {
+				OwlLogger.registerException(2, e);
 			} catch (Nullable e) {
 			}
 		}
@@ -317,7 +318,7 @@ public class EntityManager extends Controller {
 			try {
 				Files.copy(entity.getPath(), out);
 			} catch (IOException e) {
-				ErrorLogger.registerException(e);
+				OwlLogger.registerException(1, e);
 			}
 		}
 	}
