@@ -7,13 +7,17 @@ import java.util.List;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlValue;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import space.sadfox.owlook.jaxb.ControllerNotDefined;
 import space.sadfox.owlook.jaxb.JAXBEntity;
 import space.sadfox.owlook.jaxb.JAXBEntityValidateException;
@@ -26,6 +30,8 @@ public class OwlookConfigurationEntity extends JAXBEntity {
 	private final StringProperty title = new SimpleStringProperty("title");
 	private final IntegerProperty loggingDepth = new SimpleIntegerProperty(1);
 	private final BooleanProperty debugMode = new SimpleBooleanProperty(true);
+	private final BooleanProperty skipModuleManage = new SimpleBooleanProperty(false);
+	private final ObservableList<String> modules = FXCollections.observableArrayList();
 
 	@Override
 	@XmlElement
@@ -57,7 +63,7 @@ public class OwlookConfigurationEntity extends JAXBEntity {
 	}
 
 	@XmlElement
-	public boolean getDebugMode() {
+	public boolean isDebugMode() {
 		return debugModeProperty().get();
 	}
 	
@@ -68,6 +74,29 @@ public class OwlookConfigurationEntity extends JAXBEntity {
 	public BooleanProperty debugModeProperty() {
 		return debugMode;
 	}
+	
+	@XmlElement
+	public boolean isSkipModuleManage() {
+		return skipModuleManageProperty().get();
+	}
+	
+	public void setSkipModuleManage(boolean skipModuleManage) {
+		skipModuleManageProperty().set(skipModuleManage);
+	}
+	
+	public BooleanProperty skipModuleManageProperty() {
+		return skipModuleManage;
+	}
+	
+	@XmlElementWrapper(name = "modules")
+	@XmlElement(name = "module")
+	public List<String> getModules() {
+		return modulesProperty();
+	}
+	
+	public ObservableList<String> modulesProperty() {
+		return modules;
+	}
 
 	@Override
 	public Controller getConfigController() throws IOException, ControllerNotDefined {
@@ -77,7 +106,7 @@ public class OwlookConfigurationEntity extends JAXBEntity {
 	
 	@Override
 	public List<Object> getProperties() {
-		return Arrays.asList(title, loggingDepth, debugMode);
+		return Arrays.asList(title, loggingDepth, debugMode, modules, skipModuleManage);
 	}
 
 	@Override
@@ -99,7 +128,7 @@ public class OwlookConfigurationEntity extends JAXBEntity {
 		OwlookConfigurationEntity newConfig = (OwlookConfigurationEntity) entity;
 		
 		setLoggingDepth(newConfig.getLoggingDepth());
-		setDebugMode(newConfig.getDebugMode());
+		setDebugMode(newConfig.isDebugMode());
 	}
 
 }

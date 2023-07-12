@@ -5,8 +5,8 @@ import java.util.List;
 import space.sadfox.owlook.jaxb.JAXBEntity;
 import space.sadfox.owlook.utils.Nullable;
 
-public interface Module {
-	String getModuleName();
+public interface OwlookModule {
+	String getShortModuleDescription();
 	String getModuleDescription();
 	String getModuleVersion();
 	void initModule();

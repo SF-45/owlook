@@ -32,8 +32,8 @@ import space.sadfox.owlook.jaxb.ControllerNotDefined;
 import space.sadfox.owlook.jaxb.EntityLoader;
 import space.sadfox.owlook.jaxb.JAXBEntity;
 import space.sadfox.owlook.jaxb.JAXBEntityValidateException;
+import space.sadfox.owlook.moduleapi.ModuleLoader;
 import space.sadfox.owlook.ui.base.Controller;
-import space.sadfox.owlook.utils.ModuleLoader;
 import space.sadfox.owlook.utils.Nullable;
 import space.sadfox.owlook.utils.OwlLogger;
 
@@ -77,7 +77,7 @@ public class EntityManager extends Controller {
 	}
 
 	private void init() {
-		getStage().setTitle("Entity Manager");
+		stageTitle.set("Entity Manager");
 		EntityLoader.INSTANCE.addCreateChangeListener(entity -> {
 			if (dirTable.getSelectionModel().isEmpty())
 				return;

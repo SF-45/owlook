@@ -9,36 +9,21 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import space.sadfox.owlook.Main;
+import space.sadfox.owlook.moduleapi.ModuleLoader;
 import space.sadfox.owlook.moduleapi.Workspace;
-import space.sadfox.owlook.moduleapi.Module;
 import space.sadfox.owlook.ui.base.Controller;
 import space.sadfox.owlook.ui.tools.EntityManager;
-import space.sadfox.owlook.utils.ModuleLoader;
 
 public class MainStage extends Controller {
 	
-	@FXML
-    private ListView<Module> moduleList;
 
     @FXML
     private ListView<Workspace> wsList;
 
 	public MainStage() throws IOException {
 		super(Main.class.getResource("fxml/main-scene.fxml"));
+		stageTitle.set("Owlook");
 		
-		moduleList.setCellFactory(param -> {
-			return new ListCell<> () {
-				@Override
-	            public void updateItem(Module module, boolean empty) {
-	                super.updateItem(module, empty);
-	                if (empty || module == null) {
-	                    setText(null);
-	                } else {
-	                    setText(module.getModuleName() + " " + module.getModuleVersion());
-	                }
-	            }
-			};
-		});
 		wsList.setCellFactory(param -> {
 			ListCell<Workspace> cell = new ListCell<> () {
 				@Override
@@ -75,7 +60,6 @@ public class MainStage extends Controller {
 			return cell;
 		});
 		
-		moduleList.setItems(FXCollections.observableList(ModuleLoader.INSTANCE.loadModules()));
 		wsList.setItems(FXCollections.observableList(ModuleLoader.INSTANCE.loadWorkspaces()));
 		
 		

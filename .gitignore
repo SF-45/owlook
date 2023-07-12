@@ -46,6 +46,7 @@ template/
 /data.xml
 /module/
 /module-lib/
+/module-conf/
 /lib/
 /lib-win/
 /lib-linux/

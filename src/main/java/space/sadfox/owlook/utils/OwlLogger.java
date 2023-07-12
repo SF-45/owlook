@@ -44,7 +44,7 @@ public class OwlLogger implements Thread.UncaughtExceptionHandler {
 			e.printStackTrace();
 		}
 
-		if (config.getDebugMode()) {
+		if (config.isDebugMode()) {
 			MessageBox messageBox = new MessageBox(AlertType.ERROR);
 			messageBox.setTitle(entry.getName());
 			messageBox.setHeaderText(entry.getMassage());

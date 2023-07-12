@@ -1,4 +1,4 @@
-package space.sadfox.owlook.moduleapi;
+package space.sadfox.owlook.jaxb;
 
 import java.util.List;
 

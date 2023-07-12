@@ -7,15 +7,15 @@ import jakarta.xml.bind.JAXBException;
 import space.sadfox.owlook.configuration.OwlookConfigurationEntity;
 import space.sadfox.owlook.jaxb.EntityLoader;
 import space.sadfox.owlook.jaxb.JAXBEntity;
-import space.sadfox.owlook.moduleapi.Module;
+import space.sadfox.owlook.moduleapi.OwlookModule;
 import space.sadfox.owlook.moduleapi.ModuleHasNoConfiguration;
 import space.sadfox.owlook.utils.Nullable;
 
-public class OwlookModuleProvider implements Module {
+public class OwlookModuleProvider implements OwlookModule {
 
 	@Override
-	public String getModuleName() {
-		return "owlook";
+	public String getShortModuleDescription() {
+		return "General Module";
 	}
 
 	@Override

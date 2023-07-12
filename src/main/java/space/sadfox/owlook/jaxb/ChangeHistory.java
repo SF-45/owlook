@@ -12,7 +12,6 @@ import javafx.collections.ObservableMap;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
 import space.sadfox.owlook.jaxb.EntityChangeListener.Change;
-import space.sadfox.owlook.moduleapi.ChangeHistoryKeeping;
 
 public class ChangeHistory {
 

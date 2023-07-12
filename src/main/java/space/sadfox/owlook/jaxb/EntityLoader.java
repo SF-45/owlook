@@ -17,9 +17,9 @@ import jakarta.xml.bind.JAXBException;
 import space.sadfox.owlook.jaxb.EntityChangeListener.Change;
 import space.sadfox.owlook.logger.LogLevel;
 import space.sadfox.owlook.moduleapi.ModuleHasNoConfiguration;
-import space.sadfox.owlook.moduleapi.Module;
+import space.sadfox.owlook.moduleapi.ModuleLoader;
+import space.sadfox.owlook.moduleapi.OwlookModule;
 import space.sadfox.owlook.utils.LoggerMessage;
-import space.sadfox.owlook.utils.ModuleLoader;
 import space.sadfox.owlook.utils.Nullable;
 import space.sadfox.owlook.utils.OwlLogger;
 import space.sadfox.owlook.utils.ProjectPath;
@@ -97,13 +97,13 @@ public enum EntityLoader {
 		return instance;
 	}
 	
-	public synchronized <T extends JAXBEntity> T createOrLoadModuleConfiguration(Module module, Class<T> target) throws JAXBException, IOException {
-		Path path = ProjectPath.MODULE_LIB.getPath().resolve(module.getModuleName() + ".owl");
+	public synchronized <T extends JAXBEntity> T createOrLoadModuleConfiguration(OwlookModule module, Class<T> target) throws JAXBException, IOException {
+		Path path = ProjectPath.MODULE_CONFIG.getPath().resolve(module.getClass().getModule().getName() + ".owl");
 		return createOrLoadExternalEntity(path, target);
 	}
 	
-	public synchronized JAXBEntity createOrLoadModuleConfiguration(Module module) throws JAXBException, IOException, ModuleHasNoConfiguration {
-		Path path = ProjectPath.MODULE_LIB.getPath().resolve(module.getModuleName() + ".owl");
+	public synchronized JAXBEntity createOrLoadModuleConfiguration(OwlookModule module) throws JAXBException, IOException, ModuleHasNoConfiguration {
+		Path path = ProjectPath.MODULE_CONFIG.getPath().resolve(module.getClass().getModule().getName() + ".owl");
 		return createOrLoadExternalEntity(path, module.getConfigTarget());
 	}
 
@@ -182,7 +182,7 @@ public enum EntityLoader {
 		}
 
 		JAXBEntity instance;
-		for (Module module : ModuleLoader.INSTANCE.loadModules()) {
+		for (OwlookModule module : ModuleLoader.INSTANCE.loadModules()) {
 			try {
 				for (Class<? extends JAXBEntity> targetClass : module.getJaxbEntities()) {
 					try {
