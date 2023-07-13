@@ -39,8 +39,8 @@ public enum EntityLoader {
 	}
 
 	@FunctionalInterface
-	public static interface DuplicateEntityListener<T extends JAXBEntity> {
-		void duplicate(T oldEntity, T newEntity);
+	public static interface DuplicateEntityListener{
+		void duplicate(JAXBEntity oldEntity, JAXBEntity newEntity);
 	}
 
 	private final Map<UUID, JAXBEntity> loaded = new HashMap<>();
@@ -107,27 +107,6 @@ public enum EntityLoader {
 		return createOrLoadExternalEntity(path, module.getConfigTarget());
 	}
 
-//	public synchronized <T extends JAXBEntity> T loadEntityAndValidateID(String fileName, Class<T> target)
-//			throws JAXBException {
-//		try {
-//			Path path = generatePath(fileName, target);
-//			if (Files.notExists(path))
-//				throw new FileNotFoundException(path + " not found");
-//
-//			UUID id;
-//			if (isUUID(path) && loaded.containsKey(id = convertPathToUUID(path))) {
-//				return (T) loaded.get(id);
-//			}
-//
-//			T instance = new JAXBHelper<>(path, target).getInstance();
-//			instance.getJaxbHelper().validateAndfixID();
-//			loaded.put(instance.getId(), instance);
-//			return instance;
-//		} catch (FileNotFoundException e) {
-//			throw new JAXBException(e);
-//		}
-//	}
-
 	public synchronized <T extends JAXBEntity> List<T> loadAllEntities(Class<T> target) throws IOException {
 
 		return Files.find(JAXBEntity.getConfigPath(target), 1, (p, basicFileAttributes) -> {
@@ -145,34 +124,6 @@ public enum EntityLoader {
 			}
 			return null;
 		}).collect(Collectors.toList());
-
-//		Set<UUID> uuids = new HashSet<>();
-//
-//		try {
-//			uuids = Files.find(JAXBEntity.getConfigPath(target), 1, (p, basicFileAttributes) -> {
-//				boolean isExtension = p.getFileName().toString().endsWith(extension);
-//				boolean isUUID = isUUID(p);
-//				return isExtension && isUUID;
-//
-//			}).map(this::convertPathToUUID).collect(Collectors.toSet());
-//		} catch (IOException e) {
-//			ErrorLogger.registerException(e);
-//		}
-//		
-//		
-//		
-//		List<T> entitiesList = new ArrayList<>();
-//
-//		getIDConfigs(target).forEach(entityID -> {
-//			try {
-//				entitiesList.add(loadEntity(entityID, target));
-//			} catch (JAXBException e) {
-//				ErrorLogger.registerException(e);
-//			}
-//
-//		});
-//
-//		return entitiesList;
 
 	}
 
@@ -222,7 +173,6 @@ public enum EntityLoader {
 
 			if (entity.resourcesExist()) {
 				FileUtils.deleteDirectory(entity.getResourcesPath().toFile());
-				//Files.delete(entity.getResourcesPath());
 			}
 
 			entity.notifyEntityChangeListeners(new Change() {
@@ -277,7 +227,7 @@ public enum EntityLoader {
 		deleteListeners.forEach(i -> i.delete(entity));
 	}
 
-	private <T extends JAXBEntity> void notifyDuplicateChangeListeners(T oldEntity, T newEntity) {
+	private void notifyDuplicateChangeListeners(JAXBEntity oldEntity, JAXBEntity newEntity) {
 		duplicateListeners.forEach(i -> i.duplicate(oldEntity, newEntity));
 	}
 

@@ -24,6 +24,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitMenuButton;
@@ -32,9 +33,9 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
+import space.sadfox.owlook.OwlookConfiguration;
 import space.sadfox.owlook.OwlookModuleProvider;
 import space.sadfox.owlook.ResourceTarget;
-import space.sadfox.owlook.configuration.OwlookConfigurationEntity;
 import space.sadfox.owlook.ui.MainStage;
 import space.sadfox.owlook.ui.base.Controller;
 import space.sadfox.owlook.ui.tools.MessageBox;
@@ -84,7 +85,7 @@ public class ModuleLoaderController extends Controller {
 
 			nameProperty.set(module.getName());
 
-			OwlookConfigurationEntity config = OwlookModuleProvider.getConfig();
+			OwlookConfiguration config = OwlookModuleProvider.getConfig();
 			stateProperty.addListener((property, oldValue, newValue) -> {
 				switch (newValue) {
 				case ENABLE:
@@ -194,6 +195,9 @@ public class ModuleLoaderController extends Controller {
 
 	@FXML
 	private TableView<TableEntity> moduleTable;
+	
+    @FXML
+    private CheckBox skipModuleManagerCheckBox;
 
 	private final ObservableList<TableEntity> tableEntities = FXCollections.observableArrayList();
 
@@ -212,7 +216,7 @@ public class ModuleLoaderController extends Controller {
 					plugins);
 			ModuleLayer tempLayer = ModuleLayer.boot().defineModulesWithOneLoader(tempConfiguration,
 					ClassLoader.getSystemClassLoader());
-			OwlookConfigurationEntity config = OwlookModuleProvider.getConfig();
+			OwlookConfiguration config = OwlookModuleProvider.getConfig();
 
 			ServiceLoader.load(tempLayer, OwlookModule.class).stream().forEach(provider -> {
 				TableEntity tableEntity = new TableEntity(provider.get());
@@ -245,6 +249,9 @@ public class ModuleLoaderController extends Controller {
 
 	private void init() {
 		stageTitle.set("Module Manage");
+		OwlookConfiguration config = OwlookModuleProvider.getConfig();
+		skipModuleManagerCheckBox.setSelected(config.isSkipModuleManage());
+		config.skipModuleManageProperty().bindBidirectional(skipModuleManagerCheckBox.selectedProperty());
 		initModuleTable();
 		launchButton.setOnAction(this::launch);
 	}

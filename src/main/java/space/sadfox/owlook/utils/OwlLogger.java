@@ -10,8 +10,8 @@ import java.util.Date;
 import jakarta.xml.bind.JAXBException;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Modality;
+import space.sadfox.owlook.OwlookConfiguration;
 import space.sadfox.owlook.OwlookModuleProvider;
-import space.sadfox.owlook.configuration.OwlookConfigurationEntity;
 import space.sadfox.owlook.jaxb.EntityLoader;
 import space.sadfox.owlook.logger.LogLevel;
 import space.sadfox.owlook.logger.Logger;
@@ -38,7 +38,7 @@ public class OwlLogger implements Thread.UncaughtExceptionHandler {
 		entry.setLoggingDepth(loggingDepth);
 		logger.save();
 
-		OwlookConfigurationEntity config = OwlookModuleProvider.getConfig();
+		OwlookConfiguration config = OwlookModuleProvider.getConfig();
 
 		if (loggingDepth <= config.getLoggingDepth()) {
 			e.printStackTrace();

@@ -1,4 +1,4 @@
-package space.sadfox.owlook.configuration;
+package space.sadfox.owlook;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -9,7 +9,6 @@ import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlRootElement;
-import jakarta.xml.bind.annotation.XmlValue;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -25,7 +24,7 @@ import space.sadfox.owlook.ui.base.Controller;
 
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement(name = "owlookConfiguration")
-public class OwlookConfigurationEntity extends JAXBEntity {
+public class OwlookConfiguration extends JAXBEntity {
 	
 	private final StringProperty title = new SimpleStringProperty("title");
 	private final IntegerProperty loggingDepth = new SimpleIntegerProperty(1);
@@ -111,13 +110,11 @@ public class OwlookConfigurationEntity extends JAXBEntity {
 
 	@Override
 	public void validate() throws JAXBEntityValidateException {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void initialize() {
-		// TODO Auto-generated method stub
 		
 	}
 
@@ -125,7 +122,7 @@ public class OwlookConfigurationEntity extends JAXBEntity {
 	public void syncWith(JAXBEntity entity) {
 		if (!getClass().equals(entity.getClass())) return;
 		
-		OwlookConfigurationEntity newConfig = (OwlookConfigurationEntity) entity;
+		OwlookConfiguration newConfig = (OwlookConfiguration) entity;
 		
 		setLoggingDepth(newConfig.getLoggingDepth());
 		setDebugMode(newConfig.isDebugMode());

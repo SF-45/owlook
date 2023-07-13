@@ -1,7 +1,6 @@
 package space.sadfox.owlook.ui.tools;
 
 import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 
 public class MessageBox extends Alert {

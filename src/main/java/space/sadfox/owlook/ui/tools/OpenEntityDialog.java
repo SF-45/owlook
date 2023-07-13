@@ -79,11 +79,11 @@ public class OpenEntityDialog<T extends JAXBEntity> extends Controller {
 		fileName.setCellValueFactory(call -> {
 			return new SimpleStringProperty(call.getValue().getFileName());
 		});
+		tableView.getColumns().add(fileName);
 
 		TableColumn<T, String> title = new TableColumn<>("Title");
 		title.setCellValueFactory(new PropertyValueFactory<>("title"));
-
-		tableView.getColumns().addAll(fileName, title);
+		tableView.getColumns().add(title);
 
 		tableView.setRowFactory(callback -> {
 			TableRow<T> row = new TableRow<>();

@@ -31,6 +31,7 @@ public enum ModuleLoader {
 		return loadModules(ModuleExtension.class);
 	}
 
+	@SuppressWarnings("unchecked")
 	public <T extends ModuleExtension> List<T> loadModuleExtension(Class<T> target,
 			Predicate<? super ModuleExtension> predicate) {
 

@@ -1,6 +1,5 @@
 import space.sadfox.owlook.moduleapi.ModuleExtension;
 import space.sadfox.owlook.moduleapi.OwlookModule;
-import space.sadfox.owlook.moduleapi.Tool;
 import space.sadfox.owlook.moduleapi.Workspace;
 
 module space.sadfox.owlook {
@@ -28,10 +27,10 @@ module space.sadfox.owlook {
 
     requires org.fxmisc.richtext;
     requires org.fxmisc.flowless;
-    requires reactfx;
+    //requires reactfx;
     
     opens space.sadfox.owlook.logger to jakarta.xml.bind;
-    opens space.sadfox.owlook.configuration to jakarta.xml.bind;
+    opens space.sadfox.owlook to jakarta.xml.bind;
     opens space.sadfox.owlook.ui to javafx.fxml;
     opens space.sadfox.owlook.ui.tools to javafx.fxml;
     
@@ -52,7 +51,6 @@ module space.sadfox.owlook {
     
     uses OwlookModule;
     uses Workspace;
-    uses Tool;
     uses ModuleExtension;
     
     

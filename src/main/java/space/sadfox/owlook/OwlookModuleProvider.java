@@ -4,11 +4,10 @@ import java.io.IOException;
 import java.util.List;
 
 import jakarta.xml.bind.JAXBException;
-import space.sadfox.owlook.configuration.OwlookConfigurationEntity;
 import space.sadfox.owlook.jaxb.EntityLoader;
 import space.sadfox.owlook.jaxb.JAXBEntity;
-import space.sadfox.owlook.moduleapi.OwlookModule;
 import space.sadfox.owlook.moduleapi.ModuleHasNoConfiguration;
+import space.sadfox.owlook.moduleapi.OwlookModule;
 import space.sadfox.owlook.utils.Nullable;
 
 public class OwlookModuleProvider implements OwlookModule {
@@ -43,12 +42,12 @@ public class OwlookModuleProvider implements OwlookModule {
 
 	@Override
 	public Class<? extends JAXBEntity> getConfigTarget() throws ModuleHasNoConfiguration {
-		return OwlookConfigurationEntity.class;
+		return OwlookConfiguration.class;
 	}
 	
-	public synchronized static OwlookConfigurationEntity getConfig() {
+	public synchronized static OwlookConfiguration getConfig() {
 		try {
-			return EntityLoader.INSTANCE.createOrLoadModuleConfiguration(new OwlookModuleProvider(), OwlookConfigurationEntity.class);
+			return EntityLoader.INSTANCE.createOrLoadModuleConfiguration(new OwlookModuleProvider(), OwlookConfiguration.class);
 		} catch (JAXBException | IOException e) {
 			e.printStackTrace();
 			return null;
