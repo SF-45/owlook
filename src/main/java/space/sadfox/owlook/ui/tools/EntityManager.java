@@ -28,12 +28,13 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import space.sadfox.owlook.ResourceTarget;
-import space.sadfox.owlook.jaxb.ControllerNotDefined;
-import space.sadfox.owlook.jaxb.EntityLoader;
-import space.sadfox.owlook.jaxb.JAXBEntity;
-import space.sadfox.owlook.jaxb.JAXBEntityValidateException;
-import space.sadfox.owlook.moduleapi.ModuleLoader;
+import space.sadfox.owlook.base.jaxb.JAXBEntity;
+import space.sadfox.owlook.base.jaxb.JAXBEntityValidateException;
+import space.sadfox.owlook.base.moduleapi.ModuleHasNoProvideEntities;
+import space.sadfox.owlook.ui.base.Controllable;
 import space.sadfox.owlook.ui.base.Controller;
+import space.sadfox.owlook.utils.EntityLoader;
+import space.sadfox.owlook.utils.ModuleLoader;
 import space.sadfox.owlook.utils.Nullable;
 import space.sadfox.owlook.utils.OwlLogger;
 
@@ -60,7 +61,7 @@ public class EntityManager extends Controller {
 		ModuleLoader.INSTANCE.loadModules().forEach(module -> {
 			try {
 				dirTable.getItems().addAll(module.getJaxbEntities());
-			} catch (Nullable e) {
+			} catch (ModuleHasNoProvideEntities e) {
 			}
 		});
 	}
@@ -250,11 +251,12 @@ public class EntityManager extends Controller {
 	}
 
 	private void editEntityAction(JAXBEntity jaxbEntitiy) {
-		try {
-			jaxbEntitiy.getConfigController().show();
-		} catch (IOException e) {
-			OwlLogger.registerException(1, e);
-		} catch (ControllerNotDefined e) {
+		if (jaxbEntitiy instanceof Controllable) {
+			try {
+				((Controllable) jaxbEntitiy).getConfigController().show();
+			} catch (IOException e) {
+				OwlLogger.registerException(1, e);
+			}
 		}
 	}
 

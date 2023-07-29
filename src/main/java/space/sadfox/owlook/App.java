@@ -3,7 +3,7 @@ package space.sadfox.owlook;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import space.sadfox.owlook.moduleapi.ModuleLoaderController;
+import space.sadfox.owlook.ui.ModuleLoaderController;
 import space.sadfox.owlook.utils.StageFactory;
 
 public class App extends Application {
@@ -13,9 +13,8 @@ public class App extends Application {
 		StageFactory.INSTANCE.registerStage(primaryStage);
 		
 		ModuleLoaderController moduleLoaderController = new ModuleLoaderController();
-		
-		OwlookConfiguration config = OwlookModuleProvider.getConfig();
-		
+
+		OwlookConfiguration config = OwlookConfiguration.instance();
 		if (!config.isSkipModuleManage() || !moduleLoaderController.launch()) {
 			primaryStage.setScene(new Scene(moduleLoaderController.getParent()));
 			primaryStage.setTitle(moduleLoaderController.getStageTitle());

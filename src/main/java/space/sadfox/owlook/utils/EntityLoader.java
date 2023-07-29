@@ -1,4 +1,4 @@
-package space.sadfox.owlook.jaxb;
+package space.sadfox.owlook.utils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -10,19 +10,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
 
 import jakarta.xml.bind.JAXBException;
-import space.sadfox.owlook.jaxb.EntityChangeListener.Change;
+import space.sadfox.owlook.base.jaxb.EntityChangeListener.Change;
+import space.sadfox.owlook.base.jaxb.JAXBEntity;
+import space.sadfox.owlook.base.jaxb.JAXBEntityValidateException;
+import space.sadfox.owlook.base.jaxb.JAXBHelper;
+import space.sadfox.owlook.base.moduleapi.ModuleHasNoConfiguration;
+import space.sadfox.owlook.base.moduleapi.ModuleHasNoProvideEntities;
+import space.sadfox.owlook.base.moduleapi.OwlookModule;
 import space.sadfox.owlook.logger.LogLevel;
-import space.sadfox.owlook.moduleapi.ModuleHasNoConfiguration;
-import space.sadfox.owlook.moduleapi.ModuleLoader;
-import space.sadfox.owlook.moduleapi.OwlookModule;
-import space.sadfox.owlook.utils.LoggerMessage;
-import space.sadfox.owlook.utils.Nullable;
-import space.sadfox.owlook.utils.OwlLogger;
-import space.sadfox.owlook.utils.ProjectPath;
 
 public enum EntityLoader {
 
@@ -39,7 +39,7 @@ public enum EntityLoader {
 	}
 
 	@FunctionalInterface
-	public static interface DuplicateEntityListener{
+	public static interface DuplicateEntityListener {
 		void duplicate(JAXBEntity oldEntity, JAXBEntity newEntity);
 	}
 
@@ -52,20 +52,33 @@ public enum EntityLoader {
 	private final String extension = ".owl";
 
 	@SuppressWarnings("unchecked")
-	public synchronized <T extends JAXBEntity> T loadEntity(String fileName, Class<T> target) throws JAXBException, FileNotFoundException {
-			Path path = generatePath(fileName, target);
-			if (Files.notExists(path))
-				throw new FileNotFoundException(path + " not found");
+	public synchronized <T extends JAXBEntity> T loadEntity(String fileName, Class<T> target)
+			throws JAXBException, IOException {
+		Path path = generatePath(fileName, target);
+		if (Files.notExists(path))
+			throw new FileNotFoundException(path + " not found");
 
-			UUID id;
-			if (isUUID(path) && loaded.containsKey(id = convertPathToUUID(path))) {
-				return (T) loaded.get(id);
-			}
+		UUID id;
+		if (isUUID(path) && loaded.containsKey(id = convertPathToUUID(path))) {
+			return (T) loaded.get(id);
+		}
 
-			T instance = new JAXBHelper<>(path, target).getInstance();
-			instance.getJaxbHelper().validateAndfixID();
-			loaded.put(instance.getId(), instance);
-			return instance;
+		T instance = new JAXBHelper<>(path, target).getInstance();
+		if (!isUUID(instance.getPath())) {
+			String oldName = instance.getFileName();
+			String newName = generateFileName();
+
+			instance.getJaxbHelper().renameEntity(newName);
+			LoggerMessage massage = new LoggerMessage(LogLevel.WARNING);
+			massage.setName("Bad ID instance [" + oldName + "]");
+			massage.setMessage("Instance [" + oldName + "] is bad ID. New ID=[" + newName + "]");
+			OwlLogger.registerMessage(massage);
+		}
+		instance.getJaxbHelper().enableAutoSave(e -> {
+			OwlLogger.registerException(1, e);
+		});
+		loaded.put(convertPathToUUID(instance.getPath()), instance);
+		return instance;
 	}
 
 	public synchronized <T extends JAXBEntity> T createEntity(Class<T> target) throws JAXBException, IOException {
@@ -74,8 +87,11 @@ public enum EntityLoader {
 		if (Files.exists(path))
 			throw new JAXBException("[" + path + "] alredy exist");
 		T instance = new JAXBHelper<>(path, target).getInstance();
-		loaded.put(instance.getId(), instance);
-		instance.saveImmediately();
+		instance.getJaxbHelper().enableAutoSave(e -> {
+			OwlLogger.registerException(1, e);
+		});
+		loaded.put(convertPathToUUID(instance.getPath()), instance);
+		instance.save();
 		notifyCreateChangeListeners(instance);
 
 		return instance;
@@ -89,27 +105,31 @@ public enum EntityLoader {
 		}
 
 		T instance = new JAXBHelper<>(path, target).getInstance();
-		instance.setExternalEnity(true);
+		instance.getJaxbHelper().enableAutoSave(e -> {
+			OwlLogger.registerException(1, e);
+		});
 		externalLoaded.put(path, instance);
-		instance.saveImmediately();
+		instance.save();
 		notifyCreateChangeListeners(instance);
 
 		return instance;
 	}
-	
-	public synchronized <T extends JAXBEntity> T createOrLoadModuleConfiguration(OwlookModule module, Class<T> target) throws JAXBException, IOException {
+
+	public synchronized <T extends JAXBEntity> T createOrLoadModuleConfiguration(OwlookModule module, Class<T> target)
+			throws JAXBException, IOException {
 		Path path = ProjectPath.MODULE_CONFIG.getPath().resolve(module.getClass().getModule().getName() + ".owl");
 		return createOrLoadExternalEntity(path, target);
 	}
-	
-	public synchronized JAXBEntity createOrLoadModuleConfiguration(OwlookModule module) throws JAXBException, IOException, ModuleHasNoConfiguration {
+
+	public synchronized JAXBEntity createOrLoadModuleConfiguration(OwlookModule module)
+			throws JAXBException, IOException, ModuleHasNoConfiguration {
 		Path path = ProjectPath.MODULE_CONFIG.getPath().resolve(module.getClass().getModule().getName() + ".owl");
 		return createOrLoadExternalEntity(path, module.getConfigTarget());
 	}
 
 	public synchronized <T extends JAXBEntity> List<T> loadAllEntities(Class<T> target) throws IOException {
 
-		return Files.find(JAXBEntity.getConfigPath(target), 1, (p, basicFileAttributes) -> {
+		return Files.find(getConfigPath(target), 1, (p, basicFileAttributes) -> {
 			return p.getFileName().toString().endsWith(extension);
 		}).map(p -> {
 			try {
@@ -121,6 +141,8 @@ public enum EntityLoader {
 				message.setName("Instance Not Found");
 				message.setMessage("Instance [" + p.getFileName() + "] not found in " + target.getPackageName());
 				OwlLogger.registerMessage(message);
+			} catch (IOException e) {
+				OwlLogger.registerException(1, e);
 			}
 			return null;
 		}).collect(Collectors.toList());
@@ -136,17 +158,15 @@ public enum EntityLoader {
 		for (OwlookModule module : ModuleLoader.INSTANCE.loadModules()) {
 			try {
 				for (Class<? extends JAXBEntity> targetClass : module.getJaxbEntities()) {
-					try {
-						instance = new JAXBHelper<>(path, targetClass).getInstance();
-						instance.validate();
-						instance.initialize();
-						return instance;
-					} catch (JAXBEntityValidateException e) {
-						throw e;
-					} catch (FileNotFoundException | JAXBException e) {
-					}
+					instance = new JAXBHelper<>(path, targetClass).getInstance();
+					instance.validate();
+					instance.initialize();
+					return instance;
 				}
-			} catch (Nullable e) {
+			} catch (ModuleHasNoProvideEntities e) {
+			} catch (JAXBEntityValidateException e) {
+				throw e;
+			} catch (IOException | JAXBException e) {
 			}
 		}
 
@@ -165,14 +185,14 @@ public enum EntityLoader {
 	public synchronized <T extends JAXBEntity> boolean deleteEntity(T entity) {
 		try {
 			Files.delete(entity.getPath());
-			if (entity.isExternalEntity()) {
-				externalLoaded.remove(entity.getPath());
-			} else {
-				loaded.remove(entity.getId());
+			
+			if (isUUID(entity.getPath())) {
+				loaded.remove(convertPathToUUID(entity.getPath()));
 			}
+			externalLoaded.remove(entity.getPath());
 
-			if (entity.resourcesExist()) {
-				FileUtils.deleteDirectory(entity.getResourcesPath().toFile());
+			if (entityResourcesExist(entity)) {
+				FileUtils.deleteDirectory(getEntityResourcesPath(entity).toFile());
 			}
 
 			entity.notifyEntityChangeListeners(new Change() {
@@ -185,6 +205,11 @@ public enum EntityLoader {
 				@Override
 				public boolean wasModify() {
 					return false;
+				}
+
+				@Override
+				public JAXBEntity getEntity() {
+					return entity;
 				}
 			});
 			notifyDeleteChangeListeners(entity);
@@ -231,8 +256,22 @@ public enum EntityLoader {
 		duplicateListeners.forEach(i -> i.duplicate(oldEntity, newEntity));
 	}
 
+	private Path getConfigPath(Class<? extends JAXBEntity> target) {
+		Path path = ProjectPath.CONFiG.getPath().resolve(target.getPackageName()).toAbsolutePath();
+
+		if (Files.notExists(path)) {
+			try {
+				Files.createDirectories(path);
+			} catch (IOException e) {
+				OwlLogger.registerException(1, e);
+			}
+		}
+
+		return path;
+	}
+
 	private Path generatePath(String fileName, Class<? extends JAXBEntity> target) {
-		Path path = JAXBEntity.getConfigPath(target);
+		Path path = getConfigPath(target);
 		if (!fileName.endsWith(extension)) {
 			return path.resolve(fileName + extension);
 		} else {
@@ -240,21 +279,52 @@ public enum EntityLoader {
 		}
 	}
 
-	String generateFileName() {
+	public static Path getEntityResourcesPath(JAXBEntity entity) {
+		Path entityResPath = ProjectPath.RESOURCES.getPath().resolve(entity.getFileName()).toAbsolutePath();
+		if (Files.notExists(entityResPath)) {
+			try {
+				Files.createDirectory(entityResPath);
+			} catch (IOException e) {
+				OwlLogger.registerException(1, e);
+			}
+		}
+
+		return entityResPath;
+	}
+
+	public static boolean entityResourcesExist(JAXBEntity entity) {
+		Path resPath = ProjectPath.RESOURCES.getPath().toAbsolutePath();
+		Path entityResPath = resPath.resolve(entity.getFileName()).toAbsolutePath();
+
+		if (Files.exists(resPath)) {
+			if (Files.exists(entityResPath)) {
+				try (Stream<Path> files = Files.list(entityResPath)) {
+					if (files.count() > 0) {
+						return true;
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return false;
+	}
+
+	private String generateFileName() {
 		return UUID.randomUUID().toString() + extension;
 	}
 
-	private String convertPathToString(Path path) {
+	public static String convertPathToString(Path path) {
 		String fileName = path.getFileName().toString();
 		int ind = fileName.lastIndexOf(".");
 		return fileName.substring(0, ind);
 	}
 
-	private UUID convertPathToUUID(Path path) {
+	public static UUID convertPathToUUID(Path path) {
 		return UUID.fromString(convertPathToString(path));
 	}
 
-	private boolean isUUID(Path path) {
+	public static boolean isUUID(Path path) {
 		try {
 			UUID.fromString(convertPathToString(path));
 			return true;

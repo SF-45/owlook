@@ -1,6 +1,9 @@
 package space.sadfox.owlook;
 
 
+import java.util.function.Predicate;
+import java.util.stream.Stream;
+
 import space.sadfox.owlook.utils.OwlLogger;
 
 public class Main {
@@ -9,7 +12,6 @@ public class Main {
 		Thread.setDefaultUncaughtExceptionHandler(new OwlLogger());
 
 		App.go();
-		
 		
 		
 		

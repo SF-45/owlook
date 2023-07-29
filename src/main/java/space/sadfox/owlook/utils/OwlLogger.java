@@ -11,8 +11,6 @@ import jakarta.xml.bind.JAXBException;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Modality;
 import space.sadfox.owlook.OwlookConfiguration;
-import space.sadfox.owlook.OwlookModuleProvider;
-import space.sadfox.owlook.jaxb.EntityLoader;
 import space.sadfox.owlook.logger.LogLevel;
 import space.sadfox.owlook.logger.Logger;
 import space.sadfox.owlook.logger.LoggerDAO;
@@ -36,22 +34,27 @@ public class OwlLogger implements Thread.UncaughtExceptionHandler {
 		entry.setStackTrace(writer.toString());
 		entry.setLogLevel(LogLevel.ERROR);
 		entry.setLoggingDepth(loggingDepth);
-		logger.save();
+		try {
+			logger.save();
+		} catch (JAXBException | IOException e1) {
+			e1.printStackTrace();
+		}
 
-		OwlookConfiguration config = OwlookModuleProvider.getConfig();
+		OwlookConfiguration config = OwlookConfiguration.instance();
 
 		if (loggingDepth <= config.getLoggingDepth()) {
 			e.printStackTrace();
+			if (config.isDebugMode()) {
+				MessageBox messageBox = new MessageBox(AlertType.ERROR);
+				messageBox.setTitle(entry.getName());
+				messageBox.setHeaderText(entry.getMassage());
+				messageBox.setContentText(entry.getStackTrace());
+				messageBox.initModality(Modality.NONE);
+				messageBox.show();
+			}
 		}
 
-		if (config.isDebugMode()) {
-			MessageBox messageBox = new MessageBox(AlertType.ERROR);
-			messageBox.setTitle(entry.getName());
-			messageBox.setHeaderText(entry.getMassage());
-			messageBox.setContentText(entry.getStackTrace());
-			messageBox.initModality(Modality.NONE);
-			messageBox.show();
-		}
+		
 
 	}
 
@@ -73,7 +76,11 @@ public class OwlLogger implements Thread.UncaughtExceptionHandler {
 		entry.setMessage(message.getMessage());
 		entry.setLogLevel(message.getLogLevel());
 		entry.setTime(System.currentTimeMillis());
-		logger.save();
+		try {
+			logger.save();
+		} catch (JAXBException | IOException e) {
+			e.printStackTrace();
+		}
 		System.out.println(message.getLogLevel());
 		System.out.println(message.getName());
 		System.out.println(message.getMessage());

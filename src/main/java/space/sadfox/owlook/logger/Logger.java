@@ -1,6 +1,5 @@
 package space.sadfox.owlook.logger;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,9 +7,7 @@ import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
-import space.sadfox.owlook.jaxb.ControllerNotDefined;
-import space.sadfox.owlook.jaxb.JAXBEntity;
-import space.sadfox.owlook.ui.base.Controller;
+import space.sadfox.owlook.base.jaxb.JAXBEntity;
 
 
 @XmlAccessorType(XmlAccessType.NONE)
@@ -43,11 +40,6 @@ public class Logger extends JAXBEntity {
 
 	@Override
 	public void validate() {
-	}
-
-	@Override
-	public Controller getConfigController() throws IOException, ControllerNotDefined {
-		throw new ControllerNotDefined();
 	}
 
 	@Override

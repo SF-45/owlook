@@ -9,10 +9,10 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import space.sadfox.owlook.Main;
-import space.sadfox.owlook.moduleapi.ModuleLoader;
-import space.sadfox.owlook.moduleapi.Workspace;
+import space.sadfox.owlook.component.Workspace;
 import space.sadfox.owlook.ui.base.Controller;
 import space.sadfox.owlook.ui.tools.EntityManager;
+import space.sadfox.owlook.utils.ModuleLoader;
 
 public class MainStage extends Controller {
 	
@@ -32,7 +32,7 @@ public class MainStage extends Controller {
 	                if (empty || wp == null) {
 	                    setText(null);
 	                } else {
-	                    setText(wp.getWorkspaceName());
+	                    setText(wp.getComponentName());
 	                }
 	            }
 			};

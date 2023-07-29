@@ -16,9 +16,9 @@ import javafx.scene.control.TableView.TableViewSelectionModel;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.cell.PropertyValueFactory;
 import space.sadfox.owlook.ResourceTarget;
-import space.sadfox.owlook.jaxb.EntityLoader;
-import space.sadfox.owlook.jaxb.JAXBEntity;
+import space.sadfox.owlook.base.jaxb.JAXBEntity;
 import space.sadfox.owlook.ui.base.Controller;
+import space.sadfox.owlook.utils.EntityLoader;
 
 public class OpenEntityDialog<T extends JAXBEntity> extends Controller {
 

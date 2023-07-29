@@ -1,9 +1,11 @@
 package space.sadfox.owlook;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
+import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
@@ -17,10 +19,10 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import space.sadfox.owlook.jaxb.ControllerNotDefined;
-import space.sadfox.owlook.jaxb.JAXBEntity;
-import space.sadfox.owlook.jaxb.JAXBEntityValidateException;
-import space.sadfox.owlook.ui.base.Controller;
+import space.sadfox.owlook.base.jaxb.JAXBEntity;
+import space.sadfox.owlook.utils.EntityLoader;
+import space.sadfox.owlook.utils.OwlLogger;
+import space.sadfox.owlook.utils.ProjectPath;
 
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement(name = "owlookConfiguration")
@@ -96,12 +98,6 @@ public class OwlookConfiguration extends JAXBEntity {
 	public ObservableList<String> modulesProperty() {
 		return modules;
 	}
-
-	@Override
-	public Controller getConfigController() throws IOException, ControllerNotDefined {
-		// TODO Auto-generated method stub
-		return null;
-	}
 	
 	@Override
 	public List<Object> getProperties() {
@@ -109,7 +105,7 @@ public class OwlookConfiguration extends JAXBEntity {
 	}
 
 	@Override
-	public void validate() throws JAXBEntityValidateException {
+	public void validate() {
 		
 	}
 
@@ -126,6 +122,16 @@ public class OwlookConfiguration extends JAXBEntity {
 		
 		setLoggingDepth(newConfig.getLoggingDepth());
 		setDebugMode(newConfig.isDebugMode());
+	}
+	
+	public static OwlookConfiguration instance() {
+		Path confPath = ProjectPath.MODULE_CONFIG.getPath().resolve("Owlook.owl");
+		try {
+			return EntityLoader.INSTANCE.createOrLoadExternalEntity(confPath, OwlookConfiguration.class);
+		} catch (JAXBException | IOException e) {
+			OwlLogger.registerException(0, e);
+			return null;
+		}
 	}
 
 }

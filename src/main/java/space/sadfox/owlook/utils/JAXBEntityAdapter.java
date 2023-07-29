@@ -1,19 +1,16 @@
-package space.sadfox.owlook.jaxb.adapters;
+package space.sadfox.owlook.utils;
 
 import java.io.FileNotFoundException;
 
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
-import space.sadfox.owlook.jaxb.EntityLoader;
-import space.sadfox.owlook.jaxb.JAXBEntity;
+import space.sadfox.owlook.base.jaxb.JAXBEntity;
 import space.sadfox.owlook.logger.LogLevel;
-import space.sadfox.owlook.utils.LoggerMessage;
-import space.sadfox.owlook.utils.OwlLogger;
 
 public abstract class JAXBEntityAdapter<T extends JAXBEntity> extends XmlAdapter<String, T> {
 
 	@Override
-	public T unmarshal(String v) throws Exception {
+	public final T unmarshal(String v) throws Exception {
 		try {
 			return EntityLoader.INSTANCE.loadEntity(v, getTarget());
 		} catch (JAXBException e) {
@@ -32,8 +29,8 @@ public abstract class JAXBEntityAdapter<T extends JAXBEntity> extends XmlAdapter
 	}
 
 	@Override
-	public String marshal(T v) throws Exception {
-		return v.getId().toString();
+	public final String marshal(T v) throws Exception {
+		return v.getFileName();
 	}
 
 	protected abstract Class<T> getTarget();
