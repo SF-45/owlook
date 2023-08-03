@@ -3,7 +3,7 @@ package space.sadfox.owlook;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import space.sadfox.owlook.ui.ModuleLoaderController;
+import space.sadfox.owlook.moduleloader.ModuleLoaderController;
 import space.sadfox.owlook.utils.StageFactory;
 
 public class App extends Application {
@@ -20,6 +20,8 @@ public class App extends Application {
 			primaryStage.setTitle(moduleLoaderController.getStageTitle());
 			primaryStage.show();
 		}
+		
+		
 		
 		
 	}

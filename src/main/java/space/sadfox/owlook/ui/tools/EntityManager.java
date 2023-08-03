@@ -31,10 +31,10 @@ import space.sadfox.owlook.ResourceTarget;
 import space.sadfox.owlook.base.jaxb.JAXBEntity;
 import space.sadfox.owlook.base.jaxb.JAXBEntityValidateException;
 import space.sadfox.owlook.base.moduleapi.ModuleHasNoProvideEntities;
+import space.sadfox.owlook.moduleloader.ModuleLoader;
 import space.sadfox.owlook.ui.base.Controllable;
 import space.sadfox.owlook.ui.base.Controller;
 import space.sadfox.owlook.utils.EntityLoader;
-import space.sadfox.owlook.utils.ModuleLoader;
 import space.sadfox.owlook.utils.Nullable;
 import space.sadfox.owlook.utils.OwlLogger;
 

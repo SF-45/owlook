@@ -25,6 +25,8 @@ module space.sadfox.owlook {
 	opens space.sadfox.owlook to jakarta.xml.bind;
 	opens space.sadfox.owlook.ui to javafx.fxml;
 	opens space.sadfox.owlook.ui.tools to javafx.fxml;
+	
+	opens space.sadfox.owlook.moduleloader to javafx.fxml;
 
 
 	// api
@@ -35,6 +37,7 @@ module space.sadfox.owlook {
 	exports space.sadfox.owlook.logger;
 	exports space.sadfox.owlook.ui.base;
 	exports space.sadfox.owlook.ui.tools;
+	exports space.sadfox.owlook.moduleloader;
 
 	uses OwlookModule;
 	uses OwlookModuleComponent;

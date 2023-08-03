@@ -23,6 +23,7 @@ import space.sadfox.owlook.base.moduleapi.ModuleHasNoConfiguration;
 import space.sadfox.owlook.base.moduleapi.ModuleHasNoProvideEntities;
 import space.sadfox.owlook.base.moduleapi.OwlookModule;
 import space.sadfox.owlook.logger.LogLevel;
+import space.sadfox.owlook.moduleloader.ModuleLoader;
 
 public enum EntityLoader {
 

@@ -10,9 +10,9 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import space.sadfox.owlook.Main;
 import space.sadfox.owlook.component.Workspace;
+import space.sadfox.owlook.moduleloader.ModuleLoader;
 import space.sadfox.owlook.ui.base.Controller;
 import space.sadfox.owlook.ui.tools.EntityManager;
-import space.sadfox.owlook.utils.ModuleLoader;
 
 public class MainStage extends Controller {
 	

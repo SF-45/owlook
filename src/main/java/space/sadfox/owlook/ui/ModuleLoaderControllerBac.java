@@ -42,15 +42,15 @@ import javafx.stage.Stage;
 import space.sadfox.owlook.OwlookConfiguration;
 import space.sadfox.owlook.ResourceTarget;
 import space.sadfox.owlook.base.moduleapi.OwlookModule;
+import space.sadfox.owlook.moduleloader.ModuleLoader;
 import space.sadfox.owlook.ui.base.Controller;
 import space.sadfox.owlook.ui.tools.MessageBox;
-import space.sadfox.owlook.utils.ModuleLoader;
 import space.sadfox.owlook.utils.Nullable;
 import space.sadfox.owlook.utils.OwlLogger;
 import space.sadfox.owlook.utils.ProjectPath;
 import space.sadfox.owlook.utils.StageFactory;
 
-public class ModuleLoaderController extends Controller {
+public class ModuleLoaderControllerBac extends Controller {
 	private enum State {
 		OK("OK", 0), NOT_OWLMODULE("Not Owl-Module", 1), ERROR("Error", 2), NOT_FOUND("Not Found", 3),
 		DISABLE("Disable", 4);
@@ -293,7 +293,7 @@ public class ModuleLoaderController extends Controller {
 	private final ModuleFinder libFinder = ModuleFinder.of(ProjectPath.MODULE_LIB.getPath());
 	private final OwlookConfiguration config = OwlookConfiguration.instance();
 
-	public ModuleLoaderController() throws IOException {
+	public ModuleLoaderControllerBac() throws IOException {
 		super(ResourceTarget.class.getResource("fxml/module-loader.fxml"));
 		init();
 		reloadModules();
@@ -430,7 +430,7 @@ public class ModuleLoaderController extends Controller {
 			Configuration configuration = ModuleLayer.boot().configuration().resolve(enablePluginsFinder, libFinder,
 					enablePlugins);
 
-			ModuleLoaderUILink.setModuleLayer(ModuleLayer.boot().defineModulesWithOneLoader(configuration, ClassLoader.getSystemClassLoader()));
+			//ModuleLoaderUILink.setModuleLayer(ModuleLayer.boot().defineModulesWithOneLoader(configuration, ClassLoader.getSystemClassLoader()));
 			ModuleLoader.INSTANCE.loadModules().forEach(OwlookModule::initModule);
 			MainStage mainStage = new MainStage();
 			mainStage.show();
