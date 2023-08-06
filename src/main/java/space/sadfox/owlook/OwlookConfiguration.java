@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.annotation.XmlAccessType;
@@ -20,6 +21,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import space.sadfox.owlook.base.jaxb.JAXBEntity;
+import space.sadfox.owlook.base.moduleapi.VersionFormat;
 import space.sadfox.owlook.utils.EntityLoader;
 import space.sadfox.owlook.utils.OwlLogger;
 import space.sadfox.owlook.utils.ProjectPath;
@@ -29,6 +31,7 @@ import space.sadfox.owlook.utils.ProjectPath;
 public class OwlookConfiguration extends JAXBEntity {
 	
 	private final StringProperty title = new SimpleStringProperty("title");
+	private VersionFormat version;
 	private final IntegerProperty loggingDepth = new SimpleIntegerProperty(1);
 	private final BooleanProperty debugMode = new SimpleBooleanProperty(true);
 	private final BooleanProperty skipModuleManage = new SimpleBooleanProperty(false);
@@ -49,6 +52,11 @@ public class OwlookConfiguration extends JAXBEntity {
 	public StringProperty titleProperty() {
 		return title;
 	}
+	
+	public VersionFormat getVersion() {
+		return version;
+	}
+
 	
 	@XmlElement
 	public int getLoggingDepth() {
@@ -111,6 +119,13 @@ public class OwlookConfiguration extends JAXBEntity {
 
 	@Override
 	public void initialize() {
+		try {
+			Properties properties = new Properties();
+			properties.load(ResourceTarget.class.getResourceAsStream("pom.properties"));
+			version = VersionFormat.of(properties.getProperty("version", "0.0.0-default"));
+		} catch (IOException e) {
+			OwlLogger.registerException(0, e);
+		}
 		
 	}
 

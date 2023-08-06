@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>space.sadfox</groupId>
 	<artifactId>owlook</artifactId>
-	<version>0.4.43</version>
+	<version>0.4.51</version>
 	<name>Owlook</name>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -15,7 +15,7 @@
 		<dependency>
 			<groupId>space.sadfox</groupId>
 			<artifactId>owlook.base</artifactId>
-			<version>0.4.21</version>
+			<version>0.5.0</version>
 		</dependency>
 		<!-- JAXB -->
 		<dependency>
@@ -113,6 +113,22 @@
 
 
 	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/pom.properties</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>false</filtering>
+				<excludes>
+					<exclude>**/pom.properties</exclude>
+				</excludes>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -148,6 +164,14 @@
 									<useDefaultExcludes>true</useDefaultExcludes>
 									<includes>
 										<include>*.jar</include>
+									</includes>
+								</fileset>
+								<fileset>
+									<directory>module</directory>
+									<followSymlinks>false</followSymlinks>
+									<useDefaultExcludes>true</useDefaultExcludes>
+									<includes>
+										<include>*.owlm</include>
 									</includes>
 								</fileset>
 							</filesets>
@@ -204,30 +228,18 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!--			<plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>3.3.0</version>
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>space.sadfox.owlook.Main</mainClass>
-							<addClasspath />
-							<addDefaultEntries />
-							<addDefaultImplementationEntries />
-							<addDefaultSpecificationEntries />
-							<addBuildEnvironmentEntries />
-							<addExtensions />
-							<classpathLayoutType />
-							<classpathPrefix />
-							<customClasspathLayout />
-							<mainClass />
-							<packageName />
-							<useUniqueVersions />
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
 						</manifest>
 					</archive>
 				</configuration>
-			</plugin>-->
+			</plugin>
 			<plugin>
 				<groupId>org.openjfx</groupId>
 				<artifactId>javafx-maven-plugin</artifactId>

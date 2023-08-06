@@ -19,9 +19,11 @@ import java.util.ServiceLoader.Provider;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import space.sadfox.owlook.OwlookConfiguration;
 import space.sadfox.owlook.base.moduleapi.OwlookModule;
 import space.sadfox.owlook.base.moduleapi.OwlookModuleComponent;
 import space.sadfox.owlook.base.moduleapi.OwlookModulePack;
+import space.sadfox.owlook.base.moduleapi.VersionFormat;
 import space.sadfox.owlook.component.Workspace;
 import space.sadfox.owlook.utils.OwlLogger;
 import space.sadfox.owlook.utils.ProjectPath;
@@ -32,7 +34,7 @@ public enum ModuleLoader {
 	class LoadReport {
 		private final List<ModuleLoadInfo> loadInfoList = new ArrayList<>();
 		private boolean load = true;
-		
+
 		private ModuleLayer resultLayer;
 
 		private LoadReport() {
@@ -51,7 +53,7 @@ public enum ModuleLoader {
 
 	private ModuleLayer moduleLayer;
 	private boolean initModules = false;
-	
+
 	public <T> List<T> loadModules(Class<T> target) {
 		return ServiceLoader.load(moduleLayer, target).stream().map(Provider::get).collect(Collectors.toList());
 	}
@@ -72,7 +74,8 @@ public enum ModuleLoader {
 	public <T extends OwlookModuleComponent> List<T> loadModuleComponents(Class<T> target,
 			Predicate<? super OwlookModuleComponent> predicate) {
 
-		return loadModules(OwlookModuleComponent.class).stream().filter(predicate).map(m -> (T) m).collect(Collectors.toList());
+		return loadModules(OwlookModuleComponent.class).stream().filter(predicate).map(m -> (T) m)
+				.collect(Collectors.toList());
 	}
 
 	Collection<OwlookModulePack> loadedModulePacks() throws IOException {
@@ -114,17 +117,29 @@ public enum ModuleLoader {
 	}
 
 	LoadReport testBoot(Collection<OwlookModulePack> modulePacks) {
-		
+
 		List<OwlookModulePack> pool = new ArrayList<>(modulePacks);
-		
+
 		LoadReport loadReport = new LoadReport();
 
 		ModuleLayer moduleLayer = ModuleLayer.boot();
 
-		
-		
+		VersionFormat projectVersion = OwlookConfiguration.instance().getVersion();
+
+		List<OwlookModulePack> testVersions = new ArrayList<>(pool);
+		testVersions.forEach(pack -> {
+			if (!pack.MODILE_INFO.version().compatibleWith(projectVersion)) {
+				pool.remove(pack);
+
+				String errorMassage = "Module version is incompatible with project version. " + pack.MODILE_INFO.name()
+						+ "-" + pack.MODILE_INFO.version() + " incompatible with Owlook-" + projectVersion;
+
+				loadReport.loadInfoList.add(new ModuleLoadInfo(pack, ModuleLoadInfo.Status.ERROR, errorMassage));
+			}
+		});
+
 		Map<String, List<OwlookModulePack>> loadedModules = new HashMap<>();
-		
+
 		pool.forEach(pack -> {
 			if (loadedModules.containsKey(pack.MODILE_INFO.moduleName())) {
 				loadedModules.get(pack.MODILE_INFO.moduleName()).add(pack);
@@ -132,22 +147,24 @@ public enum ModuleLoader {
 				loadedModules.put(pack.MODILE_INFO.moduleName(), new ArrayList<>(Arrays.asList(pack)));
 			}
 		});
-		
+
 		loadedModules.forEach((key, value) -> {
 			if (value.size() > 1) {
 				value.forEach(pack -> {
 					if (pool.remove(pack)) {
 						StringBuilder builder = new StringBuilder("Duplicate module:");
 						value.forEach(pack2 -> {
-							builder.append("\n " + pack2.MODILE_INFO.name() + "-" + pack2.MODILE_INFO.version() + " [" + pack2.LOCATION + "]");
+							builder.append("\n " + pack2.MODILE_INFO.name() + "-" + pack2.MODILE_INFO.version() + " ["
+									+ pack2.LOCATION + "]");
 						});
-						loadReport.loadInfoList.add(new ModuleLoadInfo(pack, ModuleLoadInfo.Status.ERROR, builder.toString()));
+						loadReport.loadInfoList
+								.add(new ModuleLoadInfo(pack, ModuleLoadInfo.Status.ERROR, builder.toString()));
 					}
 				});
 				loadReport.load = false;
 			}
 		});
-		
+
 		LoadOrder loadOrder = new LoadOrder(pool);
 
 		OwlookModulePack loadPack = null;
@@ -172,21 +189,23 @@ public enum ModuleLoader {
 		if (loadReport.isLoad()) {
 			loadReport.resultLayer = moduleLayer;
 		}
-		
+
 		return loadReport;
 
 	}
+
 	LoadReport boot(Collection<OwlookModulePack> modulePacks) {
 		LoadReport loadReport = testBoot(modulePacks);
 		if (loadReport.isLoad()) {
 			this.moduleLayer = loadReport.resultLayer;
 		}
 		return loadReport;
-		
+
 	}
-	
+
 	void initOwlookModules(boolean forceInit) {
-		if (!isBoot()) return;
+		if (!isBoot())
+			return;
 		if (!isInitModules() || forceInit) {
 			loadModules().forEach(OwlookModule::initModule);
 		}
@@ -195,7 +214,7 @@ public enum ModuleLoader {
 	boolean isBoot() {
 		return moduleLayer != null;
 	}
-	
+
 	boolean isInitModules() {
 		return initModules;
 	}

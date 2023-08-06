@@ -33,6 +33,7 @@ import javafx.stage.Stage;
 import space.sadfox.owlook.OwlookConfiguration;
 import space.sadfox.owlook.ResourceTarget;
 import space.sadfox.owlook.base.moduleapi.OwlookModulePack;
+import space.sadfox.owlook.base.moduleapi.VersionFormat;
 import space.sadfox.owlook.moduleloader.ModuleLoader.LoadReport;
 import space.sadfox.owlook.ui.MainStage;
 import space.sadfox.owlook.ui.base.Controller;
@@ -65,7 +66,7 @@ public class ModuleLoaderController extends Controller {
 		final StringProperty name = new SimpleStringProperty();
 		final StringProperty moduleName = new SimpleStringProperty();
 		final StringProperty description = new SimpleStringProperty();
-		final StringProperty version = new SimpleStringProperty();
+		final ObjectProperty<VersionFormat> version = new SimpleObjectProperty<>();
 		final StringProperty massage = new SimpleStringProperty("");
 		final BooleanProperty enable = new SimpleBooleanProperty(false);
 		final ObjectProperty<TableEntityStatus> status = new SimpleObjectProperty<>(TableEntityStatus.READY);
@@ -260,7 +261,7 @@ public class ModuleLoaderController extends Controller {
 		moduleDescription.setCellValueFactory(cellData -> cellData.getValue().description);
 		moduleTable.getColumns().add(moduleDescription);
 
-		TableColumn<TableEntity, String> moduleVersion = new TableColumn<>("Version");
+		TableColumn<TableEntity, VersionFormat> moduleVersion = new TableColumn<>("Version");
 		moduleVersion.setCellValueFactory(cellData -> cellData.getValue().version);
 		moduleTable.getColumns().add(moduleVersion);
 
