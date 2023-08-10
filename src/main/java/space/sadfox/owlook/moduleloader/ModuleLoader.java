@@ -82,39 +82,54 @@ public enum ModuleLoader {
 		return Collections.unmodifiableCollection(owlookModulePacks.values());
 	}
 
-	OwlookModulePack getModulePack(Path moduleFile) throws IOException {
-		moduleFile = moduleFile.toAbsolutePath();
-		if (!owlookModulePacks.containsKey(moduleFile)) {
-			OwlookModulePack pack = new OwlookModulePack(moduleFile);
-			owlookModulePacks.put(moduleFile, pack);
-		}
-		return owlookModulePacks.get(moduleFile);
-	}
-
-	List<OwlookModulePack> getModulePacks(Path... moduleFiles) {
-		return getModulePacks(Arrays.asList(moduleFiles));
-	}
-
-	List<OwlookModulePack> getModulePacks(Collection<Path> moduleFiles) {
-		List<OwlookModulePack> returnList = new ArrayList<>();
-		for (Path moduleFile : moduleFiles) {
-			try {
-				returnList.add(getModulePack(moduleFile));
-			} catch (IOException e) {
-				OwlLogger.registerException(2, e);
-			}
-		}
-		return returnList;
-	}
-
-	void removeModulePack(OwlookModulePack owlookModulePack) throws IOException {
-		if (owlookModulePacks.containsKey(owlookModulePack.LOCATION)) {
-			owlookModulePack.close();
-			owlookModulePacks.remove(owlookModulePack.LOCATION);
-		}
-
-		Files.deleteIfExists(owlookModulePack.LOCATION);
-	}
+//	OwlookModulePack getModulePack(Path moduleFile) throws IOException {
+//		moduleFile = moduleFile.toAbsolutePath();
+//		if (!owlookModulePacks.containsKey(moduleFile)) {
+//			OwlookModulePack pack = new OwlookModulePack(moduleFile);
+//			owlookModulePacks.put(moduleFile, pack);
+//		}
+//		return owlookModulePacks.get(moduleFile);
+//	}
+//	
+//	List<OwlookModulePack> getModulePacks(Path... moduleFiles) {
+//		return getModulePacks(Arrays.asList(moduleFiles));
+//	}
+//
+//	List<OwlookModulePack> getModulePacks(Collection<Path> moduleFiles) {
+//		List<OwlookModulePack> returnList = new ArrayList<>();
+//		for (Path moduleFile : moduleFiles) {
+//			try {
+//				returnList.add(getModulePack(moduleFile));
+//			} catch (IOException e) {
+//				OwlLogger.registerException(2, e);
+//			}
+//		}
+//		return returnList;
+//	}
+//
+//	void closeModulePack(OwlookModulePack owlookModulePack) throws IOException {
+//		if (owlookModulePacks.containsKey(owlookModulePack.LOCATION)) {
+//			owlookModulePack.close();
+//			owlookModulePacks.remove(owlookModulePack.LOCATION);
+//		}
+//	}
+//
+//	void removeModulePack(OwlookModulePack owlookModulePack) throws IOException {
+//		closeModulePack(owlookModulePack);
+//		Files.deleteIfExists(owlookModulePack.LOCATION);
+//	}
+//	
+//	OwlookModulePack importModulePack(Path moduleFile) throws IOException {
+//		try (OwlookModulePack testPack = new OwlookModulePack(moduleFile)) {}
+//		
+//		Path outPath = ProjectPath.MODULE.getPath().resolve(moduleFile.getFileName());
+//		if (Files.exists(outPath)) {
+//			throw new IOException("Module file alredy exists: " + outPath);
+//		}
+//		
+//		Files.copy(moduleFile, ProjectPath.MODULE.getPath().resolve(moduleFile.getFileName()));
+//		return getModulePack(outPath);
+//	}
 
 	LoadReport testBoot(Collection<OwlookModulePack> modulePacks) {
 
@@ -169,8 +184,8 @@ public enum ModuleLoader {
 
 		OwlookModulePack loadPack = null;
 		while ((loadPack = loadOrder.poll()) != null) {
-			ModuleFinder moduleFinder = ModuleFinder.of(loadPack.MODULE_PATH);
-			ModuleFinder libFinder = ModuleFinder.of(loadPack.LIB_PATH);
+			ModuleFinder moduleFinder = ModuleFinder.of(loadPack.MODULE);
+			ModuleFinder libFinder = ModuleFinder.of(loadPack.LIB);
 
 			try {
 				Configuration configuration = moduleLayer.configuration().resolve(moduleFinder, libFinder,
@@ -195,9 +210,14 @@ public enum ModuleLoader {
 	}
 
 	LoadReport boot(Collection<OwlookModulePack> modulePacks) {
+		if (isBoot()) {
+			stopBoot();
+		}
 		LoadReport loadReport = testBoot(modulePacks);
 		if (loadReport.isLoad()) {
 			this.moduleLayer = loadReport.resultLayer;
+			loadReport.loadInfoList.stream().map(info -> info.PACK).forEach(pack -> owlookModulePacks.put(pack.LOCATION, pack));
+			
 		}
 		return loadReport;
 
@@ -208,20 +228,22 @@ public enum ModuleLoader {
 			return;
 		if (!isInitModules() || forceInit) {
 			loadModules().forEach(OwlookModule::initModule);
+			initModules = true;
 		}
 	}
 
 	boolean isBoot() {
 		return moduleLayer != null;
 	}
+	
+	void stopBoot() {
+		moduleLayer = null;
+		owlookModulePacks.clear();
+		initModules = false;
+	}
 
 	boolean isInitModules() {
 		return initModules;
-	}
-
-	static List<Path> findModuleFiles() throws IOException {
-		return Files.find(ProjectPath.MODULE.getPath(), 1, (p, attr) -> p.getFileName().toString().endsWith(".owlm"))
-				.map(Path::toAbsolutePath).collect(Collectors.toList());
 	}
 
 }

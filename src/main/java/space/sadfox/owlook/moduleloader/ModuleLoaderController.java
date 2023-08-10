@@ -1,7 +1,12 @@
 package space.sadfox.owlook.moduleloader;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -29,29 +34,34 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.cell.CheckBoxTableCell;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
+import javafx.scene.layout.AnchorPane;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 import space.sadfox.owlook.OwlookConfiguration;
 import space.sadfox.owlook.ResourceTarget;
 import space.sadfox.owlook.base.moduleapi.OwlookModulePack;
+import space.sadfox.owlook.base.moduleapi.OwlookModulePacks;
 import space.sadfox.owlook.base.moduleapi.VersionFormat;
 import space.sadfox.owlook.moduleloader.ModuleLoader.LoadReport;
 import space.sadfox.owlook.ui.MainStage;
 import space.sadfox.owlook.ui.base.Controller;
 import space.sadfox.owlook.ui.tools.MessageBox;
 import space.sadfox.owlook.utils.OwlLogger;
+import space.sadfox.owlook.utils.ProjectPath;
 import space.sadfox.owlook.utils.StageFactory;
 
 public class ModuleLoaderController extends Controller {
 
 	private enum TableEntityStatus {
-		OK("OK", 0), ERROR("Error", 2), NOT_FOUND("Not Found", 3), DISABLE("Disable", 4), READY("Ready", 5);
+		OK("OK"), ERROR("Error"), NOT_FOUND("Not Found"), DISABLE("Disable"), READY("Ready");
 
 		final String title;
-		final int ORDER;
 
-		private TableEntityStatus(String title, int order) {
+		private TableEntityStatus(String title) {
 			this.title = title;
-			ORDER = order;
 		}
 
 		@Override
@@ -88,11 +98,11 @@ public class ModuleLoaderController extends Controller {
 					config.getModules().remove(moduleName.get());
 					status.set(TableEntityStatus.DISABLE);
 				}
-				testBoot();
+				testLaunch();
 			});
 			update();
 		}
-		
+
 		TableEntity(String owlookModuleName) {
 			this.owlookModulePack = null;
 
@@ -106,19 +116,21 @@ public class ModuleLoaderController extends Controller {
 			});
 			update();
 		}
-		
+
 		void update() {
 			update(null);
 		}
 
 		void update(LoadReport loadReport) {
-			if (status.get().equals(TableEntityStatus.NOT_FOUND)) return;
+			if (status.get().equals(TableEntityStatus.NOT_FOUND))
+				return;
 			if (!enable.get()) {
 				status.set(TableEntityStatus.DISABLE);
 				massage.set("");
 				return;
 			}
-			if (loadReport == null) return;
+			if (loadReport == null)
+				return;
 			for (ModuleLoadInfo info : loadReport.getModuleLoadInfoList()) {
 				if (info.PACK.LOCATION.equals(owlookModulePack.LOCATION)) {
 					switch (info.STATUS) {
@@ -166,34 +178,16 @@ public class ModuleLoaderController extends Controller {
 			});
 			MenuItem remove = new MenuItem("Remove");
 			remove.setOnAction(event -> {
-				if (tableEntity.status.equals(TableEntityStatus.NOT_FOUND)) {
-					config.getModules().removeIf(moduleName -> moduleName.equals(tableEntity.moduleName.get()));
-				} else {
-					Dialog<ButtonType> dialog = new Dialog<>();
-					dialog.getDialogPane().getButtonTypes().addAll(ButtonType.NO, ButtonType.YES);
-					dialog.setTitle("Deletion confirmation");
-					dialog.setHeaderText("Are you sure you want to remove the module "+ tableEntity.name.get() +" ?");
-					
+				Dialog<ButtonType> dialog = new Dialog<>();
+				dialog.getDialogPane().getButtonTypes().addAll(ButtonType.NO, ButtonType.YES);
+				dialog.setTitle("Deletion confirmation");
+				dialog.setHeaderText("Are you sure you want to remove the module " + tableEntity.name.get() + " ?");
 
-					Optional<ButtonType> choose = dialog.showAndWait();
+				Optional<ButtonType> choose = dialog.showAndWait();
 
-					if (choose.isPresent() || choose.get().equals(ButtonType.YES)) {
-						try {
-							ModuleLoader.INSTANCE.removeModulePack(tableEntity.owlookModulePack);
-							tableEntities.remove(tableEntity);
-							testBoot();
-						} catch (IOException e) {
-							OwlLogger.registerException(1, e);
-							
-							MessageBox messageBox = new MessageBox(AlertType.ERROR);
-							messageBox.setTitle("Deletion error");
-							messageBox.setHeaderText("Module removal error " + tableEntity.name.get());
-							messageBox.setContentText(e.getMessage());
-							messageBox.showAndWait();
-						}
-					}
+				if (choose.isPresent() && choose.get().equals(ButtonType.YES)) {
+					removeTableEntity(tableEntity);
 				}
-
 			});
 			this.getItems().add(remove);
 
@@ -202,13 +196,16 @@ public class ModuleLoaderController extends Controller {
 	}
 
 	@FXML
+	private MenuItem importModulesButton;
+
+	@FXML
 	private Button launchButton;
 
 	@FXML
-	private TextArea moduleDescriptionTextArea;
+	private TableView<TableEntity> moduleTable;
 
 	@FXML
-	private TableView<TableEntity> moduleTable;
+	private AnchorPane root;
 
 	@FXML
 	private CheckBox skipModuleManagerCheckBox;
@@ -221,15 +218,16 @@ public class ModuleLoaderController extends Controller {
 		super(ResourceTarget.class.getResource("fxml/module-loader.fxml"));
 
 		init();
-		tableEntities.addAll(ModuleLoader.INSTANCE.getModulePacks(ModuleLoader.findModuleFiles()).stream()
-				.map(TableEntity::new).collect(Collectors.toList()));
-		
+
+		List<OwlookModulePack> findPacks = OwlookModulePacks
+				.getModulePacks(OwlookModulePacks.findModuleFiles(ProjectPath.MODULE.getPath(), 1));
+		findPacks.stream().map(TableEntity::new).forEach(tableEntities::add);
+
 		config.getModules().stream().filter(moduleName -> {
-			return tableEntities.stream()
-					.noneMatch(tableEntity -> tableEntity.moduleName.get().equals(moduleName));
+			return tableEntities.stream().noneMatch(tableEntity -> tableEntity.moduleName.get().equals(moduleName));
 		}).forEach(moduleName -> tableEntities.add(new TableEntity(moduleName)));
 
-		testBoot();
+		testLaunch();
 	}
 
 	private void init() {
@@ -238,6 +236,33 @@ public class ModuleLoaderController extends Controller {
 		config.skipModuleManageProperty().bindBidirectional(skipModuleManagerCheckBox.selectedProperty());
 		initModuleTable();
 		launchButton.setOnAction(this::launch);
+
+		root.setOnDragOver(dragEvent -> {
+			Dragboard dragboard = dragEvent.getDragboard();
+			if (dragboard.hasFiles()) {
+				boolean modulesDetect = dragboard.getFiles().stream().map(File::getName)
+						.allMatch(fileName -> fileName.endsWith(".owlm"));
+				if (modulesDetect) {
+					dragEvent.acceptTransferModes(TransferMode.ANY);
+					dragEvent.consume();
+				}
+			}
+		});
+		root.setOnDragDropped(dragEvent -> {
+			Dragboard dragboard = dragEvent.getDragboard();
+			dragboard.getFiles().stream().map(File::toPath).forEach(this::importModulePack);
+		});
+
+		importModulesButton.setOnAction(event -> {
+			FileChooser fileChooser = new FileChooser();
+			fileChooser.getExtensionFilters().add(new ExtensionFilter("OwlookModule", "*.owlm"));
+
+			List<File> selectedModules = fileChooser.showOpenMultipleDialog(StageFactory.INSTANCE.getCurrentStage());
+
+			if (selectedModules != null) {
+				selectedModules.stream().map(File::toPath).forEach(this::importModulePack);
+			}
+		});
 	}
 
 	private void initModuleTable() {
@@ -295,17 +320,19 @@ public class ModuleLoaderController extends Controller {
 		tableEntities.forEach(e -> e.update(loadReport));
 	}
 
-	private List<TableEntity> filteredTableEntities(TableEntityStatus ... status) {
+	private List<TableEntity> filteredTableEntities(TableEntityStatus... status) {
 		List<TableEntityStatus> statusList = Arrays.asList(status);
 		return tableEntities.filtered(tableEntity -> statusList.contains(tableEntity.status.get()));
 	}
-	
-	private List<OwlookModulePack> filteredModulePacks(TableEntityStatus ... status) {
-		return filteredTableEntities(status).stream().map(tableEntity -> tableEntity.owlookModulePack).collect(Collectors.toList());
+
+	private List<OwlookModulePack> filteredModulePacks(TableEntityStatus... status) {
+		return filteredTableEntities(status).stream().map(tableEntity -> tableEntity.owlookModulePack)
+				.collect(Collectors.toList());
 	}
 
-	private void testBoot() {
-		LoadReport loadReport = ModuleLoader.INSTANCE.testBoot(filteredModulePacks(TableEntityStatus.OK, TableEntityStatus.ERROR, TableEntityStatus.READY));
+	private void testLaunch() {
+		LoadReport loadReport = ModuleLoader.INSTANCE
+				.testBoot(filteredModulePacks(TableEntityStatus.OK, TableEntityStatus.ERROR, TableEntityStatus.READY));
 		updateTableEtities(loadReport);
 	}
 
@@ -318,7 +345,8 @@ public class ModuleLoaderController extends Controller {
 	}
 
 	public boolean launch() {
-		List<TableEntity> errorTableEntities = filteredTableEntities(TableEntityStatus.ERROR, TableEntityStatus.NOT_FOUND);
+		List<TableEntity> errorTableEntities = filteredTableEntities(TableEntityStatus.ERROR,
+				TableEntityStatus.NOT_FOUND);
 
 		if (errorTableEntities.size() > 0) {
 			Dialog<ButtonType> dialog = new Dialog<>();
@@ -343,7 +371,7 @@ public class ModuleLoaderController extends Controller {
 		LoadReport loadReport = ModuleLoader.INSTANCE.boot(filteredModulePacks(TableEntityStatus.OK));
 		updateTableEtities(loadReport);
 
-		if (loadReport.isLoad()) {
+		if (ModuleLoader.INSTANCE.isBoot()) {
 			try {
 				ModuleLoader.INSTANCE.initOwlookModules(true);
 				MainStage mainStage = new MainStage();
@@ -355,5 +383,92 @@ public class ModuleLoaderController extends Controller {
 		}
 		return false;
 
+	}
+
+	private void removeTableEntity(TableEntity tableEntity) {
+
+		try {
+			if (!tableEntity.status.get().equals(TableEntityStatus.NOT_FOUND)) {
+				removeModulePack(tableEntity.owlookModulePack);
+			}
+			config.getModules().removeIf(moduleName -> moduleName.equals(tableEntity.moduleName.get()));
+			tableEntities.remove(tableEntity);
+			testLaunch();
+		} catch (IOException e) {
+			OwlLogger.registerException(1, e);
+
+			MessageBox messageBox = new MessageBox(AlertType.ERROR);
+			messageBox.setTitle("Deletion error");
+			messageBox.setHeaderText("Module removal error " + tableEntity.name.get());
+			messageBox.setContentText(e.getMessage());
+			messageBox.showAndWait();
+		}
+	}
+
+	private void removeModulePack(OwlookModulePack owlookModulePack) throws IOException {
+		if (owlookModulePack.isOpened()) {
+			owlookModulePack.close();
+		}
+		Files.deleteIfExists(owlookModulePack.LOCATION);
+	}
+
+	private void importModulePack(Path moduleFile) {
+		try {
+			try (OwlookModulePack newPack = new OwlookModulePack(moduleFile)) {
+
+				if (!newPack.MODILE_INFO.version().compatibleWith(config.getVersion())) {
+					MessageBox message = new MessageBox(AlertType.ERROR);
+					message.setTitle("Version incompatibility [" + newPack.MODILE_INFO.name() + "-"
+							+ newPack.MODILE_INFO.version() + "]");
+					message.setHeaderText("The module version is incompatible with the version Owlook");
+					message.showAndWait();
+					return;
+				}
+
+				List<TableEntity> sameEntities = tableEntities
+						.filtered(tableEntity -> tableEntity.moduleName.get().equals(newPack.MODILE_INFO.moduleName()));
+
+				if (sameEntities.size() > 0) {
+					sameEntities = new ArrayList<>(sameEntities);
+					sameEntities.sort(
+							Comparator.<TableEntity, VersionFormat>comparing(te1 -> te1.version.get()).reversed());
+					OwlookModulePack samePack = sameEntities.get(0).owlookModulePack;
+					Dialog<ButtonType> dialog = new Dialog<>();
+					dialog.getDialogPane().getButtonTypes().addAll(ButtonType.NO, ButtonType.YES);
+					dialog.setTitle("The module is already installed [" + newPack.MODILE_INFO.name() + "-"
+							+ newPack.MODILE_INFO.version() + "]");
+					Optional<ButtonType> answer = Optional.empty();
+
+					if (samePack.MODILE_INFO.version().compareTo(newPack.MODILE_INFO.version()) > 0) {
+						dialog.setHeaderText("The version of the installed module is higher. Downgrade?");
+						dialog.setContentText(samePack.MODILE_INFO.version() + " -> " + newPack.MODILE_INFO.version());
+						answer = dialog.showAndWait();
+					} else if (samePack.MODILE_INFO.version().compareTo(newPack.MODILE_INFO.version()) < 0) {
+						dialog.setHeaderText("The version of the installed module is lower. Upgrade?");
+						dialog.setContentText(samePack.MODILE_INFO.version() + " -> " + newPack.MODILE_INFO.version());
+						answer = dialog.showAndWait();
+					}
+
+					if (answer.isEmpty() || answer.get().equals(ButtonType.NO)) {
+						return;
+					}
+					sameEntities.forEach(this::removeTableEntity);
+				}
+
+			}
+
+			Path newModuleFile = ProjectPath.MODULE.getPath().resolve(moduleFile.getFileName());
+			Files.copy(moduleFile, newModuleFile);
+			tableEntities.add(new TableEntity(new OwlookModulePack(newModuleFile)));
+			testLaunch();
+		} catch (IOException e) {
+			OwlLogger.registerException(1, e);
+			MessageBox messageBox = new MessageBox(AlertType.ERROR);
+			messageBox.setTitle("Import error");
+			messageBox.setHeaderText("Module import error: " + moduleFile);
+			messageBox.setContentText(e.getMessage());
+			messageBox.showAndWait();
+
+		}
 	}
 }

@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>space.sadfox</groupId>
 	<artifactId>owlook</artifactId>
-	<version>0.4.51</version>
+	<version>0.4.56</version>
 	<name>Owlook</name>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -15,7 +15,7 @@
 		<dependency>
 			<groupId>space.sadfox</groupId>
 			<artifactId>owlook.base</artifactId>
-			<version>0.5.0</version>
+			<version>0.5.1</version>
 		</dependency>
 		<!-- JAXB -->
 		<dependency>
