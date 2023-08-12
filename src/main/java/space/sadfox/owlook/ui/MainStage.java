@@ -11,10 +11,10 @@ import javafx.scene.control.MenuItem;
 import space.sadfox.owlook.Main;
 import space.sadfox.owlook.component.Workspace;
 import space.sadfox.owlook.moduleloader.ModuleLoader;
-import space.sadfox.owlook.ui.base.Controller;
+import space.sadfox.owlook.ui.base.FXMLController;
 import space.sadfox.owlook.ui.tools.EntityManager;
 
-public class MainStage extends Controller {
+public class MainStage extends FXMLController {
 	
 
     @FXML

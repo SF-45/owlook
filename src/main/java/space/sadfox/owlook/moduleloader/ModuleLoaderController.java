@@ -32,7 +32,6 @@ import javafx.scene.control.SplitMenuButton;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
@@ -47,13 +46,13 @@ import space.sadfox.owlook.base.moduleapi.OwlookModulePacks;
 import space.sadfox.owlook.base.moduleapi.VersionFormat;
 import space.sadfox.owlook.moduleloader.ModuleLoader.LoadReport;
 import space.sadfox.owlook.ui.MainStage;
-import space.sadfox.owlook.ui.base.Controller;
+import space.sadfox.owlook.ui.base.FXMLController;
 import space.sadfox.owlook.ui.tools.MessageBox;
 import space.sadfox.owlook.utils.OwlLogger;
 import space.sadfox.owlook.utils.ProjectPath;
 import space.sadfox.owlook.utils.StageFactory;
 
-public class ModuleLoaderController extends Controller {
+public class ModuleLoaderController extends FXMLController {
 
 	private enum TableEntityStatus {
 		OK("OK"), ERROR("Error"), NOT_FOUND("Not Found"), DISABLE("Disable"), READY("Ready");

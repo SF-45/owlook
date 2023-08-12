@@ -33,12 +33,12 @@ import space.sadfox.owlook.base.jaxb.JAXBEntityValidateException;
 import space.sadfox.owlook.base.moduleapi.ModuleHasNoProvideEntities;
 import space.sadfox.owlook.moduleloader.ModuleLoader;
 import space.sadfox.owlook.ui.base.Controllable;
-import space.sadfox.owlook.ui.base.Controller;
+import space.sadfox.owlook.ui.base.FXMLController;
 import space.sadfox.owlook.utils.EntityLoader;
 import space.sadfox.owlook.utils.Nullable;
 import space.sadfox.owlook.utils.OwlLogger;
 
-public class EntityManager extends Controller {
+public class EntityManager extends FXMLController {
 
 	@FXML
 	private ButtonBar buttonBar;
