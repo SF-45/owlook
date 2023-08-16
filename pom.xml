@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>space.sadfox</groupId>
 	<artifactId>owlook</artifactId>
-	<version>0.4.58</version>
+	<version>0.4.60</version>
 	<name>Owlook</name>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

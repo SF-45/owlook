@@ -9,7 +9,6 @@ public class DesignController<T extends FormDesigner> extends Controller {
 	public DesignController(T formDesigner) {
 		this.DESIGN = formDesigner;
 		root = formDesigner.root();
-		formDesigner.initialization();
 	}
 
 	@Override
