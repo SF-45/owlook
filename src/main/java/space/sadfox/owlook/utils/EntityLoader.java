@@ -158,7 +158,7 @@ public enum EntityLoader {
 		JAXBEntity instance;
 		for (OwlookModule module : ModuleLoader.INSTANCE.loadModules()) {
 			try {
-				for (Class<? extends JAXBEntity> targetClass : module.getJaxbEntities()) {
+				for (Class<? extends JAXBEntity> targetClass : module.getOwlEntities()) {
 					instance = new JAXBHelper<>(path, targetClass).getInstance();
 					instance.validate();
 					instance.initialize();

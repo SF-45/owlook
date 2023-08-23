@@ -60,7 +60,7 @@ public class EntityManager extends FXMLController {
 
 		ModuleLoader.INSTANCE.loadModules().forEach(module -> {
 			try {
-				dirTable.getItems().addAll(module.getJaxbEntities());
+				dirTable.getItems().addAll(module.getOwlEntities());
 			} catch (ModuleHasNoProvideEntities e) {
 			}
 		});
