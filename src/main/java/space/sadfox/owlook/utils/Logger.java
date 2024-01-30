@@ -12,17 +12,20 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Modality;
 import space.sadfox.owlook.OwlookConfiguration;
 import space.sadfox.owlook.logger.LogLevel;
-import space.sadfox.owlook.logger.Logger;
+import space.sadfox.owlook.logger.LoggerEntity;
 import space.sadfox.owlook.logger.LoggerDAO;
 import space.sadfox.owlook.logger.LoggerEntry;
 import space.sadfox.owlook.ui.tools.MessageBox;
 
-public class OwlLogger implements Thread.UncaughtExceptionHandler {
+public class Logger implements Thread.UncaughtExceptionHandler {
+	
+	private static ConfigurationManager<LoggerEntity> configurationManager = new ConfigurationManager<>(LoggerEntity.class);
 
-	public static void registerException(int loggingDepth, Throwable e) {
-		Logger logger = getErrorLogger();
-		LoggerDAO loggerDAO = new LoggerDAO(logger);
+	public synchronized static void registerException(int loggingDepth, Throwable e) {
+		LoggerEntity loggerEntity = getErrorLogger();
+		LoggerDAO loggerDAO = new LoggerDAO(loggerEntity);
 		LoggerEntry entry = loggerDAO.addNewLoggerEntry();
+		
 
 		loggingDepth = normalizeLoggingDepth(loggingDepth);
 
@@ -35,7 +38,7 @@ public class OwlLogger implements Thread.UncaughtExceptionHandler {
 		entry.setLogLevel(LogLevel.ERROR);
 		entry.setLoggingDepth(loggingDepth);
 		try {
-			logger.save();
+			loggerEntity.save();
 		} catch (JAXBException | IOException e1) {
 			e1.printStackTrace();
 		}
@@ -58,26 +61,16 @@ public class OwlLogger implements Thread.UncaughtExceptionHandler {
 
 	}
 
-	private static int normalizeLoggingDepth(int loggingDepth) {
-		if (loggingDepth < 0) {
-			return 0;
-		} else if (loggingDepth > 3) {
-			return 3;
-		} else {
-			return loggingDepth;
-		}
-	}
-
-	public static void registerMessage(LoggerMessage message) {
-		Logger logger = getErrorLogger();
-		LoggerDAO loggerDAO = new LoggerDAO(logger);
+	public synchronized static void registerMessage(LoggerMessage message) {
+		LoggerEntity loggerEntity = getErrorLogger();
+		LoggerDAO loggerDAO = new LoggerDAO(loggerEntity);
 		LoggerEntry entry = loggerDAO.addNewLoggerEntry();
 		entry.setName(message.getName());
 		entry.setMessage(message.getMessage());
 		entry.setLogLevel(message.getLogLevel());
 		entry.setTime(System.currentTimeMillis());
 		try {
-			logger.save();
+			loggerEntity.save();
 		} catch (JAXBException | IOException e) {
 			e.printStackTrace();
 		}
@@ -86,25 +79,36 @@ public class OwlLogger implements Thread.UncaughtExceptionHandler {
 		System.out.println(message.getMessage());
 	}
 
-	public static void registerException(Thread t, Throwable e) {
+	public synchronized static void registerException(Thread t, Throwable e) {
 		registerException(0, e);
 		System.err.print("Exception in thread \"" + t.getName() + "\" ");
 		e.printStackTrace();
 	}
 
-	public static Logger getErrorLogger() {
+	public synchronized static LoggerEntity getErrorLogger() {
 		Path path = ProjectPath.LOG.getPath()
 				.resolve(new SimpleDateFormat("dd-MM-yyyy").format(new Date(System.currentTimeMillis())));
+		
 		try {
-			return EntityLoader.INSTANCE.createOrLoadExternalEntity(path, Logger.class);
-		} catch (IOException | JAXBException e) {
+			return configurationManager.getConfig(path);
+		} catch (ClassCastException | JAXBException | IOException | ReflectiveOperationException e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
 
 	@Override
-	public void uncaughtException(Thread t, Throwable e) {
+	public synchronized void uncaughtException(Thread t, Throwable e) {
 		registerException(t, e);
+	}
+
+	private static int normalizeLoggingDepth(int loggingDepth) {
+		if (loggingDepth < 0) {
+			return 0;
+		} else if (loggingDepth > 3) {
+			return 3;
+		} else {
+			return loggingDepth;
+		}
 	}
 }

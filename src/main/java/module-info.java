@@ -1,5 +1,7 @@
 import space.sadfox.owlook.base.moduleapi.OwlookModule;
 import space.sadfox.owlook.base.moduleapi.OwlookModuleComponent;
+import space.sadfox.owlook.base.owl.OwlEntity;
+import space.sadfox.owlook.component.Workspace;
 module space.sadfox.owlook {
 	requires transitive owlook.base;
 
@@ -23,6 +25,7 @@ module space.sadfox.owlook {
 
 	opens space.sadfox.owlook.logger to jakarta.xml.bind;
 	opens space.sadfox.owlook to jakarta.xml.bind;
+	opens space.sadfox.owlook.owlery to jakarta.xml.bind;
 	opens space.sadfox.owlook.ui to javafx.fxml;
 	opens space.sadfox.owlook.ui.tools to javafx.fxml;
 	
@@ -32,6 +35,7 @@ module space.sadfox.owlook {
 	// api
 
 	exports space.sadfox.owlook to javafx.graphics, owlook.base;
+	exports space.sadfox.owlook.owlery;
 	exports space.sadfox.owlook.component;
 	exports space.sadfox.owlook.utils;
 	exports space.sadfox.owlook.logger;
@@ -40,6 +44,8 @@ module space.sadfox.owlook {
 	exports space.sadfox.owlook.moduleloader;
 
 	uses OwlookModule;
+	uses Workspace;
 	uses OwlookModuleComponent;
+	uses OwlEntity;
 
 }

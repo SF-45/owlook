@@ -24,7 +24,7 @@ public class ActionTimer {
 					try {
 						Thread.sleep(1);
 					} catch (InterruptedException e) {
-						OwlLogger.registerException(2, e);
+						Logger.registerException(2, e);
 					}
 				}
 				action.run();

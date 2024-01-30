@@ -16,47 +16,25 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import space.sadfox.owlook.base.jaxb.JAXBEntity;
+import space.sadfox.owlook.base.jaxb.ObservedJAXBEntity;
 import space.sadfox.owlook.base.moduleapi.VersionFormat;
-import space.sadfox.owlook.utils.EntityLoader;
-import space.sadfox.owlook.utils.OwlLogger;
-import space.sadfox.owlook.utils.ProjectPath;
+import space.sadfox.owlook.utils.ConfigurationManager;
+import space.sadfox.owlook.utils.Logger;
 
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement(name = "owlookConfiguration")
-public class OwlookConfiguration extends JAXBEntity {
-	
-	private final StringProperty title = new SimpleStringProperty("title");
+public class OwlookConfiguration extends ObservedJAXBEntity {
 	private VersionFormat version;
 	private final IntegerProperty loggingDepth = new SimpleIntegerProperty(1);
 	private final BooleanProperty debugMode = new SimpleBooleanProperty(true);
 	private final BooleanProperty skipModuleManage = new SimpleBooleanProperty(false);
 	private final ObservableList<String> modules = FXCollections.observableArrayList();
-
-	@Override
-	@XmlElement
-	public String getTitle() {
-		return titleProperty().get();
-	}
-
-	@Override
-	public void setTitle(String title) {
-		titleProperty().set(title);
-		
-	}
-	
-	public StringProperty titleProperty() {
-		return title;
-	}
 	
 	public VersionFormat getVersion() {
 		return version;
 	}
-
 	
 	@XmlElement
 	public int getLoggingDepth() {
@@ -106,46 +84,30 @@ public class OwlookConfiguration extends JAXBEntity {
 	public ObservableList<String> modulesProperty() {
 		return modules;
 	}
-	
 	@Override
 	public List<Object> getProperties() {
-		return Arrays.asList(title, loggingDepth, debugMode, modules, skipModuleManage);
+		return Arrays.asList(loggingDepth, debugMode, modules, skipModuleManage);
+	}
+
+	public static OwlookConfiguration instance() {
+		Path confPath = Path.of("owlook.conf");
+		try {
+			return new ConfigurationManager<>(OwlookConfiguration.class).getConfig(confPath);
+		} catch (JAXBException | IOException | ClassCastException | ReflectiveOperationException e) {
+			Logger.registerException(0, e);
+			return null;
+		}
 	}
 
 	@Override
-	public void validate() {
-		
-	}
-
-	@Override
-	public void initialize() {
+	protected void initialization() {
+		super.initialization();
 		try {
 			Properties properties = new Properties();
 			properties.load(ResourceTarget.class.getResourceAsStream("pom.properties"));
 			version = VersionFormat.of(properties.getProperty("version", "0.0.0-default"));
 		} catch (IOException e) {
-			OwlLogger.registerException(0, e);
-		}
-		
-	}
-
-	@Override
-	public void syncWith(JAXBEntity entity) {
-		if (!getClass().equals(entity.getClass())) return;
-		
-		OwlookConfiguration newConfig = (OwlookConfiguration) entity;
-		
-		setLoggingDepth(newConfig.getLoggingDepth());
-		setDebugMode(newConfig.isDebugMode());
-	}
-	
-	public static OwlookConfiguration instance() {
-		Path confPath = ProjectPath.MODULE_CONFIG.getPath().resolve("Owlook.owl");
-		try {
-			return EntityLoader.INSTANCE.createOrLoadExternalEntity(confPath, OwlookConfiguration.class);
-		} catch (JAXBException | IOException e) {
-			OwlLogger.registerException(0, e);
-			return null;
+			Logger.registerException(0, e);
 		}
 	}
 

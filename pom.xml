@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>space.sadfox</groupId>
 	<artifactId>owlook</artifactId>
-	<version>0.4.60</version>
+	<version>0.5.0-beta</version>
 	<name>Owlook</name>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -15,7 +15,7 @@
 		<dependency>
 			<groupId>space.sadfox</groupId>
 			<artifactId>owlook.base</artifactId>
-			<version>0.5.1</version>
+			<version>0.6.0-beta3</version>
 		</dependency>
 		<!-- JAXB -->
 		<dependency>
@@ -138,7 +138,7 @@
 					<execution>
 						<phase>validate</phase>
 						<goals>
-							<goal>use-latest-releases</goal>
+							<goal>use-latest-versions</goal>
 						</goals>
 						<configuration>
 							<includes>space.sadfox:owlook.base</includes>

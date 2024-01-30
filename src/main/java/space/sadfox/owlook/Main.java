@@ -1,11 +1,11 @@
 package space.sadfox.owlook;
 
-import space.sadfox.owlook.utils.OwlLogger;
+import space.sadfox.owlook.utils.Logger;
 
 public class Main {
 
 	public static void main(String[] args) {
-		Thread.setDefaultUncaughtExceptionHandler(new OwlLogger());
+		Thread.setDefaultUncaughtExceptionHandler(new Logger());
 
 		App.go();
 

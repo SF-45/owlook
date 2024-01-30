@@ -7,15 +7,15 @@ public class LoggerDAO {
 
 	private static final String DATE_FORMAT = "HH:mm:ss";
 
-	private Logger logger;
+	private LoggerEntity loggerEntity;
 
-	public LoggerDAO(Logger logger) {
-		this.logger = logger;
+	public LoggerDAO(LoggerEntity loggerEntity) {
+		this.loggerEntity = loggerEntity;
 	}
 
 	public LoggerEntry addNewLoggerEntry() {
 		LoggerEntry entry = new LoggerEntry();
-		logger.getLogs().add(entry);
+		loggerEntity.getLogs().add(entry);
 		return entry;
 	}
 

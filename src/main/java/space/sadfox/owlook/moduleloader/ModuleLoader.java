@@ -1,11 +1,9 @@
 package space.sadfox.owlook.moduleloader;
 
-import java.io.IOException;
 import java.lang.module.Configuration;
 import java.lang.module.FindException;
 import java.lang.module.ModuleFinder;
 import java.lang.module.ResolutionException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,6 +12,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.ServiceLoader.Provider;
 import java.util.function.Predicate;
@@ -22,11 +21,12 @@ import java.util.stream.Collectors;
 import space.sadfox.owlook.OwlookConfiguration;
 import space.sadfox.owlook.base.moduleapi.OwlookModule;
 import space.sadfox.owlook.base.moduleapi.OwlookModuleComponent;
+import space.sadfox.owlook.base.moduleapi.OwlookModuleInfo;
 import space.sadfox.owlook.base.moduleapi.OwlookModulePack;
 import space.sadfox.owlook.base.moduleapi.VersionFormat;
+import space.sadfox.owlook.base.owl.OwlEntity;
 import space.sadfox.owlook.component.Workspace;
-import space.sadfox.owlook.utils.OwlLogger;
-import space.sadfox.owlook.utils.ProjectPath;
+import space.sadfox.owlook.utils.Logger;
 
 public enum ModuleLoader {
 	INSTANCE;
@@ -63,7 +63,15 @@ public enum ModuleLoader {
 	}
 
 	public List<Workspace> loadWorkspaces() {
-		return loadModuleComponents(Workspace.class, comp -> comp instanceof Workspace);
+		return loadModules(Workspace.class);
+	}
+
+	public List<OwlEntity> loadOwlEntities() {
+		return loadModules(OwlEntity.class);
+	}
+	
+	public Optional<OwlEntity> loadOwlEntity(String className) {
+		return loadOwlEntities().stream().filter(owlEntity -> owlEntity.getClass().getName().equals(className)).findFirst();
 	}
 
 	public List<OwlookModuleComponent> loadModuleComponents() {
@@ -78,7 +86,25 @@ public enum ModuleLoader {
 				.collect(Collectors.toList());
 	}
 
-	Collection<OwlookModulePack> loadedModulePacks() throws IOException {
+	public List<OwlookModuleInfo> getLoadedModules() {
+		return owlookModulePacks.values().stream().map(modulePack -> modulePack.MODILE_INFO)
+				.collect(Collectors.toList());
+	}
+
+	public Optional<OwlookModuleInfo> getLoadedModule(Module module) {
+		return getLoadedModules(module.getName());
+	}
+
+	public Optional<OwlookModuleInfo> getLoadedModules(String moduleName) {
+		List<OwlookModuleInfo> moduleInfos = getLoadedModules().stream().filter(moduleInfo -> moduleInfo.moduleName().equals(moduleName)).collect(Collectors.toList());
+		if (moduleInfos.size() > 0) {
+			return Optional.of(moduleInfos.get(0));
+		} else {
+			return Optional.empty();
+		}
+	}
+
+	Collection<OwlookModulePack> loadedModulePacks() {
 		return Collections.unmodifiableCollection(owlookModulePacks.values());
 	}
 
@@ -194,7 +220,7 @@ public enum ModuleLoader {
 				moduleLayer = moduleLayer.defineModulesWithOneLoader(configuration, ClassLoader.getSystemClassLoader());
 				loadReport.loadInfoList.add(new ModuleLoadInfo(loadPack, ModuleLoadInfo.Status.OK, ""));
 			} catch (FindException | ResolutionException e) {
-				OwlLogger.registerException(3, e);
+				Logger.registerException(3, e);
 				loadReport.loadInfoList.add(new ModuleLoadInfo(loadPack, ModuleLoadInfo.Status.ERROR, e.getMessage()));
 				loadReport.load = false;
 			}
@@ -216,8 +242,9 @@ public enum ModuleLoader {
 		LoadReport loadReport = testBoot(modulePacks);
 		if (loadReport.isLoad()) {
 			this.moduleLayer = loadReport.resultLayer;
-			loadReport.loadInfoList.stream().map(info -> info.PACK).forEach(pack -> owlookModulePacks.put(pack.LOCATION, pack));
-			
+			loadReport.loadInfoList.stream().map(info -> info.PACK)
+					.forEach(pack -> owlookModulePacks.put(pack.LOCATION, pack));
+
 		}
 		return loadReport;
 
@@ -235,7 +262,7 @@ public enum ModuleLoader {
 	boolean isBoot() {
 		return moduleLayer != null;
 	}
-	
+
 	void stopBoot() {
 		moduleLayer = null;
 		owlookModulePacks.clear();

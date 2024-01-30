@@ -51,3 +51,5 @@ template/
 /lib-win/
 /lib-linux/
 /res/
+/owlery/
+owlook.conf

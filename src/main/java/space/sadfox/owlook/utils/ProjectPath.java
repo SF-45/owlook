@@ -7,8 +7,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public enum ProjectPath {
+	OWLERY("owlery", false),
     CONFiG("conf",false),
-    RESOURCES("res",false),
     DATA("data", false),
     TEMP("temp", true),
     LOG("log", false),
@@ -20,7 +20,7 @@ public enum ProjectPath {
     private boolean isTemp;
 
     ProjectPath(String path, boolean isTemp) {
-        this.path = Paths.get(path);
+        this.path = Paths.get(path).toAbsolutePath();
         this.isTemp = isTemp;
     }
 
@@ -30,7 +30,7 @@ public enum ProjectPath {
                 Files.createDirectory(path);
                 if (isTemp) path.toFile().deleteOnExit();
             } catch (IOException e) {
-                OwlLogger.registerException(1, e);
+                Logger.registerException(1, e);
             }
         }
         return path;

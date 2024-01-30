@@ -1,5 +1,6 @@
 package space.sadfox.owlook.utils;
 
+import javafx.beans.InvalidationListener;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -17,6 +18,13 @@ import space.sadfox.owlook.ResourceTarget;
 public enum StageFactory {
     INSTANCE;
 
+	private StageFactory() {
+		openStages.addListener((InvalidationListener) prop -> {
+			if (openStages.size() == 0) {
+				applicationCloseActions.forEach(Runnable::run);
+			}
+		});
+	}
     private final ObservableList<Stage> openStages = FXCollections.observableArrayList();
 
     public ObservableList<Stage> getOpenStages() {
@@ -27,6 +35,8 @@ public enum StageFactory {
 
     private final  ObservableMap<EventHandler<KeyEvent>, EventType<KeyEvent>> keyEvents = FXCollections.observableHashMap();
 
+    private final ObservableList<Runnable> applicationCloseActions = FXCollections.observableArrayList();
+    
     public final ObjectProperty<Stage> currentStageProperty() {
         return this.currentStage;
     }
@@ -73,4 +83,14 @@ public enum StageFactory {
     public ObservableMap<EventHandler<KeyEvent>, EventType<KeyEvent>> getKeyEvents() {
         return keyEvents;
     }
+    
+    public void addApplicationCloseAction(Runnable action) {
+    	applicationCloseActions.add(action);
+    }
+    
+    public void removeApplicationCloseAction(Runnable action) {
+    	applicationCloseActions.remove(action);
+    }
+    
+    
 }

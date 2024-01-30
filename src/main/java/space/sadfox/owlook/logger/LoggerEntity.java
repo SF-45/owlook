@@ -7,12 +7,13 @@ import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
-import space.sadfox.owlook.base.jaxb.JAXBEntity;
+import space.sadfox.owlook.base.jaxb.JAXBEntity2;
+import space.sadfox.owlook.base.jaxb.ObservedJAXBEntity;
 
 
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement
-public class Logger extends JAXBEntity {
+public class LoggerEntity extends ObservedJAXBEntity {
 
 	private List<LoggerEntry> logs = new ArrayList<>();
 
@@ -22,35 +23,8 @@ public class Logger extends JAXBEntity {
 	}
 
 	@Override
-	public String getTitle() {
-		// TODO Auto-generated method stub
+	public List<Object> getProperties() {
 		return null;
 	}
-
-	@Override
-	public void setTitle(String title) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void initialize() {
-		
-	}
-
-	@Override
-	public void validate() {
-	}
-
-	@Override
-	public void syncWith(JAXBEntity entity) {
-		if (!(entity instanceof Logger)) {
-			return;
-		}	
-		Logger l = (Logger) entity;
-		getLogs().addAll(l.getLogs());
-	}
-	
-	
 
 }

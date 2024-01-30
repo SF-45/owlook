@@ -6,6 +6,7 @@ public class LoggerMessage {
 	private String name;
 	private String message;
 	private LogLevel logLevel;
+	private boolean notification;
 
 	public LoggerMessage(LogLevel logLevel) {
 		this.logLevel = logLevel;
@@ -40,6 +41,14 @@ public class LoggerMessage {
 
 	public LogLevel getLogLevel() {
 		return logLevel;
+	}
+	
+	public boolean isNotification() {
+		return notification;
+	}
+	
+	public void setNotification(boolean notification) {
+		this.notification = notification;
 	}
 	
 	
