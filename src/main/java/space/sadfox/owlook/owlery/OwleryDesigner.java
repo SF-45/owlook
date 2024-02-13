@@ -1,11 +1,10 @@
 package space.sadfox.owlook.owlery;
 
-import static space.sadfox.owlook.owlery.OwleryConfig.DATE_COLUMN_HEAD;
-import static space.sadfox.owlook.owlery.OwleryConfig.ID_COLUMN_HEAD;
-import static space.sadfox.owlook.owlery.OwleryConfig.MODULE_COLUMN_HEAD;
-import static space.sadfox.owlook.owlery.OwleryConfig.OWL_NAME_COLUMN_HEAD;
-import static space.sadfox.owlook.owlery.OwleryConfig.TITLE_COLUMN_HEAD;
-
+import static space.sadfox.owlook.owlery.OwlTableView.DATE_COLUMN_NAME;
+import static space.sadfox.owlook.owlery.OwlTableView.ID_COLUMN_NAME;
+import static space.sadfox.owlook.owlery.OwlTableView.MODULE_COLUMN_NAME;
+import static space.sadfox.owlook.owlery.OwlTableView.OWL_NAME_COLUMN_NAME;
+import static space.sadfox.owlook.owlery.OwlTableView.TITLE_COLUMN_NAME;
 import javafx.beans.InvalidationListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -30,205 +29,230 @@ import space.sadfox.owlook.ui.base.FormDesigner;
 import space.sadfox.owlook.ui.base.FormDesigners;
 
 public class OwleryDesigner extends FormDesigner {
+  public static class ViewMenu extends Menu {
+    final Menu showByMenu;
+    final RadioMenuItem showAllMenuItem;
+    final RadioMenuItem showByOwlNameMenuItem;
+    final RadioMenuItem showByModuleMenuItem;
+    final ToggleGroup showByToggleGroup = new ToggleGroup();
 
-	final VBox root = new VBox();
-	final SplitPane body;
+    final CheckMenuItem idColumnVisible;
+    final CheckMenuItem titleColumnVisible;
+    final CheckMenuItem owlNameColumnVisible;
+    final CheckMenuItem moduleColumnVisible;
+    final CheckMenuItem dateColumnVisible;
 
-	final MenuItem importOwls;
-	final MenuItem exportOwls;
+    final CheckMenuItem editOwlPreview;
+    final RadioMenuItem showImportedMenuItem;
 
-	final Menu createOwlMenu;
+    private ViewMenu() {
+      setText("View");
+      showByMenu = FormDesigners.addTo(this, new Menu("Show By"));
+      showAllMenuItem = FormDesigners.addTo(showByMenu, new RadioMenuItem("Show All"));
+      showAllMenuItem.setToggleGroup(showByToggleGroup);
 
-	final RadioMenuItem showAllMenuItem;
-	final RadioMenuItem showByOwlNameMenuItem;
-	final RadioMenuItem showByModuleMenuItem;
-	final RadioMenuItem showImportedMenuItem;
-	final ToggleGroup showByGroup = new ToggleGroup();
+      showByOwlNameMenuItem = FormDesigners.addTo(showByMenu, new RadioMenuItem("Owl Name"));
+      showByOwlNameMenuItem.setToggleGroup(showByToggleGroup);
 
-	final CheckMenuItem idColumnVisible;
-	final CheckMenuItem titleColumnVisible;
-	final CheckMenuItem owlNameColumnVisible;
-	final CheckMenuItem moduleColumnVisible;
-	final CheckMenuItem dateColumnVisible;
+      showByModuleMenuItem = FormDesigners.addTo(showByMenu, new RadioMenuItem("Module"));
+      showByModuleMenuItem.setToggleGroup(showByToggleGroup);
 
-	final CheckMenuItem editOwlPreview;
-	private Node currentOwlEditPreview;
+      Menu columns = FormDesigners.addTo(this, new Menu("Columns"));
+      idColumnVisible = FormDesigners.addTo(columns, new CheckMenuItem(ID_COLUMN_NAME));
+      titleColumnVisible = FormDesigners.addTo(columns, new CheckMenuItem(TITLE_COLUMN_NAME));
+      owlNameColumnVisible = FormDesigners.addTo(columns, new CheckMenuItem(OWL_NAME_COLUMN_NAME));
+      moduleColumnVisible = FormDesigners.addTo(columns, new CheckMenuItem(MODULE_COLUMN_NAME));
+      dateColumnVisible = FormDesigners.addTo(columns, new CheckMenuItem(DATE_COLUMN_NAME));
 
-	final TextField searchOwlTextField;
-	final ListView<String> groupListView;
-	final OwlTableView owlTableView;
+      editOwlPreview = FormDesigners.addTo(this, new CheckMenuItem("Edit Preview"));
 
-	private final OwleryConfig config = OwleryConfig.instance();
+      showImportedMenuItem = FormDesigners.addTo(this, new RadioMenuItem("Show imported"));
+      showImportedMenuItem.setToggleGroup(showByToggleGroup);
+    }
+  }
 
-	OwleryDesigner() {
-		root.setPrefWidth(600);
+  public static class FileMenu extends Menu {
+    final MenuItem importOwls;
+    final MenuItem exportOwls;
 
-		// MENU_BAR
-		HBox menuBarHBox = FormDesigners.addTo(root, new HBox());
-		FormDesigners.bindMinWidth(root, menuBarHBox);
-		VBox.setMargin(menuBarHBox, new Insets(0d, 0d, 5d, 0d));
+    private FileMenu() {
+      setText("File");
+      importOwls = FormDesigners.addTo(this, new MenuItem("Import Owls"));
+      exportOwls = FormDesigners.addTo(this, new MenuItem("Export Owls"));
+    }
+  }
 
-		MenuBar leftMenuBar = FormDesigners.addTo(menuBarHBox, new MenuBar());
-		MenuBar rightMenuBar = FormDesigners.addTo(menuBarHBox, new MenuBar());
-		rightMenuBar.setMinWidth(180d);
-		FormDesigners.bindMinHeight(rightMenuBar, leftMenuBar);
-		leftMenuBar.minWidthProperty().bind(menuBarHBox.widthProperty().subtract(rightMenuBar.widthProperty()));
+  public static class EditMenu extends Menu {
+    final Menu createOwlMenu;
 
-		Menu fileMenu = FormDesigners.addTo(leftMenuBar, new Menu("File"));
+    private EditMenu() {
+      setText("Edit");
+      createOwlMenu = FormDesigners.addTo(this, new Menu("Create Owl"));
 
-		importOwls = FormDesigners.addTo(fileMenu, new MenuItem("Import Owls"));
+    }
+  }
 
-		exportOwls = FormDesigners.addTo(fileMenu, new MenuItem("Export Owls"));
+  final VBox root = new VBox();
+  final SplitPane body;
 
-		Menu editMenu = FormDesigners.addTo(leftMenuBar, new Menu("Edit"));
+  final MenuBar leftMenuBar;
+  final MenuBar rightMenuBar;
+  final FileMenu fileMenu;
+  final EditMenu editMenu;
+  final ViewMenu viewMenu;
 
-		createOwlMenu = FormDesigners.addTo(editMenu, new Menu("Create Owl"));
+  private Node currentOwlEditPreview;
 
-		Menu viewMenu = FormDesigners.addTo(leftMenuBar, new Menu("View"));
+  final TextField searchOwlTextField;
+  final ListView<String> groupListView;
+  final OwlTableView owlTableView;
 
-		Menu showBy = FormDesigners.addTo(viewMenu, new Menu("Show By"));
+  OwleryDesigner(OwleryConfig config) {
+    root.setPrefWidth(600);
 
-		showAllMenuItem = FormDesigners.addTo(showBy, new RadioMenuItem("Show All"));
-		showAllMenuItem.setToggleGroup(showByGroup);
-		showAllMenuItem.selectedProperty().addListener((property, oldValue, newValue) -> {
-			if (newValue) {
-				config.setSelectedShowBy(SelectedShowBy.ALL);
-			}
-		});
+    // MENU_BAR
+    HBox menuBarHBox = FormDesigners.addTo(root, new HBox());
+    FormDesigners.bindMinWidth(root, menuBarHBox);
+    VBox.setMargin(menuBarHBox, new Insets(0d, 0d, 5d, 0d));
 
-		showByOwlNameMenuItem = FormDesigners.addTo(showBy, new RadioMenuItem("Owl Name"));
-		showByOwlNameMenuItem.setToggleGroup(showByGroup);
-		showByOwlNameMenuItem.selectedProperty().addListener((property, oldValue, newValue) -> {
-			if (newValue) {
-				config.setSelectedShowBy(SelectedShowBy.OWL_NAME);
-			}
-		});
+    leftMenuBar = FormDesigners.addTo(menuBarHBox, new MenuBar());
+    rightMenuBar = FormDesigners.addTo(menuBarHBox, new MenuBar());
+    rightMenuBar.setMinWidth(180d);
+    FormDesigners.bindMinHeight(rightMenuBar, leftMenuBar);
+    leftMenuBar.minWidthProperty()
+        .bind(menuBarHBox.widthProperty().subtract(rightMenuBar.widthProperty()));
 
-		showByModuleMenuItem = FormDesigners.addTo(showBy, new RadioMenuItem("Module"));
-		showByModuleMenuItem.setToggleGroup(showByGroup);
-		showByModuleMenuItem.selectedProperty().addListener((property, oldValue, newValue) -> {
-			if (newValue) {
-				config.setSelectedShowBy(SelectedShowBy.MODULE);
-			}
-		});
+    fileMenu = FormDesigners.addTo(leftMenuBar, new FileMenu());
+    editMenu = FormDesigners.addTo(leftMenuBar, new EditMenu());
+    viewMenu = FormDesigners.addTo(leftMenuBar, new ViewMenu());
 
-		switch (config.getSelectedShowBy()) {
-		case ALL:
-			showAllMenuItem.setSelected(true);
-			break;
-		case OWL_NAME:
-			showByOwlNameMenuItem.setSelected(true);
-			break;
-		case MODULE:
-			showByModuleMenuItem.setSelected(true);
-			break;
-		default:
-			break;
-		}
+    viewMenu.showAllMenuItem.selectedProperty().addListener((property, oldValue, newValue) -> {
+      if (newValue) {
+        config.setSelectedShowBy(SelectedShowBy.ALL);
+      }
+    });
 
-		Menu columns = FormDesigners.addTo(viewMenu, new Menu("Columns"));
+    viewMenu.showByOwlNameMenuItem.selectedProperty()
+        .addListener((property, oldValue, newValue) -> {
+          if (newValue) {
+            config.setSelectedShowBy(SelectedShowBy.OWL_NAME);
+          }
+        });
 
-		idColumnVisible = FormDesigners.addTo(columns, new CheckMenuItem(ID_COLUMN_HEAD));
-		idColumnVisible.setSelected(config.getIdColumnVisible());
-		config.idColumnVisibleProperty().bind(idColumnVisible.selectedProperty());
+    viewMenu.showByModuleMenuItem.selectedProperty().addListener((property, oldValue, newValue) -> {
+      if (newValue) {
+        config.setSelectedShowBy(SelectedShowBy.MODULE);
+      }
+    });
 
-		titleColumnVisible = FormDesigners.addTo(columns, new CheckMenuItem(TITLE_COLUMN_HEAD));
-		titleColumnVisible.setSelected(config.getTitleColumnVisible());
-		config.titleColumnVisibleProperty().bind(titleColumnVisible.selectedProperty());
+    switch (config.getSelectedShowBy()) {
+      case ALL:
+        viewMenu.showAllMenuItem.setSelected(true);
+        break;
+      case OWL_NAME:
+        viewMenu.showByOwlNameMenuItem.setSelected(true);
+        break;
+      case MODULE:
+        viewMenu.showByModuleMenuItem.setSelected(true);
+        break;
+      default:
+        break;
+    }
 
-		owlNameColumnVisible = FormDesigners.addTo(columns, new CheckMenuItem(OWL_NAME_COLUMN_HEAD));
-		owlNameColumnVisible.setSelected(config.getOwlNameColumnVisible());
-		config.owlNameColumnVisibleProperty().bind(owlNameColumnVisible.selectedProperty());
 
-		moduleColumnVisible = FormDesigners.addTo(columns, new CheckMenuItem(MODULE_COLUMN_HEAD));
-		moduleColumnVisible.setSelected(config.getModuleColumnVisible());
-		config.moduleColumnVisibleProperty().bind(moduleColumnVisible.selectedProperty());
+    viewMenu.idColumnVisible.setSelected(config.getIdColumnVisible());
+    config.idColumnVisibleProperty().bind(viewMenu.idColumnVisible.selectedProperty());
 
-		dateColumnVisible = FormDesigners.addTo(columns, new CheckMenuItem(DATE_COLUMN_HEAD));
-		dateColumnVisible.setSelected(config.getDateColumnVisible());
-		config.dateColumnVisibleProperty().bind(dateColumnVisible.selectedProperty());
+    viewMenu.titleColumnVisible.setSelected(config.getTitleColumnVisible());
+    config.titleColumnVisibleProperty().bind(viewMenu.titleColumnVisible.selectedProperty());
 
-		showImportedMenuItem = FormDesigners.addTo(viewMenu, new RadioMenuItem("Show imported"));
-		showImportedMenuItem.setToggleGroup(showByGroup);
+    viewMenu.owlNameColumnVisible.setSelected(config.getOwlNameColumnVisible());
+    config.owlNameColumnVisibleProperty().bind(viewMenu.owlNameColumnVisible.selectedProperty());
 
-		editOwlPreview = FormDesigners.addTo(viewMenu, new CheckMenuItem("Edit Preview"));
-		editOwlPreview.setSelected(config.getEditOwlPreview());
-		config.editOwlPreviewProperty().bind(editOwlPreview.selectedProperty());
-		config.editOwlPreviewProperty().addListener((property, oldValue, newValue) -> {
-			if (newValue == false) {
-				setEditOwlPreview(null);
-			}
-		});
+    viewMenu.moduleColumnVisible.setSelected(config.getModuleColumnVisible());
+    config.moduleColumnVisibleProperty().bind(viewMenu.moduleColumnVisible.selectedProperty());
 
-		searchOwlTextField = new TextField();
-		searchOwlTextField.setPromptText("Search Owl");
-		Menu searchMenu = FormDesigners.addTo(rightMenuBar, new Menu("", searchOwlTextField));
+    viewMenu.dateColumnVisible.setSelected(config.getDateColumnVisible());
+    config.dateColumnVisibleProperty().bind(viewMenu.dateColumnVisible.selectedProperty());
 
-		// BODY
-		body = FormDesigners.addTo(root, new SplitPane());
-		FormDesigners.bindMinWidth(root, body);
-		body.minHeightProperty().bind(root.heightProperty().subtract(menuBarHBox.heightProperty()));
-		body.setOrientation(Orientation.HORIZONTAL);
-		body.getDividers().addListener((InvalidationListener) change -> {
-			Divider group = null;
-			Divider preview = null;
-			if (body.getDividers().size() == 1) {
-				if (!config.getSelectedShowBy().equals(OwleryConfig.SelectedShowBy.ALL)) {
-					group = body.getDividers().get(0);
-				} else {
-					preview = body.getDividers().get(0);
-				}
-			} else if (body.getDividers().size() > 1) {
-				group = body.getDividers().get(0);
-				preview = body.getDividers().get(1);
-			}
-			
-			
-			if (group != null) {
-				group.setPosition(config.getGroupDividerPos());
-				config.groupDividerPosProperty().bind(group.positionProperty());
-			}
-			if (preview != null) {
-				preview.setPosition(config.getEditPreviewDividerPos());
-				config.editPreviewDividerPosProperty().bind(preview.positionProperty());
-			}
-		});
+    viewMenu.editOwlPreview.setSelected(config.getEditOwlPreview());
+    config.editOwlPreviewProperty().bind(viewMenu.editOwlPreview.selectedProperty());
+    config.editOwlPreviewProperty().addListener((property, oldValue, newValue) -> {
+      if (newValue == false) {
+        setEditOwlPreview(null);
+      }
+    });
 
-		groupListView = new ListView<>();
+    searchOwlTextField = new TextField();
+    searchOwlTextField.setPromptText("Search Owl");
+    FormDesigners.addTo(rightMenuBar, new Menu("", searchOwlTextField));
 
-		owlTableView = FormDesigners.addTo(body, new OwlTableView());
-		owlTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-		owlTableView.ID.visibleProperty().bind(idColumnVisible.selectedProperty());
-		owlTableView.TITLE.visibleProperty().bind(titleColumnVisible.selectedProperty());
-		owlTableView.OWL_NAME.visibleProperty().bind(owlNameColumnVisible.selectedProperty());
-		owlTableView.MODULE_NAME.visibleProperty().bind(moduleColumnVisible.selectedProperty());
-		owlTableView.DATE_CREATED.visibleProperty().bind(dateColumnVisible.selectedProperty());
-		owlTableView.setMinHeight(TableView.USE_COMPUTED_SIZE);
+    // BODY
+    body = FormDesigners.addTo(root, new SplitPane());
+    FormDesigners.bindMinWidth(root, body);
+    body.minHeightProperty().bind(root.heightProperty().subtract(menuBarHBox.heightProperty()));
+    body.setOrientation(Orientation.HORIZONTAL);
+    body.getDividers().addListener((InvalidationListener) change -> {
+      Divider group = null;
+      Divider preview = null;
+      if (body.getDividers().size() == 1) {
+        if (!config.getSelectedShowBy().equals(OwleryConfig.SelectedShowBy.ALL)) {
+          group = body.getDividers().get(0);
+        } else {
+          preview = body.getDividers().get(0);
+        }
+      } else if (body.getDividers().size() > 1) {
+        group = body.getDividers().get(0);
+        preview = body.getDividers().get(1);
+      }
 
-	}
 
-	@Override
-	protected Parent root() {
-		return root;
-	}
+      if (group != null) {
+        group.setPosition(config.getGroupDividerPos());
+        config.groupDividerPosProperty().bind(group.positionProperty());
+      }
+      if (preview != null) {
+        preview.setPosition(config.getEditPreviewDividerPos());
+        config.editPreviewDividerPosProperty().bind(preview.positionProperty());
+      }
+    });
 
-	void setGroupListViewVisible(boolean visible) {
-		if (visible && !body.getItems().contains(groupListView)) {
-			body.getItems().add(0, groupListView);
-		} else if (!visible) {
-			body.getItems().remove(groupListView);
-		}
-	}
+    groupListView = new ListView<>();
 
-	void setEditOwlPreview(Node node) {
-		if (currentOwlEditPreview != null) {
-			body.getItems().remove(currentOwlEditPreview);
-			currentOwlEditPreview = null;
-		}
-		if (node != null) {
-			body.getItems().add(node);
-			currentOwlEditPreview = node;
-		}
-	}
+    owlTableView = FormDesigners.addTo(body, new OwlTableView());
+    owlTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    owlTableView.ID.visibleProperty().bind(viewMenu.idColumnVisible.selectedProperty());
+    owlTableView.TITLE.visibleProperty().bind(viewMenu.titleColumnVisible.selectedProperty());
+    owlTableView.OWL_NAME.visibleProperty().bind(viewMenu.owlNameColumnVisible.selectedProperty());
+    owlTableView.MODULE_NAME.visibleProperty()
+        .bind(viewMenu.moduleColumnVisible.selectedProperty());
+    owlTableView.DATE_CREATED.visibleProperty().bind(viewMenu.dateColumnVisible.selectedProperty());
+    owlTableView.setMinHeight(TableView.USE_COMPUTED_SIZE);
+
+  }
+
+  @Override
+  protected Parent root() {
+    return root;
+  }
+
+  void setGroupListViewVisible(boolean visible) {
+    if (visible && !body.getItems().contains(groupListView)) {
+      body.getItems().add(0, groupListView);
+    } else if (!visible) {
+      body.getItems().remove(groupListView);
+    }
+  }
+
+  void setEditOwlPreview(Node node) {
+    if (currentOwlEditPreview != null) {
+      body.getItems().remove(currentOwlEditPreview);
+      currentOwlEditPreview = null;
+    }
+    if (node != null) {
+      body.getItems().add(node);
+      currentOwlEditPreview = node;
+    }
+  }
 
 }

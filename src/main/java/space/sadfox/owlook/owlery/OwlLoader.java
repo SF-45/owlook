@@ -76,7 +76,8 @@ public enum OwlLoader {
     return new ArrayList<>(owls.values());
   }
 
-  public synchronized <T extends OwlEntity> Owl<T> createOwl(Class<T> target) throws Exception {
+  public synchronized <T extends OwlEntity> Owl<T> createOwl(Class<T> target) throws IOException,
+      JAXBException, ReflectiveOperationException, OwlEntityInitializeException {
     Owl<T> newOwl = Owl.create(ProjectPath.OWLERY.getPath(), target);
     initOwl(newOwl);
     owls.put(newOwl.info().id(), newOwl);

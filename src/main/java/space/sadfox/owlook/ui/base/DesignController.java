@@ -2,7 +2,7 @@ package space.sadfox.owlook.ui.base;
 
 import javafx.scene.Parent;
 
-public class DesignController<T extends FormDesigner> extends Controller {
+public abstract class DesignController<T extends FormDesigner> extends Controller {
 	private final Parent root;
 	protected final T DESIGN;
 	
