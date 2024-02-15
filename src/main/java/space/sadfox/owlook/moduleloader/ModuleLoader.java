@@ -17,15 +17,14 @@ import java.util.ServiceLoader;
 import java.util.ServiceLoader.Provider;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
 import space.sadfox.owlook.OwlookConfiguration;
+import space.sadfox.owlook.api.Workspace;
 import space.sadfox.owlook.base.moduleapi.OwlookModule;
 import space.sadfox.owlook.base.moduleapi.OwlookModuleComponent;
 import space.sadfox.owlook.base.moduleapi.OwlookModuleInfo;
 import space.sadfox.owlook.base.moduleapi.OwlookModulePack;
 import space.sadfox.owlook.base.moduleapi.VersionFormat;
 import space.sadfox.owlook.base.owl.OwlEntity;
-import space.sadfox.owlook.component.Workspace;
 import space.sadfox.owlook.utils.Logger;
 
 public enum ModuleLoader {

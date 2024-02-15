@@ -374,6 +374,9 @@ public class ModuleLoaderController extends FXMLController {
 			try {
 				ModuleLoader.INSTANCE.initOwlookModules(true);
 				MainStage mainStage = new MainStage();
+        mainStage.getStage().setResizable(false);
+        mainStage.getStage().setWidth(540d);
+        mainStage.getStage().setHeight(625d);
 				mainStage.show();
 				return true;
 			} catch (IOException e) {
