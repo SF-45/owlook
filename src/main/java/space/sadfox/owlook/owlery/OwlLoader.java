@@ -1,6 +1,5 @@
 package space.sadfox.owlook.owlery;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -42,24 +41,27 @@ public enum OwlLoader {
   }
 
   private final Map<UUID, Owl<?>> owls = new HashMap<>();
+  private Map<UUID, HollowOwl> ref = new HashMap<>();
   private boolean isBoot = false;
 
   private final List<CreateOwlListener> createListeners = new ArrayList<>();
   private final List<DeleteOwlListener> deleteListeners = new ArrayList<>();
   private final List<DuplicateOwlListener> duplicateListeners = new ArrayList<>();
 
+  @SuppressWarnings("unchecked")
   public <T extends OwlEntity> Owl<T> getOwl(UUID uuid, Class<T> target)
       throws OwlCastException, OwlNotFoundException {
     if (!owls.containsKey(uuid)) {
       throw new OwlNotFoundException("Owl not found: " + uuid);
     }
-    Owl owl = owls.get(uuid);
+    Owl<?> owl = owls.get(uuid);
     if (!owl.entityClass().equals(target)) {
       throw new OwlCastException("Can't to cast an owl to" + target.getSimpleName());
     }
-    return owl;
+    return (Owl<T>) owl;
   }
 
+  @SuppressWarnings("unchecked")
   public synchronized <T extends OwlEntity> List<Owl<T>> getOwls(Class<T> target) {
     List<Owl<T>> rezOwls = new ArrayList<>();
 
@@ -88,26 +90,27 @@ public enum OwlLoader {
   }
 
   public synchronized <T extends OwlEntity> Owl<T> createOwl(Class<T> target, Owl<?> parent)
-      throws Exception {
+      throws IOException, JAXBException, ReflectiveOperationException,
+      OwlEntityInitializeException {
     Owl<T> newOwl = createOwl(target);
     newOwl.head().setParentOwl(parent.info().id());
 
     return newOwl;
   }
 
-  public synchronized <T extends OwlEntity> void deleteOwl(Owl<T> owl) throws Exception {
-
+  public synchronized <T extends OwlEntity> void deleteOwl(Owl<T> owl) throws IOException {
     Path location = owl.location();
-    UUID owlID = convertPathToUUID(location);
+    UUID owlID = owl.info().id();
 
     owl.close();
-    owls.remove(owlID);
     Files.delete(location);
+    owls.remove(owlID);
 
     notifyDeleteOwlListeners(owl);
   }
 
-  public synchronized <T extends OwlEntity> Owl<T> duplicateOwl(Owl<T> owl) throws Exception {
+  public synchronized <T extends OwlEntity> Owl<T> duplicateOwl(Owl<T> owl) throws IOException,
+      JAXBException, ReflectiveOperationException, OwlEntityInitializeException {
 
     Owl<T> newOwl = createOwl(owl.entityClass());
     newOwl.entity().syncWith(owl.entity());
@@ -117,8 +120,6 @@ public enum OwlLoader {
 
     return newOwl;
   }
-
-
 
   public void addCreateOwlListener(CreateOwlListener listener) {
     createListeners.add(listener);
@@ -157,74 +158,32 @@ public enum OwlLoader {
     duplicateListeners.forEach(i -> i.duplicate(oldEntity, newEntity));
   }
 
-  Owl<? extends OwlEntity> loadOwl(Path path)
-      throws IOException, JAXBException, ClassNotFoundException, OwlCastException,
-      OwlNotFoundException, OwlEntityInitializeException, Exception {
-    HollowOwl hollowOwl = Owl.getHollowOwl(path);
+  <T extends OwlEntity> Owl<T> loadOwl(UUID uuid, Class<T> target) throws OwlCastException,
+      OwlNotFoundException, IOException, JAXBException, OwlEntityInitializeException {
+    if (owls.containsKey(uuid)) {
+      return getOwl(uuid, target);
+    } else if (ref.containsKey(uuid)) {
+      Owl<T> loadedOwl = new Owl<>(ref.get(uuid).location(), target);
+      initOwl(loadedOwl);
+      owls.put(uuid, loadedOwl);
+      return loadedOwl;
+    } else {
+      throw new OwlNotFoundException();
+    }
+  }
 
+  Owl<? extends OwlEntity> loadOwl(UUID uuid) throws OwlCastException, OwlNotFoundException,
+      IOException, JAXBException, OwlEntityInitializeException, ClassNotFoundException {
+    HollowOwl hollowOwl = ref.get(uuid);
+    if (hollowOwl == null) {
+      throw new OwlNotFoundException("Owl not found: " + uuid);
+    }
     Optional<Class<? extends OwlEntity>> optTarget = findTarget(hollowOwl.info().targetClass());
 
     if (optTarget.isEmpty()) {
       throw new ClassNotFoundException();// TODO: Описание ошибки
     }
-    hollowOwl.close();
-
-    return loadOwl(path, optTarget.get());
-  }
-
-  <T extends OwlEntity> Owl<T> loadOwl(Path path, Class<T> target) throws OwlCastException,
-      OwlNotFoundException, IOException, JAXBException, OwlEntityInitializeException, Exception {
-
-    path = validate(path);
-    UUID owlID = convertPathToUUID(path);
-    if (owls.containsKey(owlID)) {
-      return getOwl(owlID, target);
-    } else {
-      Owl<T> loadedOwl = new Owl<>(path, target);
-      initOwl(loadedOwl);
-      owls.put(owlID, loadedOwl);
-      return loadedOwl;
-    }
-  }
-
-  <T extends OwlEntity> Owl<T> loadOwl(String uuid, Class<T> target) throws OwlCastException,
-      OwlNotFoundException, IOException, JAXBException, OwlEntityInitializeException, Exception {
-
-    Path path = validate(uuid);
-    return loadOwl(path, target);
-  }
-
-  private Path validate(String fileName) throws IOException, JAXBException, Exception {
-    if (!fileName.endsWith(Owl.EXTENSION)) {
-      fileName += Owl.EXTENSION;
-    }
-
-    return validate(ProjectPath.OWLERY.getPath().resolve(fileName));
-
-  }
-
-  private Path validate(Path path) throws IOException, JAXBException, Exception {
-    if (Files.notExists(path)) {
-      throw new FileNotFoundException("Owl " + path + Owl.EXTENSION + " does not exist");
-    }
-    if (!path.toAbsolutePath().getParent().equals(ProjectPath.OWLERY.getPath())) {
-      throw new IOException("Owl " + path + " whitout directory " + ProjectPath.OWLERY.getPath());
-    }
-    if (!isUUID(path)) {
-      path = renameOwl(path);
-    }
-
-    return path;
-  }
-
-  private Path renameOwl(Path owlPath) throws IOException, JAXBException, Exception {
-    try (HollowOwl hollowOwl = Owl.getHollowOwl(owlPath)) {
-      Path outPath =
-          ProjectPath.OWLERY.getPath().resolve(hollowOwl.info().id().toString() + Owl.EXTENSION);
-      Files.move(hollowOwl.location(), outPath);
-      // TODO: Уведомление о переименовании
-      return outPath;
-    }
+    return loadOwl(uuid, optTarget.get());
   }
 
   private void initOwl(Owl<?> owl) {
@@ -238,18 +197,37 @@ public enum OwlLoader {
       return;
 
     List<Path> owlFiles = Owls.findOwlFiles(ProjectPath.OWLERY.getPath(), 1);
-    owlFiles.forEach(t -> {
+
+    for (Path owlFile : owlFiles) {
       try {
-        OwlLoader.INSTANCE.loadOwl(t);
-      } catch (Exception e) {
+        HollowOwl hollowOwl = Owl.getHollowOwl(owlFile);
+        if (!validateFileName(hollowOwl)) {
+          hollowOwl = rename(hollowOwl);
+        }
+        ref.put(hollowOwl.info().id(), hollowOwl);
+      } catch (JAXBException | IOException e) {
+        Logger.registerException(1, e);
+      }
+    }
+
+    for (UUID uuid : ref.keySet()) {
+      if (owls.containsKey(uuid)) {
+        continue;
+      }
+      try {
+        Owl<?> loadedOwl = loadOwl(uuid);
+        owls.put(loadedOwl.info().id(), loadedOwl);
+      } catch (OwlCastException | OwlNotFoundException | ClassNotFoundException | JAXBException
+          | OwlEntityInitializeException e) {
         Logger.registerException(1, e);
         MessageBox messageBox = new MessageBox(AlertType.ERROR);
         messageBox.setTitle("Owl Load Error");
-        messageBox.setHeaderText("An error occurred while loading Owl " + t);
+        messageBox.setHeaderText("An error occurred while loading Owl " + uuid);
         messageBox.setContentText(e.getMessage());
         messageBox.showAndWait();
+        // TODO: Больше вариантов сообщения в зависимости от ошибки
       }
-    });
+    }
 
     StageFactory.INSTANCE.addApplicationCloseAction(() -> {
       owls.forEach((id, owl) -> {
@@ -261,33 +239,30 @@ public enum OwlLoader {
       });
     });
 
+    isBoot = true;
+
   }
 
-  public static String convertPathToString(Path path) {
-    String fileName = path.getFileName().toString();
-    int ind = fileName.lastIndexOf(".");
-    return fileName.substring(0, ind);
+  private HollowOwl rename(HollowOwl hollowOwl) throws IOException, JAXBException {
+    Path newPath =
+        ProjectPath.OWLERY.getPath().resolve(hollowOwl.info().id().toString() + Owl.EXTENSION);
+    Files.move(hollowOwl.location(), newPath);
+    // TODO: Уведомление о переименовании
+    return Owl.getHollowOwl(newPath);
   }
 
-  public static Optional<Class<? extends OwlEntity>> findTarget(String className) {
+  private boolean validateFileName(HollowOwl hollowOwl) {
+    String fileName = hollowOwl.location().getFileName().toString();
+    String mustBeFileName = hollowOwl.info().id().toString() + Owl.EXTENSION;
+    return fileName.equals(mustBeFileName);
+  }
+
+  private static Optional<Class<? extends OwlEntity>> findTarget(String className) {
     Optional<OwlEntity> optTarget = ModuleLoader.INSTANCE.loadOwlEntity(className);
     if (optTarget.isPresent()) {
       return Optional.of(optTarget.get().getClass());
     } else {
       return Optional.empty();
-    }
-  }
-
-  public static UUID convertPathToUUID(Path path) {
-    return UUID.fromString(convertPathToString(path));
-  }
-
-  public static boolean isUUID(Path path) {
-    try {
-      UUID.fromString(convertPathToString(path));
-      return true;
-    } catch (IllegalArgumentException e) {
-      return false;
     }
   }
 }

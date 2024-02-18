@@ -35,7 +35,7 @@ class OwlTableView extends TableView<Owl<?>> {
   public OwlTableView() {
     ID = FormDesigners.addTo(this, new TableColumn<>(ID_COLUMN_NAME));
     ID.setCellValueFactory(cellData -> {
-      return new SimpleStringProperty(cellData.getValue().fileName());
+      return new SimpleStringProperty(cellData.getValue().info().id().toString());
     });
 
     TITLE = FormDesigners.addTo(this, new TableColumn<>(TITLE_COLUMN_NAME));
