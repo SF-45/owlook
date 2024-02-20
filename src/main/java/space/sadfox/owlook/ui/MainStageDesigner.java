@@ -15,6 +15,8 @@ public class MainStageDesigner extends FormDesigner {
   final VBox root = new VBox();
   final WSItemList wsItemList;
   final Menu owleryMenuButton;
+  final Menu file;
+  final Menu edit;
 
   MainStageDesigner() {
     // MENU_BAR
@@ -24,8 +26,8 @@ public class MainStageDesigner extends FormDesigner {
     MenuBar menuBar = FormDesigners.addTo(menuBarHBox, new MenuBar());
     FormDesigners.bindMinWidth(menuBarHBox, menuBar);
 
-    Menu fileMenu = FormDesigners.addTo(menuBar, new Menu("File"));
-    Menu editMenu = FormDesigners.addTo(menuBar, new Menu("Edit"));
+    file = FormDesigners.addTo(menuBar, new Menu("File"));
+    edit = FormDesigners.addTo(menuBar, new Menu("Edit"));
 
     owleryMenuButton = FormDesigners.addTo(menuBar, new Menu("Owlery"));
     MenuItem hiddenItem = FormDesigners.addTo(owleryMenuButton, new MenuItem());
