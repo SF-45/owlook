@@ -190,6 +190,7 @@ public enum OwlLoader {
     owl.enableAutoSave(e -> {
       Logger.registerException(1, e);
     });
+    owl.setAutoSaveDuration(2);
   }
 
   public void boot() throws IOException {
