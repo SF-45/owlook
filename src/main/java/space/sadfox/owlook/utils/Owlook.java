@@ -9,18 +9,17 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Modality;
 import space.sadfox.owlook.OwlookConfiguration;
 import space.sadfox.owlook.base.jaxb.JAXBEntityFactory;
-import space.sadfox.owlook.logger.LogLevel;
 import space.sadfox.owlook.logger.LoggerDAO;
 import space.sadfox.owlook.logger.LoggerEntity;
 import space.sadfox.owlook.logger.LoggerEntry;
 import space.sadfox.owlook.ui.tools.MessageBox;
 
-public class Logger implements Thread.UncaughtExceptionHandler {
+public class Owlook implements Thread.UncaughtExceptionHandler {
 
   private static LoggerDAO logger;
 
   static {
-    Path pathToLog = ProjectPath.LOG.getPath().resolve("log.xml");
+    Path pathToLog = Path.of("log.xml");
     JAXBEntityFactory<LoggerEntity> factory = new JAXBEntityFactory<>(LoggerEntity.class);
 
     try {
@@ -32,10 +31,10 @@ public class Logger implements Thread.UncaughtExceptionHandler {
     }
   }
 
-  public synchronized static void registerException(int loggingDepth, Throwable e) {
+  public synchronized static void registerException(int criticalLevel, Throwable e) {
     LoggerEntry entry = logger.addNewLoggerEntry();
 
-    loggingDepth = normalizeLoggingDepth(loggingDepth);
+    criticalLevel = normalizeCriticalLevel(criticalLevel);
 
     entry.setName(e.getClass().getName());
     entry.setMessage(e.getMessage());
@@ -44,29 +43,27 @@ public class Logger implements Thread.UncaughtExceptionHandler {
     e.printStackTrace(new PrintWriter(writer));
     entry.setStackTrace(writer.toString());
     entry.setLogLevel(LogLevel.ERROR);
-    entry.setLoggingDepth(loggingDepth);
+    entry.setCriticalLevel(criticalLevel);
     try {
       logger.getLoggerEntity().save();
     } catch (JAXBException | IOException e1) {
       e1.printStackTrace();
     }
 
-    OwlookConfiguration config = OwlookConfiguration.instance();
+    printLogEntry(entry);
 
-    if (loggingDepth <= config.getLoggingDepth()) {
+    if (getConfig().isDebugMode()) {
       e.printStackTrace();
-      if (config.isDebugMode()) {
-        MessageBox messageBox = new MessageBox(AlertType.ERROR);
-        messageBox.setTitle(entry.getName());
-        messageBox.setHeaderText(entry.getMassage());
-        messageBox.setContentText(entry.getStackTrace().substring(0, 1000) + "...");
-        messageBox.initModality(Modality.NONE);
-        messageBox.show();
-      }
+      MessageBox messageBox = new MessageBox(AlertType.ERROR);
+      messageBox.setTitle(entry.getName());
+      messageBox.setHeaderText(entry.getName());
+      messageBox.setContentText(entry.getMassage());
+      messageBox.initModality(Modality.NONE);
+      messageBox.show();
     }
   }
 
-  public synchronized static void registerMessage(LoggerMessage message) {
+  public synchronized static void registerMessage(LogMessage message) {
     LoggerEntry entry = logger.addNewLoggerEntry();
     entry.setName(message.getName());
     entry.setMessage(message.getMessage());
@@ -77,28 +74,45 @@ public class Logger implements Thread.UncaughtExceptionHandler {
     } catch (JAXBException | IOException e) {
       e.printStackTrace();
     }
-    System.out.println(
-        "[" + message.getLogLevel() + "] " + message.getName() + ": " + message.getMessage());
-  }
 
-  public synchronized static void registerException(Thread t, Throwable e) {
-    registerException(0, e);
-    System.err.print("Exception in thread \"" + t.getName() + "\" ");
-    e.printStackTrace();
+    printLogEntry(entry);
   }
 
   @Override
   public synchronized void uncaughtException(Thread t, Throwable e) {
-    registerException(t, e);
+    registerException(0, e);
+    // System.err.print("Exception in thread \"" + t.getName() + "\" ");
+    // e.printStackTrace();
   }
 
-  private static int normalizeLoggingDepth(int loggingDepth) {
-    if (loggingDepth < 0) {
+  public static OwlookConfiguration getConfig() {
+    Path confPath = Path.of("owlook.conf");
+    try {
+      return new ConfigurationManager<>(OwlookConfiguration.class).getConfig(confPath);
+    } catch (JAXBException | IOException | ClassCastException | ReflectiveOperationException e) {
+      Owlook.registerException(0, e);
+      return null;
+    }
+  }
+
+  private static int normalizeCriticalLevel(int criticalLevel) {
+    if (criticalLevel < 0) {
       return 0;
-    } else if (loggingDepth > 3) {
-      return 3;
+    } else if (criticalLevel > 2) {
+      return 2;
     } else {
-      return loggingDepth;
+      return criticalLevel;
+    }
+  }
+
+  private static synchronized void printLogEntry(LoggerEntry loggerEntry) {
+    String message = "[" + loggerEntry.getLogLevel() + "] " + loggerEntry.getName() + ": "
+        + loggerEntry.getMassage();
+
+    if (loggerEntry.getLogLevel().equals(LogLevel.ERROR)) {
+      System.err.println(message);
+    } else {
+      System.out.println(message);
     }
   }
 }

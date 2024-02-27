@@ -17,7 +17,6 @@ import java.util.ServiceLoader;
 import java.util.ServiceLoader.Provider;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import space.sadfox.owlook.OwlookConfiguration;
 import space.sadfox.owlook.api.Workspace;
 import space.sadfox.owlook.base.moduleapi.OwlookModule;
 import space.sadfox.owlook.base.moduleapi.OwlookModuleComponent;
@@ -25,251 +24,258 @@ import space.sadfox.owlook.base.moduleapi.OwlookModuleInfo;
 import space.sadfox.owlook.base.moduleapi.OwlookModulePack;
 import space.sadfox.owlook.base.moduleapi.VersionFormat;
 import space.sadfox.owlook.base.owl.OwlEntity;
-import space.sadfox.owlook.utils.Logger;
+import space.sadfox.owlook.utils.Owlook;
 
 public enum ModuleLoader {
-	INSTANCE;
+  INSTANCE;
 
-	class LoadReport {
-		private final List<ModuleLoadInfo> loadInfoList = new ArrayList<>();
-		private boolean load = true;
+  class LoadReport {
+    private final List<ModuleLoadInfo> loadInfoList = new ArrayList<>();
+    private boolean load = true;
 
-		private ModuleLayer resultLayer;
+    private ModuleLayer resultLayer;
 
-		private LoadReport() {
-		}
+    private LoadReport() {}
 
-		public List<ModuleLoadInfo> getModuleLoadInfoList() {
-			return Collections.unmodifiableList(loadInfoList);
-		}
+    public List<ModuleLoadInfo> getModuleLoadInfoList() {
+      return Collections.unmodifiableList(loadInfoList);
+    }
 
-		public boolean isLoad() {
-			return load;
-		}
-	}
+    public boolean isLoad() {
+      return load;
+    }
+  }
 
-	private final Map<Path, OwlookModulePack> owlookModulePacks = new HashMap<>();
+  private final Map<Path, OwlookModulePack> owlookModulePacks = new HashMap<>();
 
-	private ModuleLayer moduleLayer;
-	private boolean initModules = false;
+  private ModuleLayer moduleLayer;
+  private boolean initModules = false;
 
-	public <T> List<T> loadModules(Class<T> target) {
-		return ServiceLoader.load(moduleLayer, target).stream().map(Provider::get).collect(Collectors.toList());
-	}
+  public <T> List<T> loadModules(Class<T> target) {
+    return ServiceLoader.load(moduleLayer, target).stream().map(Provider::get)
+        .collect(Collectors.toList());
+  }
 
-	public List<OwlookModule> loadModules() {
-		return loadModules(OwlookModule.class);
-	}
+  public List<OwlookModule> loadModules() {
+    return loadModules(OwlookModule.class);
+  }
 
-	public List<Workspace> loadWorkspaces() {
-		return loadModules(Workspace.class);
-	}
+  public List<Workspace> loadWorkspaces() {
+    return loadModules(Workspace.class);
+  }
 
-	public List<OwlEntity> loadOwlEntities() {
-		return loadModules(OwlEntity.class);
-	}
-	
-	public Optional<OwlEntity> loadOwlEntity(String className) {
-		return loadOwlEntities().stream().filter(owlEntity -> owlEntity.getClass().getName().equals(className)).findFirst();
-	}
+  public List<OwlEntity> loadOwlEntities() {
+    return loadModules(OwlEntity.class);
+  }
 
-	public List<OwlookModuleComponent> loadModuleComponents() {
-		return loadModules(OwlookModuleComponent.class);
-	}
+  public Optional<OwlEntity> loadOwlEntity(String className) {
+    return loadOwlEntities().stream()
+        .filter(owlEntity -> owlEntity.getClass().getName().equals(className)).findFirst();
+  }
 
-	@SuppressWarnings("unchecked")
-	public <T extends OwlookModuleComponent> List<T> loadModuleComponents(Class<T> target,
-			Predicate<? super OwlookModuleComponent> predicate) {
+  public List<OwlookModuleComponent> loadModuleComponents() {
+    return loadModules(OwlookModuleComponent.class);
+  }
 
-		return loadModules(OwlookModuleComponent.class).stream().filter(predicate).map(m -> (T) m)
-				.collect(Collectors.toList());
-	}
+  @SuppressWarnings("unchecked")
+  public <T extends OwlookModuleComponent> List<T> loadModuleComponents(Class<T> target,
+      Predicate<? super OwlookModuleComponent> predicate) {
 
-	public List<OwlookModuleInfo> getLoadedModules() {
-		return owlookModulePacks.values().stream().map(modulePack -> modulePack.MODILE_INFO)
-				.collect(Collectors.toList());
-	}
+    return loadModules(OwlookModuleComponent.class).stream().filter(predicate).map(m -> (T) m)
+        .collect(Collectors.toList());
+  }
 
-	public Optional<OwlookModuleInfo> getLoadedModule(Module module) {
-		return getLoadedModules(module.getName());
-	}
+  public List<OwlookModuleInfo> getLoadedModules() {
+    return owlookModulePacks.values().stream().map(modulePack -> modulePack.MODILE_INFO)
+        .collect(Collectors.toList());
+  }
 
-	public Optional<OwlookModuleInfo> getLoadedModules(String moduleName) {
-		List<OwlookModuleInfo> moduleInfos = getLoadedModules().stream().filter(moduleInfo -> moduleInfo.moduleName().equals(moduleName)).collect(Collectors.toList());
-		if (moduleInfos.size() > 0) {
-			return Optional.of(moduleInfos.get(0));
-		} else {
-			return Optional.empty();
-		}
-	}
+  public Optional<OwlookModuleInfo> getLoadedModule(Module module) {
+    return getLoadedModules(module.getName());
+  }
 
-	Collection<OwlookModulePack> loadedModulePacks() {
-		return Collections.unmodifiableCollection(owlookModulePacks.values());
-	}
+  public Optional<OwlookModuleInfo> getLoadedModules(String moduleName) {
+    List<OwlookModuleInfo> moduleInfos =
+        getLoadedModules().stream().filter(moduleInfo -> moduleInfo.moduleName().equals(moduleName))
+            .collect(Collectors.toList());
+    if (moduleInfos.size() > 0) {
+      return Optional.of(moduleInfos.get(0));
+    } else {
+      return Optional.empty();
+    }
+  }
 
-//	OwlookModulePack getModulePack(Path moduleFile) throws IOException {
-//		moduleFile = moduleFile.toAbsolutePath();
-//		if (!owlookModulePacks.containsKey(moduleFile)) {
-//			OwlookModulePack pack = new OwlookModulePack(moduleFile);
-//			owlookModulePacks.put(moduleFile, pack);
-//		}
-//		return owlookModulePacks.get(moduleFile);
-//	}
-//	
-//	List<OwlookModulePack> getModulePacks(Path... moduleFiles) {
-//		return getModulePacks(Arrays.asList(moduleFiles));
-//	}
-//
-//	List<OwlookModulePack> getModulePacks(Collection<Path> moduleFiles) {
-//		List<OwlookModulePack> returnList = new ArrayList<>();
-//		for (Path moduleFile : moduleFiles) {
-//			try {
-//				returnList.add(getModulePack(moduleFile));
-//			} catch (IOException e) {
-//				OwlLogger.registerException(2, e);
-//			}
-//		}
-//		return returnList;
-//	}
-//
-//	void closeModulePack(OwlookModulePack owlookModulePack) throws IOException {
-//		if (owlookModulePacks.containsKey(owlookModulePack.LOCATION)) {
-//			owlookModulePack.close();
-//			owlookModulePacks.remove(owlookModulePack.LOCATION);
-//		}
-//	}
-//
-//	void removeModulePack(OwlookModulePack owlookModulePack) throws IOException {
-//		closeModulePack(owlookModulePack);
-//		Files.deleteIfExists(owlookModulePack.LOCATION);
-//	}
-//	
-//	OwlookModulePack importModulePack(Path moduleFile) throws IOException {
-//		try (OwlookModulePack testPack = new OwlookModulePack(moduleFile)) {}
-//		
-//		Path outPath = ProjectPath.MODULE.getPath().resolve(moduleFile.getFileName());
-//		if (Files.exists(outPath)) {
-//			throw new IOException("Module file alredy exists: " + outPath);
-//		}
-//		
-//		Files.copy(moduleFile, ProjectPath.MODULE.getPath().resolve(moduleFile.getFileName()));
-//		return getModulePack(outPath);
-//	}
+  Collection<OwlookModulePack> loadedModulePacks() {
+    return Collections.unmodifiableCollection(owlookModulePacks.values());
+  }
 
-	LoadReport testBoot(Collection<OwlookModulePack> modulePacks) {
+  // OwlookModulePack getModulePack(Path moduleFile) throws IOException {
+  // moduleFile = moduleFile.toAbsolutePath();
+  // if (!owlookModulePacks.containsKey(moduleFile)) {
+  // OwlookModulePack pack = new OwlookModulePack(moduleFile);
+  // owlookModulePacks.put(moduleFile, pack);
+  // }
+  // return owlookModulePacks.get(moduleFile);
+  // }
+  //
+  // List<OwlookModulePack> getModulePacks(Path... moduleFiles) {
+  // return getModulePacks(Arrays.asList(moduleFiles));
+  // }
+  //
+  // List<OwlookModulePack> getModulePacks(Collection<Path> moduleFiles) {
+  // List<OwlookModulePack> returnList = new ArrayList<>();
+  // for (Path moduleFile : moduleFiles) {
+  // try {
+  // returnList.add(getModulePack(moduleFile));
+  // } catch (IOException e) {
+  // OwlLogger.registerException(2, e);
+  // }
+  // }
+  // return returnList;
+  // }
+  //
+  // void closeModulePack(OwlookModulePack owlookModulePack) throws IOException {
+  // if (owlookModulePacks.containsKey(owlookModulePack.LOCATION)) {
+  // owlookModulePack.close();
+  // owlookModulePacks.remove(owlookModulePack.LOCATION);
+  // }
+  // }
+  //
+  // void removeModulePack(OwlookModulePack owlookModulePack) throws IOException {
+  // closeModulePack(owlookModulePack);
+  // Files.deleteIfExists(owlookModulePack.LOCATION);
+  // }
+  //
+  // OwlookModulePack importModulePack(Path moduleFile) throws IOException {
+  // try (OwlookModulePack testPack = new OwlookModulePack(moduleFile)) {}
+  //
+  // Path outPath = ProjectPath.MODULE.getPath().resolve(moduleFile.getFileName());
+  // if (Files.exists(outPath)) {
+  // throw new IOException("Module file alredy exists: " + outPath);
+  // }
+  //
+  // Files.copy(moduleFile, ProjectPath.MODULE.getPath().resolve(moduleFile.getFileName()));
+  // return getModulePack(outPath);
+  // }
 
-		List<OwlookModulePack> pool = new ArrayList<>(modulePacks);
+  LoadReport testBoot(Collection<OwlookModulePack> modulePacks) {
 
-		LoadReport loadReport = new LoadReport();
+    List<OwlookModulePack> pool = new ArrayList<>(modulePacks);
 
-		ModuleLayer moduleLayer = ModuleLayer.boot();
+    LoadReport loadReport = new LoadReport();
 
-		VersionFormat projectVersion = OwlookConfiguration.instance().getVersion();
+    ModuleLayer moduleLayer = ModuleLayer.boot();
 
-		List<OwlookModulePack> testVersions = new ArrayList<>(pool);
-		testVersions.forEach(pack -> {
-			if (!pack.MODILE_INFO.version().compatibleWith(projectVersion)) {
-				pool.remove(pack);
+    VersionFormat projectVersion = Owlook.getConfig().getVersion();
 
-				String errorMassage = "Module version is incompatible with project version. " + pack.MODILE_INFO.name()
-						+ "-" + pack.MODILE_INFO.version() + " incompatible with Owlook-" + projectVersion;
+    List<OwlookModulePack> testVersions = new ArrayList<>(pool);
+    testVersions.forEach(pack -> {
+      if (!pack.MODILE_INFO.version().compatibleWith(projectVersion)) {
+        pool.remove(pack);
 
-				loadReport.loadInfoList.add(new ModuleLoadInfo(pack, ModuleLoadInfo.Status.ERROR, errorMassage));
-			}
-		});
+        String errorMassage =
+            "Module version is incompatible with project version. " + pack.MODILE_INFO.name() + "-"
+                + pack.MODILE_INFO.version() + " incompatible with Owlook-" + projectVersion;
 
-		Map<String, List<OwlookModulePack>> loadedModules = new HashMap<>();
+        loadReport.loadInfoList
+            .add(new ModuleLoadInfo(pack, ModuleLoadInfo.Status.ERROR, errorMassage));
+      }
+    });
 
-		pool.forEach(pack -> {
-			if (loadedModules.containsKey(pack.MODILE_INFO.moduleName())) {
-				loadedModules.get(pack.MODILE_INFO.moduleName()).add(pack);
-			} else {
-				loadedModules.put(pack.MODILE_INFO.moduleName(), new ArrayList<>(Arrays.asList(pack)));
-			}
-		});
+    Map<String, List<OwlookModulePack>> loadedModules = new HashMap<>();
 
-		loadedModules.forEach((key, value) -> {
-			if (value.size() > 1) {
-				value.forEach(pack -> {
-					if (pool.remove(pack)) {
-						StringBuilder builder = new StringBuilder("Duplicate module:");
-						value.forEach(pack2 -> {
-							builder.append("\n " + pack2.MODILE_INFO.name() + "-" + pack2.MODILE_INFO.version() + " ["
-									+ pack2.LOCATION + "]");
-						});
-						loadReport.loadInfoList
-								.add(new ModuleLoadInfo(pack, ModuleLoadInfo.Status.ERROR, builder.toString()));
-					}
-				});
-				loadReport.load = false;
-			}
-		});
+    pool.forEach(pack -> {
+      if (loadedModules.containsKey(pack.MODILE_INFO.moduleName())) {
+        loadedModules.get(pack.MODILE_INFO.moduleName()).add(pack);
+      } else {
+        loadedModules.put(pack.MODILE_INFO.moduleName(), new ArrayList<>(Arrays.asList(pack)));
+      }
+    });
 
-		LoadOrder loadOrder = new LoadOrder(pool);
+    loadedModules.forEach((key, value) -> {
+      if (value.size() > 1) {
+        value.forEach(pack -> {
+          if (pool.remove(pack)) {
+            StringBuilder builder = new StringBuilder("Duplicate module:");
+            value.forEach(pack2 -> {
+              builder.append("\n " + pack2.MODILE_INFO.name() + "-" + pack2.MODILE_INFO.version()
+                  + " [" + pack2.LOCATION + "]");
+            });
+            loadReport.loadInfoList
+                .add(new ModuleLoadInfo(pack, ModuleLoadInfo.Status.ERROR, builder.toString()));
+          }
+        });
+        loadReport.load = false;
+      }
+    });
 
-		OwlookModulePack loadPack = null;
-		while ((loadPack = loadOrder.poll()) != null) {
-			ModuleFinder moduleFinder = ModuleFinder.of(loadPack.MODULE);
-			ModuleFinder libFinder = ModuleFinder.of(loadPack.LIB);
+    LoadOrder loadOrder = new LoadOrder(pool);
 
-			try {
-				Configuration configuration = moduleLayer.configuration().resolve(moduleFinder, libFinder,
-						Arrays.asList(loadPack.MODILE_INFO.moduleName()));
+    OwlookModulePack loadPack = null;
+    while ((loadPack = loadOrder.poll()) != null) {
+      ModuleFinder moduleFinder = ModuleFinder.of(loadPack.MODULE);
+      ModuleFinder libFinder = ModuleFinder.of(loadPack.LIB);
 
-				moduleLayer = moduleLayer.defineModulesWithOneLoader(configuration, ClassLoader.getSystemClassLoader());
-				loadReport.loadInfoList.add(new ModuleLoadInfo(loadPack, ModuleLoadInfo.Status.OK, ""));
-			} catch (FindException | ResolutionException e) {
-				Logger.registerException(3, e);
-				loadReport.loadInfoList.add(new ModuleLoadInfo(loadPack, ModuleLoadInfo.Status.ERROR, e.getMessage()));
-				loadReport.load = false;
-			}
+      try {
+        Configuration configuration = moduleLayer.configuration().resolve(moduleFinder, libFinder,
+            Arrays.asList(loadPack.MODILE_INFO.moduleName()));
 
-		}
+        moduleLayer = moduleLayer.defineModulesWithOneLoader(configuration,
+            ClassLoader.getSystemClassLoader());
+        loadReport.loadInfoList.add(new ModuleLoadInfo(loadPack, ModuleLoadInfo.Status.OK, ""));
+      } catch (FindException | ResolutionException e) {
+        Owlook.registerException(3, e);
+        loadReport.loadInfoList
+            .add(new ModuleLoadInfo(loadPack, ModuleLoadInfo.Status.ERROR, e.getMessage()));
+        loadReport.load = false;
+      }
 
-		if (loadReport.isLoad()) {
-			loadReport.resultLayer = moduleLayer;
-		}
+    }
 
-		return loadReport;
+    if (loadReport.isLoad()) {
+      loadReport.resultLayer = moduleLayer;
+    }
 
-	}
+    return loadReport;
 
-	LoadReport boot(Collection<OwlookModulePack> modulePacks) {
-		if (isBoot()) {
-			stopBoot();
-		}
-		LoadReport loadReport = testBoot(modulePacks);
-		if (loadReport.isLoad()) {
-			this.moduleLayer = loadReport.resultLayer;
-			loadReport.loadInfoList.stream().map(info -> info.PACK)
-					.forEach(pack -> owlookModulePacks.put(pack.LOCATION, pack));
+  }
 
-		}
-		return loadReport;
+  LoadReport boot(Collection<OwlookModulePack> modulePacks) {
+    if (isBoot()) {
+      stopBoot();
+    }
+    LoadReport loadReport = testBoot(modulePacks);
+    if (loadReport.isLoad()) {
+      this.moduleLayer = loadReport.resultLayer;
+      loadReport.loadInfoList.stream().map(info -> info.PACK)
+          .forEach(pack -> owlookModulePacks.put(pack.LOCATION, pack));
 
-	}
+    }
+    return loadReport;
 
-	void initOwlookModules(boolean forceInit) {
-		if (!isBoot())
-			return;
-		if (!isInitModules() || forceInit) {
-			loadModules().forEach(OwlookModule::initModule);
-			initModules = true;
-		}
-	}
+  }
 
-	boolean isBoot() {
-		return moduleLayer != null;
-	}
+  void initOwlookModules(boolean forceInit) {
+    if (!isBoot())
+      return;
+    if (!isInitModules() || forceInit) {
+      loadModules().forEach(OwlookModule::initModule);
+      initModules = true;
+    }
+  }
 
-	void stopBoot() {
-		moduleLayer = null;
-		owlookModulePacks.clear();
-		initModules = false;
-	}
+  boolean isBoot() {
+    return moduleLayer != null;
+  }
 
-	boolean isInitModules() {
-		return initModules;
-	}
+  void stopBoot() {
+    moduleLayer = null;
+    owlookModulePacks.clear();
+    initModules = false;
+  }
+
+  boolean isInitModules() {
+    return initModules;
+  }
 
 }

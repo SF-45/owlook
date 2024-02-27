@@ -3,6 +3,7 @@ package space.sadfox.owlook.logger;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlType;
+import space.sadfox.owlook.utils.LogLevel;
 
 @XmlType
 public class LoggerEntry {
@@ -39,13 +40,13 @@ public class LoggerEntry {
 		return logLevel;
 	}
     
-    @XmlAttribute(name = "loggingDepth")
-	public Integer getLoggingDepth() {
+    @XmlAttribute(name = "criticalLevel")
+	public Integer getCriticalLevel() {
 		return loggingDepth;
 	}
 
-	public void setLoggingDepth(Integer loggingDepth) {
-		this.loggingDepth = loggingDepth;
+	public void setCriticalLevel(Integer criticalLevel) {
+		this.loggingDepth = criticalLevel;
 	}
 
 	public void setLogLevel(LogLevel logLevel) {

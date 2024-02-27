@@ -46,7 +46,7 @@ import space.sadfox.owlook.moduleloader.ModuleLoader.LoadReport;
 import space.sadfox.owlook.ui.MainStage;
 import space.sadfox.owlook.ui.base.FXMLController;
 import space.sadfox.owlook.ui.tools.MessageBox;
-import space.sadfox.owlook.utils.Logger;
+import space.sadfox.owlook.utils.Owlook;
 import space.sadfox.owlook.utils.ProjectPath;
 import space.sadfox.owlook.utils.StageFactory;
 
@@ -210,12 +210,14 @@ public class ModuleLoaderController extends FXMLController {
   @FXML
   private CheckBox skipModuleManagerCheckBox;
 
-  private final OwlookConfiguration config = OwlookConfiguration.instance();
+  private final OwlookConfiguration config;
 
   private final ObservableList<TableEntity> tableEntities = FXCollections.observableArrayList();
 
   public ModuleLoaderController() throws IOException {
     super(ResourceTarget.class.getResource("fxml/module-loader.fxml"));
+
+    config = Owlook.getConfig();
 
     init();
 
@@ -383,7 +385,7 @@ public class ModuleLoaderController extends FXMLController {
         mainStage.show();
         return true;
       } catch (IOException e) {
-        Logger.registerException(0, e);
+        Owlook.registerException(0, e);
       }
     }
     return false;
@@ -400,7 +402,7 @@ public class ModuleLoaderController extends FXMLController {
       tableEntities.remove(tableEntity);
       testLaunch();
     } catch (IOException e) {
-      Logger.registerException(1, e);
+      Owlook.registerException(1, e);
 
       MessageBox messageBox = new MessageBox(AlertType.ERROR);
       messageBox.setTitle("Deletion error");
@@ -468,7 +470,7 @@ public class ModuleLoaderController extends FXMLController {
       tableEntities.add(new TableEntity(new OwlookModulePack(newModuleFile)));
       testLaunch();
     } catch (IOException e) {
-      Logger.registerException(1, e);
+      Owlook.registerException(1, e);
       MessageBox messageBox = new MessageBox(AlertType.ERROR);
       messageBox.setTitle("Import error");
       messageBox.setHeaderText("Module import error: " + moduleFile);

@@ -1,4 +1,4 @@
-package space.sadfox.owlook.logger;
+package space.sadfox.owlook.utils;
 
 public enum LogLevel {
 	ALL,

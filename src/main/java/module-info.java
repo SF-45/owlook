@@ -38,7 +38,6 @@ module space.sadfox.owlook {
   exports space.sadfox.owlook.owlery;
   exports space.sadfox.owlook.api;
   exports space.sadfox.owlook.utils;
-  exports space.sadfox.owlook.logger;
   exports space.sadfox.owlook.ui.base;
   exports space.sadfox.owlook.ui.tools;
   exports space.sadfox.owlook.moduleloader;

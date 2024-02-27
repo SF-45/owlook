@@ -11,7 +11,6 @@ public enum ProjectPath {
     CONFiG("conf",false),
     DATA("data", false),
     TEMP("temp", true),
-    LOG("log", false),
     MODULE("module", false),
     MODULE_LIB("module-lib", false),
     MODULE_CONFIG("module-conf", false);
@@ -30,7 +29,7 @@ public enum ProjectPath {
                 Files.createDirectory(path);
                 if (isTemp) path.toFile().deleteOnExit();
             } catch (IOException e) {
-                Logger.registerException(1, e);
+                Owlook.registerException(1, e);
             }
         }
         return path;

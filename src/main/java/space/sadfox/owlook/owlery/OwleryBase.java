@@ -17,7 +17,7 @@ import space.sadfox.owlook.base.owl.OwlEntity;
 import space.sadfox.owlook.moduleloader.ModuleLoader;
 import space.sadfox.owlook.ui.base.Controllable;
 import space.sadfox.owlook.ui.base.DesignController;
-import space.sadfox.owlook.utils.Logger;
+import space.sadfox.owlook.utils.Owlook;
 
 public abstract class OwleryBase extends DesignController<OwleryDesigner> {
 
@@ -146,7 +146,7 @@ public abstract class OwleryBase extends DesignController<OwleryDesigner> {
       Owl<?> newOwl = OwlLoader.INSTANCE.createOwl(target);
       editOwlAction(newOwl);
     } catch (Exception e) {
-      Logger.registerException(0, e);
+      Owlook.registerException(0, e);
     }
   }
 
@@ -156,7 +156,7 @@ public abstract class OwleryBase extends DesignController<OwleryDesigner> {
       try {
         controlEntity.getController().show();
       } catch (IOException e) {
-        Logger.registerException(1, e);
+        Owlook.registerException(1, e);
       }
     }
   }
@@ -171,7 +171,7 @@ public abstract class OwleryBase extends DesignController<OwleryDesigner> {
         try {
           DESIGN.setEditOwlPreview(controlEntity.getController().getParent());
         } catch (IOException e) {
-          Logger.registerException(1, e);
+          Owlook.registerException(1, e);
         }
       } else {
         DESIGN.setEditOwlPreview(null);
@@ -185,7 +185,7 @@ public abstract class OwleryBase extends DesignController<OwleryDesigner> {
       try {
         OwlLoader.INSTANCE.deleteOwl(owl);
       } catch (Exception e) {
-        Logger.registerException(1, e); // TODO: Окно с подтверждением и уведомление об ошибке
+        Owlook.registerException(1, e); // TODO: Окно с подтверждением и уведомление об ошибке
       }
     });
   }

@@ -19,7 +19,7 @@ import space.sadfox.owlook.base.owl.OwlEntityInitializeException;
 import space.sadfox.owlook.base.owl.Owls;
 import space.sadfox.owlook.moduleloader.ModuleLoader;
 import space.sadfox.owlook.ui.tools.MessageBox;
-import space.sadfox.owlook.utils.Logger;
+import space.sadfox.owlook.utils.Owlook;
 import space.sadfox.owlook.utils.ProjectPath;
 
 public enum OwlLoader {
@@ -187,7 +187,7 @@ public enum OwlLoader {
 
   private void initOwl(Owl<?> owl) {
     owl.enableAutoSave(e -> {
-      Logger.registerException(1, e);
+      Owlook.registerException(1, e);
     });
     owl.setAutoSaveDelay(2);
   }
@@ -207,7 +207,7 @@ public enum OwlLoader {
         ref.put(hollowOwl.info().id(), hollowOwl);
       } catch (FileAlreadyExistsException e) {
       } catch (JAXBException | IOException e) {
-        Logger.registerException(1, e);
+        Owlook.registerException(1, e);
       }
     }
 
@@ -220,7 +220,7 @@ public enum OwlLoader {
         owls.put(loadedOwl.info().id(), loadedOwl);
       } catch (OwlCastException | OwlNotFoundException | ClassNotFoundException | JAXBException
           | OwlEntityInitializeException e) {
-        Logger.registerException(1, e);
+        Owlook.registerException(1, e);
         MessageBox messageBox = new MessageBox(AlertType.ERROR);
         messageBox.setTitle("Owl Load Error");
         messageBox.setHeaderText("An error occurred while loading Owl " + uuid);

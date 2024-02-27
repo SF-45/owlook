@@ -35,7 +35,7 @@ public class ConfigurationManager<T extends ObservedJAXBEntity> {
 		} else {
 			T newInstance = new JAXBEntityFactory<>(target).instanceOf(path);
 			newInstance.enableAutoSave(exception -> {
-				Logger.registerException(0, exception);
+				Owlook.registerException(0, exception);
 			});
 			configs.put(path, newInstance);
 			return newInstance;

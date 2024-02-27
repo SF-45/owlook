@@ -16,7 +16,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import space.sadfox.owlook.base.jaxb.ObservedJAXBEntity;
 import space.sadfox.owlook.utils.ConfigurationManager;
-import space.sadfox.owlook.utils.Logger;
+import space.sadfox.owlook.utils.Owlook;
 
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement(name = "owleryConfiguration")
@@ -167,7 +167,7 @@ public class OwleryConfig extends ObservedJAXBEntity {
     try {
       return new ConfigurationManager<>(OwleryConfig.class).getConfig("owlery");
     } catch (ClassCastException | JAXBException | IOException | ReflectiveOperationException e) {
-      Logger.registerException(0, e);
+      Owlook.registerException(0, e);
       return null;
     }
   }
