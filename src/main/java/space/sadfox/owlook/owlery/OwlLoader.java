@@ -1,6 +1,7 @@
 package space.sadfox.owlook.owlery;
 
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -20,7 +21,6 @@ import space.sadfox.owlook.moduleloader.ModuleLoader;
 import space.sadfox.owlook.ui.tools.MessageBox;
 import space.sadfox.owlook.utils.Logger;
 import space.sadfox.owlook.utils.ProjectPath;
-import space.sadfox.owlook.utils.StageFactory;
 
 public enum OwlLoader {
   INSTANCE;
@@ -102,7 +102,6 @@ public enum OwlLoader {
     Path location = owl.location();
     UUID owlID = owl.info().id();
 
-    owl.close();
     Files.delete(location);
     owls.remove(owlID);
 
@@ -190,7 +189,7 @@ public enum OwlLoader {
     owl.enableAutoSave(e -> {
       Logger.registerException(1, e);
     });
-    owl.setAutoSaveDuration(2);
+    owl.setAutoSaveDelay(2);
   }
 
   public void boot() throws IOException {
@@ -206,6 +205,7 @@ public enum OwlLoader {
           hollowOwl = rename(hollowOwl);
         }
         ref.put(hollowOwl.info().id(), hollowOwl);
+      } catch (FileAlreadyExistsException e) {
       } catch (JAXBException | IOException e) {
         Logger.registerException(1, e);
       }
@@ -229,24 +229,19 @@ public enum OwlLoader {
         // TODO: Больше вариантов сообщения в зависимости от ошибки
       }
     }
-
-    StageFactory.INSTANCE.addApplicationCloseAction(() -> {
-      owls.forEach((id, owl) -> {
-        try {
-          owl.close();
-        } catch (IOException e) {
-          Logger.registerException(1, e);
-        }
-      });
-    });
-
     isBoot = true;
 
   }
 
-  private HollowOwl rename(HollowOwl hollowOwl) throws IOException, JAXBException {
+  private HollowOwl rename(HollowOwl hollowOwl)
+      throws FileAlreadyExistsException, IOException, JAXBException {
     Path newPath =
         ProjectPath.OWLERY.getPath().resolve(hollowOwl.info().id().toString() + Owl.EXTENSION);
+    if (Files.exists(newPath)) {
+      // TODO: MassageBox уведомляющий что в папке существует дубликат сущности и она не будет
+      // загружена или диалог предлагающий удалить дубликат
+      throw new FileAlreadyExistsException("");
+    }
     Files.move(hollowOwl.location(), newPath);
     // TODO: Уведомление о переименовании
     return Owl.getHollowOwl(newPath);
