@@ -16,81 +16,83 @@ import javafx.stage.WindowEvent;
 import space.sadfox.owlook.ResourceTarget;
 
 public enum StageFactory {
-    INSTANCE;
+  INSTANCE;
 
-	private StageFactory() {
-		openStages.addListener((InvalidationListener) prop -> {
-			if (openStages.size() == 0) {
-				applicationCloseActions.forEach(Runnable::run);
-			}
-		});
-	}
-    private final ObservableList<Stage> openStages = FXCollections.observableArrayList();
+  private StageFactory() {
+    openStages.addListener((InvalidationListener) prop -> {
+      if (openStages.size() == 0) {
+        applicationCloseActions.forEach(Runnable::run);
+      }
+    });
+  }
 
-    public ObservableList<Stage> getOpenStages() {
-        return openStages;
-    }
+  private final ObservableList<Stage> openStages = FXCollections.observableArrayList();
 
-    private final ObjectProperty<Stage> currentStage = new SimpleObjectProperty<>(null);
+  public ObservableList<Stage> getOpenStages() {
+    return openStages;
+  }
 
-    private final  ObservableMap<EventHandler<KeyEvent>, EventType<KeyEvent>> keyEvents = FXCollections.observableHashMap();
+  private final ObjectProperty<Stage> currentStage = new SimpleObjectProperty<>(null);
 
-    private final ObservableList<Runnable> applicationCloseActions = FXCollections.observableArrayList();
-    
-    public final ObjectProperty<Stage> currentStageProperty() {
-        return this.currentStage;
-    }
+  private final ObservableMap<EventHandler<KeyEvent>, EventType<KeyEvent>> keyEvents =
+      FXCollections.observableHashMap();
 
-    public final Stage getCurrentStage() {
-        return this.currentStageProperty().get();
-    }
+  private final ObservableList<Runnable> applicationCloseActions =
+      FXCollections.observableArrayList();
 
-    public final void setCurrentStage(final Stage currentStage) {
-        this.currentStageProperty().set(currentStage);
-    }
+  public final ObjectProperty<Stage> currentStageProperty() {
+    return this.currentStage;
+  }
 
-    public void registerStage(Stage stage) {
-        stage.addEventHandler(WindowEvent.WINDOW_SHOWN, e ->
-                openStages.add(stage));
-        stage.addEventHandler(WindowEvent.WINDOW_HIDDEN, e ->
-                openStages.remove(stage));
-        stage.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
-            if (isNowFocused) {
-                currentStage.set(stage);
-            } else {
-                currentStage.set(null);
-            }
+  public final Stage getCurrentStage() {
+    return this.currentStageProperty().get();
+  }
+
+  public final void setCurrentStage(final Stage currentStage) {
+    this.currentStageProperty().set(currentStage);
+  }
+
+  public void registerStage(Stage stage) {
+    stage.addEventHandler(WindowEvent.WINDOW_SHOWN, e -> openStages.add(stage));
+    stage.addEventHandler(WindowEvent.WINDOW_HIDDEN, e -> openStages.remove(stage));
+    stage.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
+      if (isNowFocused) {
+        currentStage.set(stage);
+      } else {
+        currentStage.set(null);
+      }
+    });
+    keyEvents.forEach((eventHandler, eventType) -> {
+      stage.addEventFilter(eventType, eventHandler);
+    });
+    keyEvents
+        .addListener((MapChangeListener<EventHandler<KeyEvent>, EventType<KeyEvent>>) change -> {
+          if (change.wasAdded()) {
+            stage.addEventFilter(change.getValueAdded(), change.getKey());
+          } else if (change.wasRemoved()) {
+            stage.removeEventFilter(change.getValueAdded(), change.getKey());
+          }
         });
-        keyEvents.forEach((eventHandler, eventType) -> {
-            stage.addEventFilter(eventType, eventHandler);
-        });
-        keyEvents.addListener((MapChangeListener<EventHandler<KeyEvent>, EventType<KeyEvent>>) change -> {
-            if (change.wasAdded()) {
-                stage.addEventFilter(change.getValueAdded(), change.getKey());
-            } else if (change.wasRemoved()) {
-                stage.removeEventFilter(change.getValueAdded(), change.getKey());
-            }
-        });
-        stage.getIcons().add(new Image(ResourceTarget.class.getResourceAsStream("image/owl2.png")));
-    }
+    stage.getIcons().add(new Image(ResourceTarget.class.getResourceAsStream("image/owl2.png")));
+  }
 
-    public Stage createStage() {
-        Stage stage = new Stage();
-        registerStage(stage);
-        return stage;
-    }
+  public Stage createStage() {
+    Stage stage = new Stage();
+    registerStage(stage);
+    return stage;
+  }
 
-    public ObservableMap<EventHandler<KeyEvent>, EventType<KeyEvent>> getKeyEvents() {
-        return keyEvents;
-    }
-    
-    public void addApplicationCloseAction(Runnable action) {
-    	applicationCloseActions.add(action);
-    }
-    
-    public void removeApplicationCloseAction(Runnable action) {
-    	applicationCloseActions.remove(action);
-    }
-    
-    
+  public ObservableMap<EventHandler<KeyEvent>, EventType<KeyEvent>> getKeyEvents() {
+    return keyEvents;
+  }
+
+  public void addApplicationCloseAction(Runnable action) {
+    applicationCloseActions.add(action);
+  }
+
+  public void removeApplicationCloseAction(Runnable action) {
+    applicationCloseActions.remove(action);
+  }
+
+
 }

@@ -5,6 +5,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import space.sadfox.owlook.moduleloader.ModuleLoaderController;
 import space.sadfox.owlook.utils.Owlook;
+import space.sadfox.owlook.utils.OwlookConfiguration;
 import space.sadfox.owlook.utils.StageFactory;
 
 public class App extends Application {

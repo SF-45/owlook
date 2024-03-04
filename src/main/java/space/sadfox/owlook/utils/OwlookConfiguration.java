@@ -1,4 +1,4 @@
-package space.sadfox.owlook;
+package space.sadfox.owlook.utils;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -10,12 +10,14 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import space.sadfox.owlook.ResourceTarget;
 import space.sadfox.owlook.base.jaxb.ObservedJAXBEntity;
 import space.sadfox.owlook.base.moduleapi.VersionFormat;
-import space.sadfox.owlook.utils.Owlook;
 
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement(name = "owlookConfiguration")
@@ -24,6 +26,8 @@ public class OwlookConfiguration extends ObservedJAXBEntity {
   private final BooleanProperty debugMode = new SimpleBooleanProperty(true);
   private final BooleanProperty skipModuleManage = new SimpleBooleanProperty(false);
   private final ObservableList<String> modules = FXCollections.observableArrayList();
+  private final ObjectProperty<NotificationPos> notificationPos =
+      new SimpleObjectProperty<>(NotificationPos.TOP_RIGHT);
 
   public VersionFormat getVersion() {
     return version;
@@ -65,9 +69,22 @@ public class OwlookConfiguration extends ObservedJAXBEntity {
     return modules;
   }
 
+  public ObjectProperty<NotificationPos> notificationPosProperty() {
+    return notificationPos;
+  }
+
+  @XmlElement
+  public NotificationPos getNotificationPos() {
+    return notificationPos.get();
+  }
+
+  public void setNotificationPos(NotificationPos notificationPos) {
+    this.notificationPos.set(notificationPos);
+  }
+
   @Override
   public List<Object> getProperties() {
-    return Arrays.asList(debugMode, modules, skipModuleManage);
+    return Arrays.asList(debugMode, modules, skipModuleManage, notificationPos);
   }
 
   @Override

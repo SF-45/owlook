@@ -37,7 +37,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
-import space.sadfox.owlook.OwlookConfiguration;
 import space.sadfox.owlook.ResourceTarget;
 import space.sadfox.owlook.base.moduleapi.OwlookModulePack;
 import space.sadfox.owlook.base.moduleapi.OwlookModulePacks;
@@ -47,6 +46,7 @@ import space.sadfox.owlook.ui.MainStage;
 import space.sadfox.owlook.ui.base.FXMLController;
 import space.sadfox.owlook.ui.tools.MessageBox;
 import space.sadfox.owlook.utils.Owlook;
+import space.sadfox.owlook.utils.OwlookConfiguration;
 import space.sadfox.owlook.utils.ProjectPath;
 import space.sadfox.owlook.utils.StageFactory;
 

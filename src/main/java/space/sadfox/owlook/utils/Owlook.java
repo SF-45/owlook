@@ -7,7 +7,6 @@ import java.nio.file.Path;
 import jakarta.xml.bind.JAXBException;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Modality;
-import space.sadfox.owlook.OwlookConfiguration;
 import space.sadfox.owlook.base.jaxb.JAXBEntityFactory;
 import space.sadfox.owlook.logger.LoggerDAO;
 import space.sadfox.owlook.logger.LoggerEntity;
@@ -17,6 +16,7 @@ import space.sadfox.owlook.ui.tools.MessageBox;
 public class Owlook implements Thread.UncaughtExceptionHandler {
 
   private static LoggerDAO logger;
+  private static NotificationPopup notificationPopup;
 
   static {
     Path pathToLog = Path.of("log.xml");
@@ -42,7 +42,7 @@ public class Owlook implements Thread.UncaughtExceptionHandler {
     StringWriter writer = new StringWriter();
     e.printStackTrace(new PrintWriter(writer));
     entry.setStackTrace(writer.toString());
-    entry.setLogLevel(LogLevel.ERROR);
+    entry.setLogLevel(MessageLevel.ERROR);
     entry.setCriticalLevel(criticalLevel);
     try {
       logger.getLoggerEntity().save();
@@ -63,11 +63,11 @@ public class Owlook implements Thread.UncaughtExceptionHandler {
     }
   }
 
-  public synchronized static void registerMessage(LogMessage message) {
+  public synchronized static void registerMessage(OwlookMessage message) {
     LoggerEntry entry = logger.addNewLoggerEntry();
     entry.setName(message.getName());
     entry.setMessage(message.getMessage());
-    entry.setLogLevel(message.getLogLevel());
+    entry.setLogLevel(message.getMessageLevel());
     entry.setTime(System.currentTimeMillis());
     try {
       logger.getLoggerEntity().save();
@@ -76,6 +76,14 @@ public class Owlook implements Thread.UncaughtExceptionHandler {
     }
 
     printLogEntry(entry);
+  }
+
+  public synchronized static void notificate(OwlookMessage message) {
+    getNotificationPopup().showMessage(message);
+  }
+
+  public synchronized static void notificate(NotificationElement element) {
+    getNotificationPopup().showMessage(element);
   }
 
   @Override
@@ -90,7 +98,8 @@ public class Owlook implements Thread.UncaughtExceptionHandler {
     try {
       return new ConfigurationManager<>(OwlookConfiguration.class).getConfig(confPath);
     } catch (JAXBException | IOException | ClassCastException | ReflectiveOperationException e) {
-      Owlook.registerException(0, e);
+      // Owlook.registerException(0, e);
+      e.printStackTrace();
       return null;
     }
   }
@@ -109,10 +118,18 @@ public class Owlook implements Thread.UncaughtExceptionHandler {
     String message = "[" + loggerEntry.getLogLevel() + "] " + loggerEntry.getName() + ": "
         + loggerEntry.getMassage();
 
-    if (loggerEntry.getLogLevel().equals(LogLevel.ERROR)) {
+    if (loggerEntry.getLogLevel().equals(MessageLevel.ERROR)) {
       System.err.println(message);
     } else {
       System.out.println(message);
     }
+  }
+
+  private static NotificationPopup getNotificationPopup() {
+    if (notificationPopup == null) {
+      notificationPopup = new NotificationPopup();
+    }
+    return notificationPopup;
+
   }
 }
