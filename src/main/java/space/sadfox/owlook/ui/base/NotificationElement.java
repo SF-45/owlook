@@ -1,4 +1,4 @@
-package space.sadfox.owlook.utils;
+package space.sadfox.owlook.ui.base;
 
 import org.kordamp.ikonli.codicons.Codicons;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -20,6 +20,8 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import space.sadfox.owlook.utils.MessageLevel;
+import space.sadfox.owlook.utils.OwlookMessage;
 
 public class NotificationElement {
 
@@ -126,12 +128,12 @@ public class NotificationElement {
     addActionIcon(expand);
   }
 
-  void bindProgressBar(Task<Void> task) {
+  public void bindProgressBar(Task<Void> task) {
     progressBar.progressProperty().bind(task.progressProperty());
     closeButton.setOnMousePressed(event -> task.cancel());
   }
 
-  Node getRoot() {
+  public Node getRoot() {
     return root;
   }
 

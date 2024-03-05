@@ -11,6 +11,8 @@ import space.sadfox.owlook.base.jaxb.JAXBEntityFactory;
 import space.sadfox.owlook.logger.LoggerDAO;
 import space.sadfox.owlook.logger.LoggerEntity;
 import space.sadfox.owlook.logger.LoggerEntry;
+import space.sadfox.owlook.ui.NotificationPopup;
+import space.sadfox.owlook.ui.base.NotificationElement;
 import space.sadfox.owlook.ui.tools.MessageBox;
 
 public class Owlook implements Thread.UncaughtExceptionHandler {

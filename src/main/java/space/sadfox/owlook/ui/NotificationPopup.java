@@ -1,4 +1,4 @@
-package space.sadfox.owlook.utils;
+package space.sadfox.owlook.ui;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
@@ -13,8 +13,12 @@ import javafx.stage.Popup;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import space.sadfox.owlook.ui.base.NotificationElement;
+import space.sadfox.owlook.utils.NotificationPos;
+import space.sadfox.owlook.utils.Owlook;
+import space.sadfox.owlook.utils.OwlookMessage;
 
-class NotificationPopup {
+public class NotificationPopup {
   private final Popup popupStage;
   private final Stage crutchStage;
   private final ObjectProperty<NotificationPos> position;
