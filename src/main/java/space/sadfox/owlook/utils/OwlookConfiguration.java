@@ -28,6 +28,7 @@ public class OwlookConfiguration extends ObservedJAXBEntity {
   private final ObservableList<String> modules = FXCollections.observableArrayList();
   private final ObjectProperty<NotificationPos> notificationPos =
       new SimpleObjectProperty<>(NotificationPos.TOP_RIGHT);
+  private final BooleanProperty deleteForgottenOwls = new SimpleBooleanProperty(true);
 
   public VersionFormat getVersion() {
     return version;
@@ -82,9 +83,23 @@ public class OwlookConfiguration extends ObservedJAXBEntity {
     this.notificationPos.set(notificationPos);
   }
 
+  public BooleanProperty deleteForgottenOwlsProperty() {
+    return deleteForgottenOwls;
+  }
+
+  @XmlElement
+  public Boolean isDeleteForgottenOwls() {
+    return deleteForgottenOwls.get();
+  }
+
+  public void setDeleteForgottenOwls(Boolean deleteForgottenOwls) {
+    this.deleteForgottenOwls.set(deleteForgottenOwls);
+  }
+
   @Override
   public List<Object> getProperties() {
-    return Arrays.asList(debugMode, modules, skipModuleManage, notificationPos);
+    return Arrays.asList(debugMode, modules, skipModuleManage, notificationPos,
+        deleteForgottenOwls);
   }
 
   @Override

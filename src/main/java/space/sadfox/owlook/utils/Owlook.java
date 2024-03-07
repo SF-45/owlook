@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.file.Path;
 import jakarta.xml.bind.JAXBException;
+import javafx.application.Platform;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Modality;
 import space.sadfox.owlook.base.jaxb.JAXBEntityFactory;
@@ -81,11 +82,15 @@ public class Owlook implements Thread.UncaughtExceptionHandler {
   }
 
   public synchronized static void notificate(OwlookMessage message) {
-    getNotificationPopup().showMessage(message);
+    Platform.runLater(() -> {
+      getNotificationPopup().showMessage(message);
+    });
   }
 
   public synchronized static void notificate(NotificationElement element) {
-    getNotificationPopup().showMessage(element);
+    Platform.runLater(() -> {
+      getNotificationPopup().showMessage(element);
+    });
   }
 
   @Override

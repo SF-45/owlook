@@ -9,35 +9,45 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import jakarta.xml.bind.JAXBException;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import space.sadfox.owlook.base.owl.HollowOwl;
 import space.sadfox.owlook.base.owl.Owl;
 import space.sadfox.owlook.base.owl.OwlEntity;
 import space.sadfox.owlook.base.owl.OwlEntityInitializeException;
 import space.sadfox.owlook.base.owl.Owls;
 import space.sadfox.owlook.moduleloader.ModuleLoader;
+import space.sadfox.owlook.owlery.DependencyBuilder.Dependency;
 import space.sadfox.owlook.ui.tools.MessageBox;
+import space.sadfox.owlook.utils.MessageLevel;
 import space.sadfox.owlook.utils.Owlook;
+import space.sadfox.owlook.utils.OwlookMessage;
 import space.sadfox.owlook.utils.ProjectPath;
 
 public enum OwlLoader {
   INSTANCE;
 
+  public static enum DeleteFlag {
+    FORCE, NO_DEPENDENCIES;
+  }
+
   @FunctionalInterface
   public static interface CreateOwlListener {
-    void create(Owl<? extends OwlEntity> entity);
+    void create(Owl<?> entity);
   }
 
   @FunctionalInterface
   public static interface DeleteOwlListener {
-    void delete(Owl<? extends OwlEntity> entity);
+    void delete(Owl<?> entity);
   }
 
   @FunctionalInterface
   public static interface DuplicateOwlListener {
-    void duplicate(Owl<? extends OwlEntity> oldEntity, Owl<? extends OwlEntity> newEntity);
+    void duplicate(Owl<?> oldEntity, Owl<?> newEntity);
   }
 
   private final Map<UUID, Owl<?>> owls = new HashMap<>();
@@ -61,8 +71,21 @@ public enum OwlLoader {
     return (Owl<T>) owl;
   }
 
-  @SuppressWarnings("unchecked")
   public synchronized <T extends OwlEntity> List<Owl<T>> getOwls(Class<T> target) {
+    return getAllOwls(target).stream().filter(owl -> !owl.head().isHidden())
+        .collect(Collectors.toList());
+  }
+
+  public synchronized List<Owl<?>> getOwls() {
+    return getAllOwls().stream().filter(owl -> !owl.head().isHidden()).collect(Collectors.toList());
+  }
+
+  public synchronized List<Owl<?>> getAllOwls() {
+    return new ArrayList<>(owls.values());
+  }
+
+  @SuppressWarnings("unchecked")
+  public synchronized <T extends OwlEntity> List<Owl<T>> getAllOwls(Class<T> target) {
     List<Owl<T>> rezOwls = new ArrayList<>();
 
     owls.forEach((key, value) -> {
@@ -71,11 +94,6 @@ public enum OwlLoader {
       }
     });
     return rezOwls;
-  }
-
-  public synchronized List<Owl<?>> getOwls() {
-
-    return new ArrayList<>(owls.values());
   }
 
   public synchronized <T extends OwlEntity> Owl<T> createOwl(Class<T> target) throws IOException,
@@ -89,23 +107,74 @@ public enum OwlLoader {
     return newOwl;
   }
 
-  public synchronized <T extends OwlEntity> Owl<T> createOwl(Class<T> target, Owl<?> parent)
+  public synchronized <T extends OwlEntity> Owl<T> createHiddenOwl(Class<T> target)
       throws IOException, JAXBException, ReflectiveOperationException,
       OwlEntityInitializeException {
     Owl<T> newOwl = createOwl(target);
-    newOwl.head().setParentOwl(parent.info().id());
+    newOwl.head().setHidden(true);
 
     return newOwl;
   }
 
-  public synchronized <T extends OwlEntity> void deleteOwl(Owl<T> owl) throws IOException {
-    Path location = owl.location();
-    UUID owlID = owl.info().id();
+  public synchronized void deleteOwl(Owl<?> owl, List<Owl<?>> ignoreDependencies,
+      DeleteFlag... flags) throws IOException {
+    boolean depFlag = false, deleteConfyrm = false;
 
-    Files.delete(location);
-    owls.remove(owlID);
+    for (DeleteFlag flag : flags) {
+      switch (flag) {
+        case FORCE:
+          deleteConfyrm = true;
+          break;
+        case NO_DEPENDENCIES:
+          depFlag = true;
+          break;
+      }
+    }
 
-    notifyDeleteOwlListeners(owl);
+    if (!deleteConfyrm) {
+      DependencyBuilder depBuilder = new DependencyBuilder(getAllOwls());
+      List<Owl<?>> dependencyFor = new ArrayList<>();
+      Optional<Dependency> o = depBuilder.getDendency(owl);
+      if (o.isPresent()) {
+        dependencyFor = o.get().getDependencyFor().stream()
+            .filter(depOwl -> !ignoreDependencies.contains(depOwl)).collect(Collectors.toList());
+      }
+
+      MessageBox messageBox =
+          new MessageBox(AlertType.CONFIRMATION, "", ButtonType.YES, ButtonType.NO);
+      messageBox.setTitle("Deletion confirmation");
+      messageBox.setHeaderText("Are you sure you want to remove " + owl.info().owlName() + ": "
+          + owl.head().getTitle() + "?");
+      if (dependencyFor.size() > 0) {
+        StringBuilder depMessage = new StringBuilder("This Owl is an dependency for:\n");
+        dependencyFor.forEach(depOwl -> {
+          depMessage.append(" -" + depOwl.info().owlName() + ": " + depOwl.head().getTitle());
+          depMessage.append("\n");
+        });
+        messageBox.setContentText(depMessage.toString());
+      }
+
+      if (depFlag && (dependencyFor.size() == 0)) {
+        deleteConfyrm = true;
+      } else {
+        Optional<ButtonType> answer = messageBox.showAndWait();
+        if (answer.isPresent() && answer.get().equals(ButtonType.YES)) {
+          deleteConfyrm = true;
+        }
+      }
+    }
+
+    if (deleteConfyrm) {
+      Path location = owl.location();
+      UUID owlID = owl.info().id();
+      Files.delete(location);
+      owls.remove(owlID);
+      notifyDeleteOwlListeners(owl);
+    }
+  }
+
+  public synchronized void deleteOwl(Owl<?> owl, DeleteFlag... flags) throws IOException {
+    deleteOwl(owl, new ArrayList<>(), flags);
   }
 
   public synchronized <T extends OwlEntity> Owl<T> duplicateOwl(Owl<T> owl) throws IOException,
@@ -144,16 +213,15 @@ public enum OwlLoader {
     duplicateListeners.remove(listener);
   }
 
-  private void notifyCreateOwlListeners(Owl<? extends OwlEntity> entity) {
+  private void notifyCreateOwlListeners(Owl<?> entity) {
     createListeners.forEach(i -> i.create(entity));
   }
 
-  private void notifyDeleteOwlListeners(Owl<? extends OwlEntity> entity) {
+  private void notifyDeleteOwlListeners(Owl<?> entity) {
     deleteListeners.forEach(i -> i.delete(entity));
   }
 
-  private void notifyDuplicateOwlListeners(Owl<? extends OwlEntity> oldEntity,
-      Owl<? extends OwlEntity> newEntity) {
+  private void notifyDuplicateOwlListeners(Owl<?> oldEntity, Owl<?> newEntity) {
     duplicateListeners.forEach(i -> i.duplicate(oldEntity, newEntity));
   }
 
@@ -171,8 +239,8 @@ public enum OwlLoader {
     }
   }
 
-  Owl<? extends OwlEntity> loadOwl(UUID uuid) throws OwlCastException, OwlNotFoundException,
-      IOException, JAXBException, OwlEntityInitializeException, ClassNotFoundException {
+  Owl<?> loadOwl(UUID uuid) throws OwlCastException, OwlNotFoundException, IOException,
+      JAXBException, OwlEntityInitializeException, ClassNotFoundException {
     HollowOwl hollowOwl = ref.get(uuid);
     if (hollowOwl == null) {
       throw new OwlNotFoundException("Owl not found: " + uuid);
@@ -195,7 +263,6 @@ public enum OwlLoader {
   public void boot() throws IOException {
     if (isBoot)
       return;
-
     List<Path> owlFiles = Owls.findOwlFiles(ProjectPath.OWLERY.getPath(), 1);
 
     for (Path owlFile : owlFiles) {
@@ -228,6 +295,32 @@ public enum OwlLoader {
         messageBox.showAndWait();
         // TODO: Больше вариантов сообщения в зависимости от ошибки
       }
+    }
+    DependencyBuilder depBuilder = new DependencyBuilder(getAllOwls());
+    Set<Owl<?>> forgottenOwls = depBuilder.getForgottenOwls();
+    if (forgottenOwls.size() > 0) {
+      OwlookMessage message = new OwlookMessage(MessageLevel.INFO);
+      StringBuilder messageBuilder = new StringBuilder();
+      if (Owlook.getConfig().isDeleteForgottenOwls()) {
+        message.setName("Forgotten owls removed");
+        forgottenOwls.forEach(forgottenOwl -> {
+          try {
+            deleteOwl(forgottenOwl, DeleteFlag.FORCE);
+            messageBuilder.append(
+                forgottenOwl.info().owlName() + ": " + forgottenOwl.head().getTitle() + "\n");
+          } catch (IOException e) {
+            Owlook.registerException(2, e);
+          }
+        });
+      } else {
+        message.setName("Forgotten owls discovered");
+        forgottenOwls.forEach(forgottenOwl -> {
+          messageBuilder
+              .append(forgottenOwl.info().owlName() + ": " + forgottenOwl.head().getTitle() + "\n");
+        });
+      }
+      message.setMessage(messageBuilder.toString());
+      Owlook.notificate(message);
     }
     isBoot = true;
 

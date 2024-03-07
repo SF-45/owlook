@@ -1,11 +1,16 @@
 package space.sadfox.owlook.ui;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.ListChangeListener;
 import javafx.concurrent.Task;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Node;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -13,6 +18,7 @@ import javafx.stage.Popup;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.Duration;
 import space.sadfox.owlook.ui.base.NotificationElement;
 import space.sadfox.owlook.utils.NotificationPos;
 import space.sadfox.owlook.utils.Owlook;
@@ -66,6 +72,20 @@ public class NotificationPopup {
     });
     root.widthProperty().addListener((property, oldValue, newValue) -> {
       updateXPosition(newValue.doubleValue());
+    });
+    root.getChildren().addListener((ListChangeListener<Node>) change -> {
+      while (change.next()) {
+        if (change.wasAdded()) {
+          change.getAddedSubList().forEach(node -> {
+            node.setOpacity(0d);
+            KeyValue keyValue = new KeyValue(node.opacityProperty(), 1d);
+            KeyFrame keyFrame = new KeyFrame(Duration.millis(700), keyValue);
+            Timeline opacityAnimation = new Timeline(60, keyFrame);
+            opacityAnimation.play();
+
+          });
+        }
+      }
     });
   }
 
