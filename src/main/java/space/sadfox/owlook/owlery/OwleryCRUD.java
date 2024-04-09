@@ -22,7 +22,12 @@ public abstract class OwleryCRUD extends OwleryBase {
     editOwl.setOnAction(event -> {
       TableViewSelectionModel<Owl<?>> select = DESIGN.owlTableView.getSelectionModel();
       editOwlAction(select.getSelectedItem());
+    });
 
+    MenuItem duplicateOwl = FormDesigners.addTo(rowContextMenu, new MenuItem("Duplicate Owl"));
+    duplicateOwl.setOnAction(event -> {
+      TableViewSelectionModel<Owl<?>> select = DESIGN.owlTableView.getSelectionModel();
+      duplicateOwlAction(select.getSelectedItem());
     });
 
     MenuItem deleteOwl = FormDesigners.addTo(rowContextMenu, new MenuItem("Delete Owl"));

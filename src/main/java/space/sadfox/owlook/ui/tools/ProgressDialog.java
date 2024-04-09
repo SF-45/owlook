@@ -5,7 +5,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
-import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.concurrent.Task;
@@ -91,22 +92,28 @@ public class ProgressDialog extends Dialog<ButtonType> {
   }
 
   private void registerTask(Task<?> task) {
-    progressProperty().bind(task.progressProperty());
-    progressTextProperty().bind(task.messageProperty());
+    progressBar.progressProperty().bind(task.progressProperty());
+    progressText.textProperty().bind(task.messageProperty());
     task.setOnSucceeded(event -> {
       long doneTime = System.currentTimeMillis() - startTime;
 
-      progressTextProperty().unbind();
-      setProgressText(
+      progressText.textProperty().unbind();
+      progressText.setText(
           "Done for " + new SimpleDateFormat("mm'm' ss's' SSSS'ms'").format(new Date(doneTime)));
       finish();
     });
     task.setOnCancelled(event -> {
       finish();
     });
+    task.setOnFailed(event -> {
+      Throwable e = task.getException();
+      progressText.textProperty().unbind();
+      progressText.setText(e.getClass().getSimpleName() + ": " + e.getMessage());
+      finish();
+    });
   }
 
-  public DoubleProperty progressProperty() {
+  public ReadOnlyDoubleProperty progressProperty() {
     return progressBar.progressProperty();
   }
 
@@ -114,20 +121,12 @@ public class ProgressDialog extends Dialog<ButtonType> {
     return progressBar.getProgress();
   }
 
-  public void setProgress(double progress) {
-    progressBar.setProgress(progress);
-  }
-
-  public StringProperty progressTextProperty() {
+  public ReadOnlyStringProperty progressTextProperty() {
     return progressText.textProperty();
   }
 
   public String getProgressText() {
     return progressText.getText();
-  }
-
-  public void setProgressText(String progressText) {
-    this.progressText.setText(progressText);
   }
 
   public DateFormat getDateFormat() {

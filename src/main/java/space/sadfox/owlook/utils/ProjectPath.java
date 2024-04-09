@@ -7,31 +7,23 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public enum ProjectPath {
-	OWLERY("owlery", false),
-    CONFiG("conf",false),
-    DATA("data", false),
-    TEMP("temp", true),
-    MODULE("module", false),
-    MODULE_LIB("module-lib", false),
-    MODULE_CONFIG("module-conf", false);
+  OWLERY("owlery"), CONFiG("conf"), DATA("data"), TEMP("temp"), MODULE("module"), MODULE_LIB(
+      "module-lib"), MODULE_CONFIG("module-conf");
 
-    private Path path;
-    private boolean isTemp;
+  private Path path;
 
-    ProjectPath(String path, boolean isTemp) {
-        this.path = Paths.get(path).toAbsolutePath();
-        this.isTemp = isTemp;
+  ProjectPath(String path) {
+    this.path = Paths.get(path).toAbsolutePath();
+  }
+
+  public Path getPath() {
+    if (!Files.exists(path)) {
+      try {
+        Files.createDirectory(path);
+      } catch (IOException e) {
+        Owlook.registerException(1, e);
+      }
     }
-
-    public Path getPath() {
-        if (!Files.exists(path)) {
-            try {
-                Files.createDirectory(path);
-                if (isTemp) path.toFile().deleteOnExit();
-            } catch (IOException e) {
-                Owlook.registerException(1, e);
-            }
-        }
-        return path;
-    }
+    return path;
+  }
 }

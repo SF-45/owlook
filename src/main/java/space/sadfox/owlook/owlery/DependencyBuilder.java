@@ -100,7 +100,7 @@ public class DependencyBuilder {
     Set<Owl<?>> forgottenOwls = new HashSet<>();
 
     dependencies.forEach((owl, dep) -> {
-      boolean hide = owl.head().isHide();
+      boolean hide = owl.head().isHidden();
       boolean notDependencyFor = dep.getDependencyFor().size() == 0;
       if (hide && notDependencyFor) {
         forgottenOwls.add(owl);

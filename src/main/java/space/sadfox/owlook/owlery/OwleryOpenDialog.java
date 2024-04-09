@@ -102,7 +102,7 @@ public class OwleryOpenDialog<T extends OwlEntity> extends OwleryCRUD {
 
   private static OwleryConfig getOpenConfig() {
     OwleryConfig c = new OwleryConfig();
-    c.setEditOwlPreview(true);
+    c.setEditOwlPreview(false);
     c.setIdColumnVisible(false);
     c.setOwlNameColumnVisible(true);
     c.setModuleColumnVisible(true);

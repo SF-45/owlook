@@ -183,6 +183,7 @@ public enum OwlLoader {
     Owl<T> newOwl = createOwl(owl.entityClass());
     newOwl.entity().syncWith(owl.entity());
     newOwl.head().syncWith(owl.head());
+    newOwl.head().setTitle(owl.head().getTitle() + " (copy)");
 
     notifyDuplicateOwlListeners(owl, newOwl);
 
@@ -235,7 +236,7 @@ public enum OwlLoader {
       owls.put(uuid, loadedOwl);
       return loadedOwl;
     } else {
-      throw new OwlNotFoundException();
+      throw new OwlNotFoundException("ID: " + uuid);
     }
   }
 
@@ -248,7 +249,12 @@ public enum OwlLoader {
     Optional<Class<? extends OwlEntity>> optTarget = findTarget(hollowOwl.info().targetClass());
 
     if (optTarget.isEmpty()) {
-      throw new ClassNotFoundException();// TODO: Описание ошибки
+      StringBuilder builder = new StringBuilder();
+      builder.append("Provider was not found\n\n").append("Title: " + hollowOwl.head().getTitle())
+          .append('\n').append("ID: " + hollowOwl.info().id().toString()).append('\n')
+          .append("Name: " + hollowOwl.info().owlName()).append('\n')
+          .append("Module: " + hollowOwl.info().createdModule());
+      throw new ClassNotFoundException(builder.toString());
     }
     return loadOwl(uuid, optTarget.get());
   }
@@ -285,15 +291,10 @@ public enum OwlLoader {
       try {
         Owl<?> loadedOwl = loadOwl(uuid);
         owls.put(loadedOwl.info().id(), loadedOwl);
-      } catch (OwlCastException | OwlNotFoundException | ClassNotFoundException | JAXBException
-          | OwlEntityInitializeException e) {
-        Owlook.registerException(1, e);
-        MessageBox messageBox = new MessageBox(AlertType.ERROR);
-        messageBox.setTitle("Owl Load Error");
-        messageBox.setHeaderText("An error occurred while loading Owl " + uuid);
-        messageBox.setContentText(e.getMessage());
-        messageBox.showAndWait();
-        // TODO: Больше вариантов сообщения в зависимости от ошибки
+      } catch (OwlCastException | OwlNotFoundException | ClassNotFoundException | IOException
+          | JAXBException | OwlEntityInitializeException e) {
+        Owlook.registerException(2, e);
+        Owlook.notificate(generateMessage(e));
       }
     }
     DependencyBuilder depBuilder = new DependencyBuilder(getAllOwls());
@@ -321,6 +322,7 @@ public enum OwlLoader {
       }
       message.setMessage(messageBuilder.toString());
       Owlook.notificate(message);
+      Owlook.registerMessage(message);
     }
     isBoot = true;
 
@@ -353,5 +355,24 @@ public enum OwlLoader {
     } else {
       return Optional.empty();
     }
+  }
+
+  static OwlookMessage generateMessage(Exception e) {
+    OwlookMessage m = null;
+    if (e instanceof OwlNotFoundException) {
+      m = new OwlookMessage(MessageLevel.WARNING);
+      m.setName("Owl Not Found");
+    } else if (e instanceof ClassNotFoundException) {
+      m = new OwlookMessage(MessageLevel.WARNING);
+      m.setName("Owl Not Load");
+    } else if (e instanceof OwlEntityInitializeException) {
+      m = new OwlookMessage(MessageLevel.ERROR);
+      m.setName("An error occurred while initializing Owl");
+    } else {
+      m = new OwlookMessage(MessageLevel.ERROR);
+      m.setName("Owl Load Error");
+    }
+    m.setMessage(e.getMessage());
+    return m;
   }
 }

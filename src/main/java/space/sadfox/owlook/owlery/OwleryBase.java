@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import jakarta.xml.bind.JAXBException;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -15,6 +16,7 @@ import javafx.collections.ObservableList;
 import space.sadfox.owlook.base.moduleapi.OwlookModuleInfo;
 import space.sadfox.owlook.base.owl.Owl;
 import space.sadfox.owlook.base.owl.OwlEntity;
+import space.sadfox.owlook.base.owl.OwlEntityInitializeException;
 import space.sadfox.owlook.moduleloader.ModuleLoader;
 import space.sadfox.owlook.owlery.OwlLoader.DeleteFlag;
 import space.sadfox.owlook.ui.base.Controllable;
@@ -159,7 +161,7 @@ public abstract class OwleryBase extends DesignController<OwleryDesigner> {
       Controllable controlEntity = (Controllable) owl.entity();
       try {
         controlEntity.getController().show();
-      } catch (IOException e) {
+      } catch (Exception e) {
         Owlook.registerException(1, e);
       }
     }
@@ -174,12 +176,21 @@ public abstract class OwleryBase extends DesignController<OwleryDesigner> {
         Controllable controlEntity = (Controllable) owl.entity();
         try {
           DESIGN.setEditOwlPreview(controlEntity.getController().getParent());
-        } catch (IOException e) {
+        } catch (Exception e) {
           Owlook.registerException(1, e);
         }
       } else {
         DESIGN.setEditOwlPreview(null);
       }
+    }
+  }
+
+  protected static void duplicateOwlAction(Owl<?> owl) {
+    try {
+      OwlLoader.INSTANCE.duplicateOwl(owl);
+    } catch (IOException | JAXBException | ReflectiveOperationException
+        | OwlEntityInitializeException e) {
+      Owlook.registerException(1, e);
     }
   }
 
