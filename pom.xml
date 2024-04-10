@@ -15,7 +15,7 @@
     <dependency>
       <groupId>space.sadfox</groupId>
       <artifactId>owlook.base</artifactId>
-      <version>0.6.0-beta</version>
+      <version>0.7.3-beta</version>
     </dependency>
     <!-- JAXB -->
     <dependency>

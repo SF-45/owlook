@@ -80,12 +80,12 @@ public enum OwlLoader {
     return getAllOwls().stream().filter(owl -> !owl.head().isHidden()).collect(Collectors.toList());
   }
 
-  public synchronized List<Owl<?>> getAllOwls() {
+  synchronized List<Owl<?>> getAllOwls() {
     return new ArrayList<>(owls.values());
   }
 
   @SuppressWarnings("unchecked")
-  public synchronized <T extends OwlEntity> List<Owl<T>> getAllOwls(Class<T> target) {
+  synchronized <T extends OwlEntity> List<Owl<T>> getAllOwls(Class<T> target) {
     List<Owl<T>> rezOwls = new ArrayList<>();
 
     owls.forEach((key, value) -> {
@@ -110,7 +110,9 @@ public enum OwlLoader {
   public synchronized <T extends OwlEntity> Owl<T> createHiddenOwl(Class<T> target)
       throws IOException, JAXBException, ReflectiveOperationException,
       OwlEntityInitializeException {
-    Owl<T> newOwl = createOwl(target);
+    Owl<T> newOwl = Owl.create(ProjectPath.OWLERY.getPath(), target);
+    initOwl(newOwl);
+    owls.put(newOwl.info().id(), newOwl);
     newOwl.head().setHidden(true);
 
     return newOwl;
@@ -169,7 +171,9 @@ public enum OwlLoader {
       UUID owlID = owl.info().id();
       Files.delete(location);
       owls.remove(owlID);
-      notifyDeleteOwlListeners(owl);
+      if (!owl.head().isHidden()) {
+        notifyDeleteOwlListeners(owl);
+      }
     }
   }
 
@@ -180,12 +184,18 @@ public enum OwlLoader {
   public synchronized <T extends OwlEntity> Owl<T> duplicateOwl(Owl<T> owl) throws IOException,
       JAXBException, ReflectiveOperationException, OwlEntityInitializeException {
 
-    Owl<T> newOwl = createOwl(owl.entityClass());
-    newOwl.entity().syncWith(owl.entity());
-    newOwl.head().syncWith(owl.head());
-    newOwl.head().setTitle(owl.head().getTitle() + " (copy)");
+    Owl<T> newOwl = null;
+    boolean isHidden = owl.head().isHidden();
+    if (isHidden) {
+      newOwl = createHiddenOwl(owl.entityClass());
+    } else {
+      newOwl = createOwl(owl.entityClass());
+    }
+    newOwl.syncWith(owl);
 
-    notifyDuplicateOwlListeners(owl, newOwl);
+    if (!isHidden) {
+      notifyDuplicateOwlListeners(owl, newOwl);
+    }
 
     return newOwl;
   }
@@ -300,29 +310,13 @@ public enum OwlLoader {
     DependencyBuilder depBuilder = new DependencyBuilder(getAllOwls());
     Set<Owl<?>> forgottenOwls = depBuilder.getForgottenOwls();
     if (forgottenOwls.size() > 0) {
-      OwlookMessage message = new OwlookMessage(MessageLevel.INFO);
-      StringBuilder messageBuilder = new StringBuilder();
-      if (Owlook.getConfig().isDeleteForgottenOwls()) {
-        message.setName("Forgotten owls removed");
-        forgottenOwls.forEach(forgottenOwl -> {
-          try {
-            deleteOwl(forgottenOwl, DeleteFlag.FORCE);
-            messageBuilder.append(
-                forgottenOwl.info().owlName() + ": " + forgottenOwl.head().getTitle() + "\n");
-          } catch (IOException e) {
-            Owlook.registerException(2, e);
-          }
-        });
-      } else {
-        message.setName("Forgotten owls discovered");
-        forgottenOwls.forEach(forgottenOwl -> {
-          messageBuilder
-              .append(forgottenOwl.info().owlName() + ": " + forgottenOwl.head().getTitle() + "\n");
-        });
-      }
-      message.setMessage(messageBuilder.toString());
-      Owlook.notificate(message);
-      Owlook.registerMessage(message);
+      forgottenOwls.forEach(forgottenOwl -> {
+        try {
+          deleteOwl(forgottenOwl, DeleteFlag.FORCE);
+        } catch (IOException e) {
+          Owlook.registerException(2, e);
+        }
+      });
     }
     isBoot = true;
 
