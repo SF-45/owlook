@@ -62,11 +62,13 @@ public abstract class OwleryCRUD extends OwleryBase {
   private static List<MenuItem> generateCreateOwlMenuItems() {
     List<MenuItem> createMenuItems = new ArrayList<>();
     ModuleLoader.INSTANCE.loadOwlEntities().forEach(owlEntity -> {
-      MenuItem createOwlMenuItem = new MenuItem(owlEntity.getEntityName());
-      createOwlMenuItem.setOnAction(event -> {
-        createOwlAction(owlEntity.getClass());
-      });
-      createMenuItems.add(createOwlMenuItem);
+      if (owlEntity instanceof OwleryCreatable) {
+        MenuItem createOwlMenuItem = new MenuItem(owlEntity.getEntityName());
+        createOwlMenuItem.setOnAction(event -> {
+          createOwlAction(owlEntity.getClass());
+        });
+        createMenuItems.add(createOwlMenuItem);
+      }
     });
     return createMenuItems;
   }
