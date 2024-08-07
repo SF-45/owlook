@@ -95,7 +95,7 @@ public class OwlookConfiguration extends ObservedJAXBEntity {
       properties.load(ResourceTarget.class.getResourceAsStream("pom.properties"));
       version = VersionFormat.of(properties.getProperty("version", "0.0.0-default"));
     } catch (IOException e) {
-      Owlook.registerException(0, e);
+      Owlook.registerException(e);
     }
   }
 

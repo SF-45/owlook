@@ -34,11 +34,8 @@ public class Owlook implements Thread.UncaughtExceptionHandler {
     }
   }
 
-  public synchronized static void registerException(int criticalLevel, Throwable e) {
+  public synchronized static void registerException(Throwable e) {
     LoggerEntry entry = logger.addNewLoggerEntry();
-
-    criticalLevel = normalizeCriticalLevel(criticalLevel);
-
     entry.setName(e.getClass().getName());
     entry.setMessage(e.getMessage());
     entry.setTime(System.currentTimeMillis());
@@ -46,7 +43,6 @@ public class Owlook implements Thread.UncaughtExceptionHandler {
     e.printStackTrace(new PrintWriter(writer));
     entry.setStackTrace(writer.toString());
     entry.setLogLevel(MessageLevel.ERROR);
-    entry.setCriticalLevel(criticalLevel);
     try {
       logger.getLoggerEntity().save();
     } catch (JAXBException | IOException e1) {
@@ -95,7 +91,7 @@ public class Owlook implements Thread.UncaughtExceptionHandler {
 
   @Override
   public synchronized void uncaughtException(Thread t, Throwable e) {
-    registerException(0, e);
+    registerException(e);
     // System.err.print("Exception in thread \"" + t.getName() + "\" ");
     // e.printStackTrace();
   }
@@ -108,16 +104,6 @@ public class Owlook implements Thread.UncaughtExceptionHandler {
       // Owlook.registerException(0, e);
       e.printStackTrace();
       return null;
-    }
-  }
-
-  private static int normalizeCriticalLevel(int criticalLevel) {
-    if (criticalLevel < 0) {
-      return 0;
-    } else if (criticalLevel > 2) {
-      return 2;
-    } else {
-      return criticalLevel;
     }
   }
 

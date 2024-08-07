@@ -385,7 +385,7 @@ public class ModuleLoaderController extends FXMLController {
         mainStage.show();
         return true;
       } catch (IOException e) {
-        Owlook.registerException(0, e);
+        Owlook.registerException(e);
       }
     }
     return false;
@@ -402,7 +402,7 @@ public class ModuleLoaderController extends FXMLController {
       tableEntities.remove(tableEntity);
       testLaunch();
     } catch (IOException e) {
-      Owlook.registerException(1, e);
+      Owlook.registerException(e);
 
       MessageBox messageBox = new MessageBox(AlertType.ERROR);
       messageBox.setTitle("Deletion error");
@@ -470,7 +470,7 @@ public class ModuleLoaderController extends FXMLController {
       tableEntities.add(new TableEntity(new OwlookModulePack(newModuleFile)));
       testLaunch();
     } catch (IOException e) {
-      Owlook.registerException(1, e);
+      Owlook.registerException(e);
       MessageBox messageBox = new MessageBox(AlertType.ERROR);
       messageBox.setTitle("Import error");
       messageBox.setHeaderText("Module import error: " + moduleFile);

@@ -8,66 +8,55 @@ import space.sadfox.owlook.utils.MessageLevel;
 @XmlType
 public class LoggerEntry {
 
-    private String name;
-    private String massage;
-    private String stackTrace;
-    private MessageLevel logLevel;
-    private Integer loggingDepth = 1;
-    private long time;
+  private String name;
+  private String massage;
+  private String stackTrace;
+  private MessageLevel logLevel;
+  private long time;
 
-    @XmlAttribute(name = "name")
-    public String getName() {
-        return name;
-    }
+  @XmlAttribute(name = "name")
+  public String getName() {
+    return name;
+  }
 
-    @XmlAttribute(name = "time")
-    public long getTime() {
-        return time;
-    }
+  @XmlAttribute(name = "time")
+  public long getTime() {
+    return time;
+  }
 
-    @XmlElement(name = "massage")
-    public String getMassage() {
-        return massage;
-    }
+  @XmlElement(name = "massage")
+  public String getMassage() {
+    return massage;
+  }
 
-    @XmlElement(name = "stackTrace")
-    public String getStackTrace() {
-        return stackTrace;
-    }
+  @XmlElement(name = "stackTrace")
+  public String getStackTrace() {
+    return stackTrace;
+  }
 
-    @XmlAttribute(name = "logLevel")
-    public MessageLevel getLogLevel() {
-		return logLevel;
-	}
-    
-    @XmlAttribute(name = "criticalLevel")
-	public Integer getCriticalLevel() {
-		return loggingDepth;
-	}
+  @XmlAttribute(name = "logLevel")
+  public MessageLevel getLogLevel() {
+    return logLevel;
+  }
 
-	public void setCriticalLevel(Integer criticalLevel) {
-		this.loggingDepth = criticalLevel;
-	}
+  public void setLogLevel(MessageLevel logLevel) {
+    this.logLevel = logLevel;
+  }
 
-	public void setLogLevel(MessageLevel logLevel) {
-		this.logLevel = logLevel;
-	}
+  public void setName(String name) {
+    this.name = name;
+  }
 
+  public void setStackTrace(String stackTrace) {
+    this.stackTrace = stackTrace;
+  }
 
-	public void setName(String name) {
-        this.name = name;
-    }
+  public void setMessage(String message) {
+    this.massage = message;
+  }
 
-    public void setStackTrace(String stackTrace) {
-        this.stackTrace = stackTrace;
-    }
-
-    public void setMessage(String message) {
-        this.massage = message;
-    }
-
-    public void setTime(long time) {
-        this.time = time;
-    }
+  public void setTime(long time) {
+    this.time = time;
+  }
 
 }

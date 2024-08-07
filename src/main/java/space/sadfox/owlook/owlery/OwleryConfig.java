@@ -167,7 +167,7 @@ public class OwleryConfig extends ObservedJAXBEntity {
     try {
       return new ConfigurationManager<>(OwleryConfig.class).getConfig("owlery");
     } catch (ClassCastException | JAXBException | IOException | ReflectiveOperationException e) {
-      Owlook.registerException(0, e);
+      Owlook.registerException(e);
       return null;
     }
   }

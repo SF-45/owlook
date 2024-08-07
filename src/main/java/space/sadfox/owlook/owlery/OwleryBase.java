@@ -152,7 +152,7 @@ public abstract class OwleryBase extends DesignController<OwleryDesigner> {
       Owl<?> newOwl = OwlLoader.INSTANCE.createOwl(target);
       editOwlAction(newOwl);
     } catch (Exception e) {
-      Owlook.registerException(0, e);
+      Owlook.registerException(e);
     }
   }
 
@@ -162,7 +162,7 @@ public abstract class OwleryBase extends DesignController<OwleryDesigner> {
       try {
         controlEntity.getController().show();
       } catch (Exception e) {
-        Owlook.registerException(1, e);
+        Owlook.registerException(e);
       }
     }
   }
@@ -177,7 +177,7 @@ public abstract class OwleryBase extends DesignController<OwleryDesigner> {
         try {
           DESIGN.setEditOwlPreview(controlEntity.getController().getParent());
         } catch (Exception e) {
-          Owlook.registerException(1, e);
+          Owlook.registerException(e);
         }
       } else {
         DESIGN.setEditOwlPreview(null);
@@ -190,7 +190,7 @@ public abstract class OwleryBase extends DesignController<OwleryDesigner> {
       OwlLoader.INSTANCE.duplicateOwl(owl);
     } catch (IOException | JAXBException | ReflectiveOperationException
         | OwlEntityInitializeException e) {
-      Owlook.registerException(1, e);
+      Owlook.registerException(e);
     }
   }
 
@@ -198,7 +198,7 @@ public abstract class OwleryBase extends DesignController<OwleryDesigner> {
     List<Owl<?>> deleteOwls = new ArrayList<>(owls);
     OwlLoader loader = OwlLoader.INSTANCE;
     BiConsumer<IOException, Owl<?>> exceptionHandler = (e, owl) -> {
-      Owlook.registerException(1, e);
+      Owlook.registerException(e);
 
       OwlookMessage message = new OwlookMessage(MessageLevel.ERROR,
           "Deletion error " + owl.info().owlName() + ": " + owl.head().getTitle(),

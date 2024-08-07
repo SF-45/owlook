@@ -271,7 +271,7 @@ public enum OwlLoader {
 
   private void initOwl(Owl<?> owl) {
     owl.enableAutoSave(e -> {
-      Owlook.registerException(1, e);
+      Owlook.registerException(e);
     });
     owl.setAutoSaveDelay(2);
   }
@@ -290,7 +290,7 @@ public enum OwlLoader {
         ref.put(hollowOwl.info().id(), hollowOwl);
       } catch (FileAlreadyExistsException e) {
       } catch (JAXBException | IOException e) {
-        Owlook.registerException(1, e);
+        Owlook.registerException(e);
       }
     }
 
@@ -303,7 +303,7 @@ public enum OwlLoader {
         owls.put(loadedOwl.info().id(), loadedOwl);
       } catch (OwlCastException | OwlNotFoundException | ClassNotFoundException | IOException
           | JAXBException | OwlEntityInitializeException e) {
-        Owlook.registerException(2, e);
+        Owlook.registerException(e);
         Owlook.notificate(generateMessage(e));
       }
     }
@@ -314,7 +314,7 @@ public enum OwlLoader {
         try {
           deleteOwl(forgottenOwl, DeleteFlag.FORCE);
         } catch (IOException e) {
-          Owlook.registerException(2, e);
+          Owlook.registerException(e);
         }
       });
     }

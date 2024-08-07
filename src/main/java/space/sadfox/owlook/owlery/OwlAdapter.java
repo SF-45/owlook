@@ -14,7 +14,7 @@ public abstract class OwlAdapter<T extends OwlEntity> extends XmlAdapter<String,
       UUID uuid = UUID.fromString(v);
       return OwlLoader.INSTANCE.loadOwl(uuid, getTarget());
     } catch (Exception e) {
-      Owlook.registerException(1, e);
+      Owlook.registerException(e);
       Owlook.notificate(OwlLoader.generateMessage(e));
       throw e;
     }

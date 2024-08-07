@@ -21,7 +21,7 @@ public enum ProjectPath {
       try {
         Files.createDirectory(path);
       } catch (IOException e) {
-        Owlook.registerException(1, e);
+        Owlook.registerException(e);
       }
     }
     return path;

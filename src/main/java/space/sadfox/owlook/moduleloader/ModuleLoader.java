@@ -224,7 +224,7 @@ public enum ModuleLoader {
             ClassLoader.getSystemClassLoader());
         loadReport.loadInfoList.add(new ModuleLoadInfo(loadPack, ModuleLoadInfo.Status.OK, ""));
       } catch (FindException | ResolutionException e) {
-        Owlook.registerException(3, e);
+        Owlook.registerException(e);
         loadReport.loadInfoList
             .add(new ModuleLoadInfo(loadPack, ModuleLoadInfo.Status.ERROR, e.getMessage()));
         loadReport.load = false;
