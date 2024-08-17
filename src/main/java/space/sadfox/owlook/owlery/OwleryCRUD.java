@@ -21,25 +21,25 @@ public abstract class OwleryCRUD extends OwleryBase {
     MenuItem editOwl = FormDesigners.addTo(rowContextMenu, new MenuItem("Edit Owl"));
     editOwl.setOnAction(event -> {
       TableViewSelectionModel<Owl<?>> select = DESIGN.owlTableView.getSelectionModel();
-      editOwlAction(select.getSelectedItem());
+      OwleryActions.editOwlAction(select.getSelectedItem());
     });
 
     MenuItem duplicateOwl = FormDesigners.addTo(rowContextMenu, new MenuItem("Duplicate Owl"));
     duplicateOwl.setOnAction(event -> {
       TableViewSelectionModel<Owl<?>> select = DESIGN.owlTableView.getSelectionModel();
-      duplicateOwlAction(select.getSelectedItem());
+      OwleryActions.duplicateOwlAction(select.getSelectedItem());
     });
 
     MenuItem deleteOwl = FormDesigners.addTo(rowContextMenu, new MenuItem("Delete Owl"));
     deleteOwl.setOnAction(event -> {
-      deleteOwlAction(DESIGN.owlTableView.getSelectionModel().getSelectedItems());
+      OwleryActions.deleteOwlAction(DESIGN.owlTableView.getSelectionModel().getSelectedItems());
 
     });
 
     DESIGN.owlTableView.addEventHandler(KeyEvent.KEY_RELEASED, keyEvent -> {
       switch (keyEvent.getCode()) {
         case DELETE:
-          deleteOwlAction(DESIGN.owlTableView.getSelectionModel().getSelectedItems());
+          OwleryActions.deleteOwlAction(DESIGN.owlTableView.getSelectionModel().getSelectedItems());
           break;
 
         default:
@@ -65,7 +65,7 @@ public abstract class OwleryCRUD extends OwleryBase {
       if (owlEntity instanceof OwleryCreatable) {
         MenuItem createOwlMenuItem = new MenuItem(owlEntity.getEntityName());
         createOwlMenuItem.setOnAction(event -> {
-          createOwlAction(owlEntity.getClass());
+          OwleryActions.createOwlAction(owlEntity.getClass());
         });
         createMenuItems.add(createOwlMenuItem);
       }

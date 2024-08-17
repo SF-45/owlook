@@ -58,7 +58,7 @@ public class OwleryOpenDialog<T extends OwlEntity> extends OwleryCRUD {
 
     MenuItem createOwlMenu = new MenuItem("Create " + targetOwlEntity.getEntityName());
     DESIGN.editMenu.getItems().add(createOwlMenu);
-    createOwlMenu.setOnAction(event -> createOwlAction(target));
+    createOwlMenu.setOnAction(event -> OwleryActions.createOwlAction(target));
 
     addOwlsFilter(owl -> {
       return owl.entityClass().equals(targetOwlEntity.getClass());

@@ -22,7 +22,7 @@ public class Owlery extends OwleryCRUD {
     setListenSearchChange(true);
     setListenAddRemoveOwls(true);
 
-    DESIGN.owlTableView.setOnDoubleClickEvent(row -> editOwlAction(row.getItem()));
+    DESIGN.owlTableView.setOnDoubleClickEvent(row -> OwleryActions.editOwlAction(row.getItem()));
 
     stageTitle.set("Owlery");
 
