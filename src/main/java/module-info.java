@@ -26,7 +26,7 @@ module space.sadfox.owlook {
 
   opens space.sadfox.owlook.logger to jakarta.xml.bind;
   opens space.sadfox.owlook.utils to jakarta.xml.bind;
-  opens space.sadfox.owlook.owlery to jakarta.xml.bind;
+  opens space.sadfox.owlook.owlery to jakarta.xml.bind, org.glassfish.jaxb.runtime;
   opens space.sadfox.owlook.ui to javafx.fxml;
   opens space.sadfox.owlook.ui.tools to javafx.fxml;
 

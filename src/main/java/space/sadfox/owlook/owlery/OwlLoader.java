@@ -342,7 +342,7 @@ public enum OwlLoader {
     return fileName.equals(mustBeFileName);
   }
 
-  private static Optional<Class<? extends OwlEntity>> findTarget(String className) {
+  static Optional<Class<? extends OwlEntity>> findTarget(String className) {
     Optional<OwlEntity> optTarget = ModuleLoader.INSTANCE.loadOwlEntity(className);
     if (optTarget.isPresent()) {
       return Optional.of(optTarget.get().getClass());
