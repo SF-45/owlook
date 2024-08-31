@@ -1,18 +1,21 @@
 package space.sadfox.owlook.owlery;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.UUID;
 import java.util.stream.Collectors;
+import jakarta.xml.bind.JAXBException;
 import javafx.beans.InvalidationListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import space.sadfox.owlook.base.owl.Owl;
 import space.sadfox.owlook.base.owl.OwlEntity;
+import space.sadfox.owlook.base.owl.OwlEntityInitializeException;
+import space.sadfox.owlook.base.owl.OwlInfo;
 import space.sadfox.owlook.utils.MessageLevel;
 import space.sadfox.owlook.utils.Owlook;
 import space.sadfox.owlook.utils.OwlookMessage;
@@ -20,20 +23,18 @@ import space.sadfox.owlook.utils.OwlookMessage;
 public class OwlReferenceList<T extends OwlEntity> extends OwlReferenceBase<T>
     implements ObservableList<Owl<T>> {
 
-  private ObservableList<Owl<T>> refOwls;
-
   public OwlReferenceList(Class<T> targetOwlEntity) {
     super(targetOwlEntity);
   }
 
-  public OwlReferenceList(Class<T> targetOwlEntity, boolean removeUnloadOwlIds) {
-    super(targetOwlEntity);
-    state.removeUnloadOwlIds = removeUnloadOwlIds;
+
+  OwlReferenceList(Class<T> targetOwlEntity, List<OwlInfo> owlInfoList,
+      boolean removeUnloadOwlIds) {
+    super(targetOwlEntity, owlInfoList, removeUnloadOwlIds);
   }
 
-  OwlReferenceList(Class<T> targetOwlEntity, State state) {
-    super(targetOwlEntity, state);
-  }
+  private ObservableList<Owl<T>> refOwls;
+
 
   @Override
   List<Owl<? extends OwlEntity>> owls() {
@@ -45,38 +46,41 @@ public class OwlReferenceList<T extends OwlEntity> extends OwlReferenceBase<T>
     if (refOwls == null) {
       OwlLoader l = OwlLoader.INSTANCE;
       refOwls = FXCollections.synchronizedObservableList(FXCollections.observableArrayList());
-      List<UUID> removeOwlId = null;
-      for (UUID owlID : state.owlIds) {
+      List<OwlInfo> removeOwls = null;
+      for (OwlInfo owlInfo : owlInfoList) {
         try {
-          Owl<T> owl = l.getOwl(owlID, targetOwlEntity);
+          Owl<T> owl = l.loadOwl(owlInfo.id(), targetOwlEntity);
           refOwls.add(owl);
-        } catch (OwlCastException e) {
+        } catch (OwlCastException | OwlEntityInitializeException | JAXBException | IOException e) {
           Owlook.registerException(e);
         } catch (OwlNotFoundException e) {
-          Owlook.notificate(
-              new OwlookMessage(MessageLevel.WARNING, "Missing dependency", owlID.toString()));
-          if (state.removeUnloadOwlIds) {
-            if (removeOwlId == null) {
-              removeOwlId = new ArrayList<>();
+          if (removeUnloadOwlIds) {
+            if (removeOwls == null) {
+              removeOwls = new ArrayList<>();
             }
-            removeOwlId.add(owlID);
+            removeOwls.add(owlInfo);
             Owlook.registerMessage(
                 new OwlookMessage(MessageLevel.INFO, "OwlReferenceList Load - remove",
-                    "Remove owl id since it is not found: " + owlID.toString()));
+                    "Remove owl id since it is not found: " + owlInfo.owlName() + " ("
+                        + owlInfo.id() + ")" + " [" + owlInfo.createdModule() + "]"));
+          } else {
+            Owlook.notificate(
+                new OwlookMessage(MessageLevel.WARNING, "Missing dependency", owlInfo.owlName()
+                    + " (" + owlInfo.id() + ")" + " [" + owlInfo.createdModule() + "]"));
           }
         }
       }
-      if (removeOwlId != null) {
-        state.owlIds.removeAll(removeOwlId);
+      if (removeOwls != null) {
+        owlInfoList.removeAll(removeOwls);
       }
 
       refOwls.addListener((ListChangeListener<Owl<T>>) change -> {
         while (change.next()) {
           if (change.wasAdded()) {
-            state.owlIds.addAll(change.getFrom(), change.getAddedSubList().stream()
-                .map(addedOwl -> addedOwl.info().id()).collect(Collectors.toList()));
+            owlInfoList.addAll(change.getFrom(), change.getAddedSubList().stream()
+                .map(addedOwl -> addedOwl.info()).collect(Collectors.toList()));
           } else if (change.wasRemoved()) {
-            change.getRemoved().forEach(removedOwl -> state.owlIds.remove(removedOwl.info().id()));
+            change.getRemoved().forEach(removedOwl -> owlInfoList.remove(removedOwl.info()));
           }
           // TODO: Возможно тут нужно сделать синхронизацию перестановки
           // else if (change.wasPermutated()) {

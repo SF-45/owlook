@@ -1,14 +1,13 @@
 package space.sadfox.owlook.owlery;
 
+import java.util.List;
 import space.sadfox.owlook.base.owl.OwlEntity;
-import space.sadfox.owlook.owlery.OwlReferenceBase.State;
+import space.sadfox.owlook.base.owl.OwlInfo;
 
 public class OwlReferenceListAdapter extends OwlReferenceBaseAdapter<OwlReferenceList<?>> {
-
   @Override
   protected OwlReferenceList<?> createInstance(Class<? extends OwlEntity> targetOwlEntity,
-      State state) {
-    return new OwlReferenceList<>(targetOwlEntity, state);
+      List<OwlInfo> owlInfoList, boolean removeUnloadOwlIds) {
+    return new OwlReferenceList<>(targetOwlEntity, owlInfoList, removeUnloadOwlIds);
   }
-
 }

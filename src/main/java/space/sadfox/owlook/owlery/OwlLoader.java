@@ -59,16 +59,23 @@ public enum OwlLoader {
   private final List<DuplicateOwlListener> duplicateListeners = new ArrayList<>();
 
   @SuppressWarnings("unchecked")
-  public <T extends OwlEntity> Owl<T> getOwl(UUID uuid, Class<T> target)
+  public synchronized <T extends OwlEntity> Owl<T> getOwl(UUID uuid, Class<T> target)
       throws OwlCastException, OwlNotFoundException {
-    if (!owls.containsKey(uuid)) {
-      throw new OwlNotFoundException("Owl not found: " + uuid);
-    }
-    Owl<?> owl = owls.get(uuid);
-    if (!owl.entityClass().equals(target)) {
+    Owl<?> owl = getOwl(uuid);
+    if (target.isInstance(owl.entity())) {
       throw new OwlCastException("Can't to cast an owl to" + target.getSimpleName());
     }
     return (Owl<T>) owl;
+  }
+
+  public synchronized Owl<?> getOwl(UUID uuid) throws OwlNotFoundException {
+    owls.keySet().forEach(key -> {
+    });
+    if (!owls.containsKey(uuid)) {
+      throw new OwlNotFoundException("Owl not found: " + uuid);
+    }
+    return owls.get(uuid);
+
   }
 
   public synchronized <T extends OwlEntity> List<Owl<T>> getOwls(Class<T> target) {
@@ -89,7 +96,7 @@ public enum OwlLoader {
     List<Owl<T>> rezOwls = new ArrayList<>();
 
     owls.forEach((key, value) -> {
-      if (value.entityClass().equals(target)) {
+      if (target.isInstance(value.entity())) {
         rezOwls.add((Owl<T>) value);
       }
     });
@@ -101,6 +108,7 @@ public enum OwlLoader {
     Owl<T> newOwl = Owl.create(ProjectPath.OWLERY.getPath(), target);
     initOwl(newOwl);
     owls.put(newOwl.info().id(), newOwl);
+    newOwl.head().setTitle("New " + newOwl.entity().getEntityName());
 
     notifyCreateOwlListeners(newOwl);
 
