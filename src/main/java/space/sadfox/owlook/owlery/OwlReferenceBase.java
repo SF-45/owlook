@@ -2,6 +2,7 @@ package space.sadfox.owlook.owlery;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import space.sadfox.owlook.base.owl.Owl;
@@ -14,8 +15,6 @@ public abstract class OwlReferenceBase<T extends OwlEntity> {
     List<OwlInfo> owlInfoList;
     @XmlAttribute
     String targetClassName = "";
-    @XmlAttribute
-    boolean removeUnloadOwlIds = false;
 
     public State() {
       owlInfoList = new ArrayList<>();
@@ -27,40 +26,50 @@ public abstract class OwlReferenceBase<T extends OwlEntity> {
 
     @Override
     public String toString() {
-      return "State{owlInfoList=" + owlInfoList + ", targetClassName=" + targetClassName
-          + ", removeUnloadOwlIds=" + removeUnloadOwlIds + "}";
+      return "State{owlInfoList=" + owlInfoList + ", targetClassName=" + targetClassName + "}";
     }
+
   }
 
   protected final Class<T> targetOwlEntity;
   protected final List<OwlInfo> owlInfoList;
-  protected final boolean removeUnloadOwlIds;
+  private Optional<Owl<?>> parent = Optional.empty();
 
   public OwlReferenceBase(Class<T> targetOwlEntity) {
     this.targetOwlEntity = targetOwlEntity;
     this.owlInfoList = new ArrayList<>();
-    this.removeUnloadOwlIds = false;
-
+    init();
   }
 
-  OwlReferenceBase(Class<T> targetOwlEntity, List<OwlInfo> owlInfoList,
-      boolean removeUnloadOwlIds) {
+  OwlReferenceBase(Class<T> targetOwlEntity, List<OwlInfo> owlInfoList) {
     this.targetOwlEntity = targetOwlEntity;
-
     this.owlInfoList = owlInfoList;
-    this.removeUnloadOwlIds = removeUnloadOwlIds;
+    init();
   }
+
+  protected abstract void init();
 
   State toState() {
     State state = new State(owlInfoList);
     state.targetClassName = targetOwlEntity.getName();
-    state.removeUnloadOwlIds = removeUnloadOwlIds;
     return state;
   }
 
-  abstract List<Owl<? extends OwlEntity>> owls();
+  public boolean setParent(Owl<?> parent) {
+    if (this.parent.isPresent()) {
+      return false;
+    }
 
+    this.parent = Optional.of(parent);
+    whenParentSet();
+    return true;
+  }
 
+  protected Optional<Owl<?>> getParent() {
+    return parent;
+  }
+
+  protected abstract void whenParentSet();
 }
 
 

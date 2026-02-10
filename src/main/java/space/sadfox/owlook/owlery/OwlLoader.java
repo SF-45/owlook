@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -21,7 +22,6 @@ import space.sadfox.owlook.base.owl.OwlEntity;
 import space.sadfox.owlook.base.owl.OwlEntityInitializeException;
 import space.sadfox.owlook.base.owl.Owls;
 import space.sadfox.owlook.moduleloader.ModuleLoader;
-import space.sadfox.owlook.owlery.DependencyBuilder.Dependency;
 import space.sadfox.owlook.ui.tools.MessageBox;
 import space.sadfox.owlook.utils.MessageLevel;
 import space.sadfox.owlook.utils.Owlook;
@@ -62,7 +62,7 @@ public enum OwlLoader {
   public synchronized <T extends OwlEntity> Owl<T> getOwl(UUID uuid, Class<T> target)
       throws OwlCastException, OwlNotFoundException {
     Owl<?> owl = getOwl(uuid);
-    if (target.isInstance(owl.entity())) {
+    if (!owl.entityClass().equals(target)) {
       throw new OwlCastException("Can't to cast an owl to" + target.getSimpleName());
     }
     return (Owl<T>) owl;
@@ -87,6 +87,10 @@ public enum OwlLoader {
     return getAllOwls().stream().filter(owl -> !owl.head().isHidden()).collect(Collectors.toList());
   }
 
+  synchronized List<Owl<?>> getHiddenOwls() {
+    return getAllOwls().stream().filter(owl -> owl.head().isHidden()).collect(Collectors.toList());
+  }
+
   synchronized List<Owl<?>> getAllOwls() {
     return new ArrayList<>(owls.values());
   }
@@ -96,7 +100,7 @@ public enum OwlLoader {
     List<Owl<T>> rezOwls = new ArrayList<>();
 
     owls.forEach((key, value) -> {
-      if (target.isInstance(value.entity())) {
+      if (value.entityClass().equals(target)) {
         rezOwls.add((Owl<T>) value);
       }
     });
@@ -142,13 +146,13 @@ public enum OwlLoader {
     }
 
     if (!deleteConfyrm) {
-      DependencyBuilder depBuilder = new DependencyBuilder(getAllOwls());
+      OwlDependencies d = OwlDependencies.INSTANCE;
       List<Owl<?>> dependencyFor = new ArrayList<>();
-      Optional<Dependency> o = depBuilder.getDendency(owl);
-      if (o.isPresent()) {
-        dependencyFor = o.get().getDependencyFor().stream()
+      if (d.getDependencyForSize(owl) > 0) {
+        dependencyFor = d.getDependencyFor(owl).stream()
             .filter(depOwl -> !ignoreDependencies.contains(depOwl)).collect(Collectors.toList());
       }
+
 
       MessageBox messageBox =
           new MessageBox(AlertType.CONFIRMATION, "", ButtonType.YES, ButtonType.NO);
@@ -315,12 +319,22 @@ public enum OwlLoader {
         Owlook.notificate(generateMessage(e));
       }
     }
-    DependencyBuilder depBuilder = new DependencyBuilder(getAllOwls());
-    Set<Owl<?>> forgottenOwls = depBuilder.getForgottenOwls();
+
+    Set<Owl<?>> forgottenOwls = new HashSet<>();
+    getHiddenOwls().forEach(owl -> {
+      if (OwlDependencies.INSTANCE.getDependencyForSize(owl) == 0) {
+        forgottenOwls.add(owl);
+      }
+    });
+
     if (forgottenOwls.size() > 0) {
       forgottenOwls.forEach(forgottenOwl -> {
         try {
           deleteOwl(forgottenOwl, DeleteFlag.FORCE);
+          OwlookMessage m = new OwlookMessage(MessageLevel.INFO);
+          m.setName("Delete forgotten Owl");
+          m.setMessage(forgottenOwl.info().owlName() + " [" + forgottenOwl.info().id() + "]");
+          Owlook.registerMessage(m);
         } catch (IOException e) {
           Owlook.registerException(e);
         }

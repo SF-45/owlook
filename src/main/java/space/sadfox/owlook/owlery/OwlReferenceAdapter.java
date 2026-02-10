@@ -7,7 +7,7 @@ import space.sadfox.owlook.base.owl.OwlInfo;
 public class OwlReferenceAdapter extends OwlReferenceBaseAdapter<OwlReference<?>> {
   @Override
   protected OwlReference<?> createInstance(Class<? extends OwlEntity> targetOwlEntity,
-      List<OwlInfo> owlInfoList, boolean removeUnloadOwlIds) {
-    return new OwlReference<>(targetOwlEntity, owlInfoList, removeUnloadOwlIds);
+      List<OwlInfo> owlInfoList) {
+    return new OwlReference<>(targetOwlEntity, owlInfoList);
   }
 }

@@ -1,7 +1,6 @@
 package space.sadfox.owlook.owlery;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import jakarta.xml.bind.JAXBException;
 import javafx.beans.InvalidationListener;
@@ -26,43 +25,65 @@ public class OwlReference<T extends OwlEntity> extends OwlReferenceBase<T>
     super(targetOwlEntity);
   }
 
-  OwlReference(Class<T> targetOwlEntity, List<OwlInfo> owlInfoList, boolean removeUnloadOwlIds) {
-    super(targetOwlEntity, owlInfoList, removeUnloadOwlIds);
+  OwlReference(Class<T> targetOwlEntity, List<OwlInfo> owlInfoList) {
+    super(targetOwlEntity, owlInfoList);
   }
 
   private ObjectProperty<Owl<T>> refOwl;
 
-
-  private ObjectProperty<Owl<T>> objectProperty() {
-    // Ленивая иницализация для того чтобы зависимости подтягивались после полной загрузки сов
-    if (refOwl == null) {
-      refOwl = new SimpleObjectProperty<>();
-      OwlLoader l = OwlLoader.INSTANCE;
-      if (owlInfoList.size() > 0) {
-        try {
-          refOwl.set(l.loadOwl(owlInfoList.get(0).id(), targetOwlEntity));
-        } catch (OwlCastException | OwlEntityInitializeException | JAXBException | IOException e) {
-          Owlook.registerException(e);
-        } catch (OwlNotFoundException e) {
-          OwlInfo oInfo = owlInfoList.get(0);
-          Owlook.notificate(new OwlookMessage(MessageLevel.WARNING, "Missing dependency",
-              oInfo.owlName() + " (" + oInfo.id() + ")" + " [" + oInfo.createdModule() + "]"));
+  @Override
+  protected void init() {
+    refOwl = new SimpleObjectProperty<>();
+    OwlLoader l = OwlLoader.INSTANCE;
+    if (owlInfoList.size() > 0) {
+      try {
+        refOwl.set(l.loadOwl(owlInfoList.get(0).id(), targetOwlEntity));
+      } catch (OwlCastException | OwlEntityInitializeException | JAXBException | IOException e) {
+        Owlook.registerException(e);
+      } catch (OwlNotFoundException e) {
+        OwlInfo oInfo = owlInfoList.get(0);
+        OwlookMessage message = new OwlookMessage(MessageLevel.WARNING);
+        message.setMessage(oInfo.owlName() + " [" + oInfo.id() + "]");
+        StringBuilder b = new StringBuilder("Missing dependency");
+        if (getParent().isPresent()) {
+          Owl<?> parent = getParent().get();
+          b.append(" for: ").append(parent.info().owlName())
+              .append(" (" + parent.head().getTitle() + ")");
+          b.append(" [").append(parent.info().id()).append("]");
+        }
+        message.setName(b.toString());
+        Owlook.registerMessage(message);
+      }
+    }
+    refOwl.addListener((property, oldValue, newValue) -> {
+      if (newValue == null) {
+        owlInfoList.clear();
+        if (getParent().isPresent()) {
+          OwlDependencies.INSTANCE.removeFrom(getParent().get(), oldValue);
+        }
+      } else {
+        owlInfoList.add(0, newValue.info());
+        if (getParent().isPresent()) {
+          OwlDependencies.INSTANCE.addTo(getParent().get(), newValue);
         }
       }
-      refOwl.addListener((property, oldValue, newValue) -> {
-        if (newValue == null) {
-          owlInfoList.clear();
-        } else {
-          owlInfoList.add(0, newValue.info());
-        }
-      });
+    });
 
-      l.addDeleteOwlListener(deleteOwl -> {
-        if (deleteOwl.equals(refOwl.get())) {
-          refOwl.set(null);
-        }
-      });
+    l.addDeleteOwlListener(deleteOwl -> {
+      if (deleteOwl.equals(refOwl.get())) {
+        refOwl.set(null);
+      }
+    });
+  }
+
+  @Override
+  protected void whenParentSet() {
+    if (isPresent()) {
+      OwlDependencies.INSTANCE.addTo(getParent().get(), this.get());
     }
+  }
+
+  private ObjectProperty<Owl<T>> objectProperty() {
     return refOwl;
   }
 
@@ -87,11 +108,6 @@ public class OwlReference<T extends OwlEntity> extends OwlReferenceBase<T>
   public void set(Owl<T> value) {
     objectProperty().set(value);
   };
-
-  @Override
-  List<Owl<? extends OwlEntity>> owls() {
-    return Arrays.asList(get());
-  }
 
   @Override
   public boolean isBound() {

@@ -15,7 +15,7 @@ public abstract class OwlReferenceBaseAdapter<T extends OwlReferenceBase<?>>
     if (optTarget.isEmpty()) {
       throw new ClassNotFoundException("Provider was not found: " + v.targetClassName);
     }
-    return createInstance(optTarget.get(), v.owlInfoList, v.removeUnloadOwlIds);
+    return createInstance(optTarget.get(), v.owlInfoList);
 
   }
 
@@ -24,8 +24,8 @@ public abstract class OwlReferenceBaseAdapter<T extends OwlReferenceBase<?>>
     return v.toState();
   }
 
-  protected abstract T createInstance(Class<? extends OwlEntity> targetOwlEntity, List<OwlInfo> owlInfoList,
-      boolean removeUnloadOwlIds); 
-      
+  protected abstract T createInstance(Class<? extends OwlEntity> targetOwlEntity,
+      List<OwlInfo> owlInfoList);
+
 }
 
