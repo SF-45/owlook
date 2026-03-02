@@ -20,6 +20,8 @@ module space.sadfox.owlook {
 
   requires eu.hansolo.tilesfx;
 
+  requires org.slf4j;
+
   // requires org.fxmisc.richtext;
   // requires org.fxmisc.flowless;
   // requires reactfx;
@@ -31,7 +33,6 @@ module space.sadfox.owlook {
   opens space.sadfox.owlook.ui.tools to javafx.fxml;
 
   opens space.sadfox.owlook.moduleloader to javafx.fxml;
-
 
   // api
 
@@ -50,4 +51,3 @@ module space.sadfox.owlook {
   uses OwlEntity;
 
 }
-
