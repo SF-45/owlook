@@ -1,6 +1,5 @@
 package space.sadfox.owlook.ui.base;
 
 public interface Controllable {
-	Controller getController() throws Exception;
+  Controller getController() throws ControllerException;
 }
-  
