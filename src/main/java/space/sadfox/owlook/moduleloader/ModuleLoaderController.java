@@ -43,6 +43,7 @@ import space.sadfox.owlook.base.moduleapi.OwlookModulePacks;
 import space.sadfox.owlook.base.moduleapi.VersionFormat;
 import space.sadfox.owlook.moduleloader.ModuleLoader.LoadReport;
 import space.sadfox.owlook.ui.MainStage;
+import space.sadfox.owlook.ui.base.ControllerException;
 import space.sadfox.owlook.ui.base.FXMLController;
 import space.sadfox.owlook.ui.tools.MessageBox;
 import space.sadfox.owlook.utils.Owlook;
@@ -76,8 +77,7 @@ public class ModuleLoaderController extends FXMLController {
     final ObjectProperty<VersionFormat> version = new SimpleObjectProperty<>();
     final StringProperty massage = new SimpleStringProperty("");
     final BooleanProperty enable = new SimpleBooleanProperty(false);
-    final ObjectProperty<TableEntityStatus> status =
-        new SimpleObjectProperty<>(TableEntityStatus.READY);
+    final ObjectProperty<TableEntityStatus> status = new SimpleObjectProperty<>(TableEntityStatus.READY);
 
     TableEntity(OwlookModulePack owlookModulePack) {
       this.owlookModulePack = owlookModulePack;
@@ -214,15 +214,20 @@ public class ModuleLoaderController extends FXMLController {
 
   private final ObservableList<TableEntity> tableEntities = FXCollections.observableArrayList();
 
-  public ModuleLoaderController() throws IOException {
+  public ModuleLoaderController() throws ControllerException {
     super(ResourceTarget.class.getResource("fxml/module-loader.fxml"));
 
     config = Owlook.getConfig();
 
     init();
 
-    List<OwlookModulePack> findPacks = OwlookModulePacks
-        .getModulePacks(OwlookModulePacks.findModuleFiles(ProjectPath.MODULE.getPath(), 1));
+    List<OwlookModulePack> findPacks;
+    try {
+      findPacks = OwlookModulePacks
+          .getModulePacks(OwlookModulePacks.findModuleFiles(ProjectPath.MODULE.getPath(), 1));
+    } catch (IOException e) {
+      throw new ControllerException(e.getMessage(), e);
+    }
     findPacks.stream().map(TableEntity::new).forEach(tableEntities::add);
 
     config.getModules().stream().filter(moduleName -> {
@@ -261,8 +266,7 @@ public class ModuleLoaderController extends FXMLController {
       FileChooser fileChooser = new FileChooser();
       fileChooser.getExtensionFilters().add(new ExtensionFilter("OwlookModule", "*.owlm"));
 
-      List<File> selectedModules =
-          fileChooser.showOpenMultipleDialog(StageFactory.INSTANCE.getCurrentStage());
+      List<File> selectedModules = fileChooser.showOpenMultipleDialog(StageFactory.INSTANCE.getCurrentStage());
 
       if (selectedModules != null) {
         selectedModules.stream().map(File::toPath).forEach(this::importModulePack);
@@ -350,8 +354,7 @@ public class ModuleLoaderController extends FXMLController {
   }
 
   public boolean launch() {
-    List<TableEntity> errorTableEntities =
-        filteredTableEntities(TableEntityStatus.ERROR, TableEntityStatus.NOT_FOUND);
+    List<TableEntity> errorTableEntities = filteredTableEntities(TableEntityStatus.ERROR, TableEntityStatus.NOT_FOUND);
 
     if (errorTableEntities.size() > 0) {
       MessageBox ms = new MessageBox(AlertType.CONFIRMATION);
