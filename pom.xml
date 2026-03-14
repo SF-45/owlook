@@ -46,32 +46,26 @@
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-base</artifactId>
-      <classifier>win</classifier>
     </dependency>
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-controls</artifactId>
-      <classifier>win</classifier>
     </dependency>
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-media</artifactId>
-      <classifier>win</classifier>
     </dependency>
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-fxml</artifactId>
-      <classifier>win</classifier>
     </dependency>
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-web</artifactId>
-      <classifier>win</classifier>
     </dependency>
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-graphics</artifactId>
-      <classifier>win</classifier>
     </dependency>
     <dependency>
       <groupId>org.kordamp.ikonli</groupId>
@@ -190,30 +184,7 @@
               <goal>copy-dependencies</goal>
             </goals>
             <configuration>
-              <excludeClassifiers>linux,win</excludeClassifiers>
               <outputDirectory>target/lib</outputDirectory>
-            </configuration>
-          </execution>
-          <execution>
-            <id>copy-dependencies-win</id>
-            <phase>package</phase>
-            <goals>
-              <goal>copy-dependencies</goal>
-            </goals>
-            <configuration>
-              <includeClassifiers>win</includeClassifiers>
-              <outputDirectory>target/lib-win</outputDirectory>
-            </configuration>
-          </execution>
-          <execution>
-            <id>copy-dependencies-linux</id>
-            <phase>package</phase>
-            <goals>
-              <goal>copy-dependencies</goal>
-            </goals>
-            <configuration>
-              <includeClassifiers>linux</includeClassifiers>
-              <outputDirectory>target/lib-linux</outputDirectory>
             </configuration>
           </execution>
         </executions>
