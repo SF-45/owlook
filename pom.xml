@@ -234,15 +234,17 @@
         <groupId>org.openjfx</groupId>
         <artifactId>javafx-maven-plugin</artifactId>
         <version>0.0.8</version>
-        <executions>
-          <execution>
-            <id>default-cli</id>
-            <configuration>
-              <mainClass>
-                space.sadfox.owlook/space.sadfox.owlook.Main</mainClass>
-            </configuration>
-          </execution>
-        </executions>
+        <configuration>
+          <stripDebug>true</stripDebug>
+          <compress>2</compress>
+          <noHeaderFiles>true</noHeaderFiles>
+          <noManPages>true</noManPages>
+          <mainClass> space.sadfox.owlook/space.sadfox.owlook.Main</mainClass>
+          <bindServices>true</bindServices>
+          <launcher>owlook-app</launcher>
+          <jlinkImageName>owlook</jlinkImageName>
+          <jlinkZipName>owlook</jlinkZipName>
+        </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>

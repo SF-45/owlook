@@ -25,6 +25,7 @@ module space.sadfox.owlook {
   // requires org.fxmisc.richtext;
   // requires org.fxmisc.flowless;
   // requires reactfx;
+  requires org.glassfish.jaxb.runtime;
 
   opens space.sadfox.owlook.logger to jakarta.xml.bind;
   opens space.sadfox.owlook.utils to jakarta.xml.bind;
