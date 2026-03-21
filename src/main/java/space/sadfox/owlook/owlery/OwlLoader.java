@@ -288,7 +288,7 @@ public enum OwlLoader {
     }
   }
 
-  Owl<?> loadOwl(UUID uuid) throws OwlCastException, OwlNotFoundException, IOException,
+  private Owl<?> loadOwl(UUID uuid) throws OwlCastException, OwlNotFoundException, IOException,
       JAXBException, OwlEntityInitializeException, ClassNotFoundException {
     HollowOwl hollowOwl = ref.get(uuid);
     if (hollowOwl == null) {
