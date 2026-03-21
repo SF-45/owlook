@@ -292,7 +292,7 @@ public enum OwlLoader {
       JAXBException, OwlEntityInitializeException, ClassNotFoundException {
     HollowOwl hollowOwl = ref.get(uuid);
     if (hollowOwl == null) {
-      throw new OwlNotFoundException("Owl not found: " + uuid);
+      throw new OwlNotFoundException("Owl not found in HollowOwls: " + uuid);
     }
     Optional<Class<? extends OwlEntity>> optTarget = findTarget(hollowOwl.info().targetClass());
 
