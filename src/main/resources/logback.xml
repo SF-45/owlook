@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration>
+
+<configuration>
+  <import class="ch.qos.logback.classic.encoder.PatternLayoutEncoder" />
+  <import class="ch.qos.logback.core.ConsoleAppender" />
+  <import class="ch.qos.logback.core.rolling.RollingFileAppender" />
+  <import class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy" />
+  <import class="ch.qos.logback.core.FileAppender" />
+
+  <timestamp key="bySecond" datePattern="yyyyMMdd'T'HHmmss" />
+  <property name="SIMPLE_PATTERN"
+    value="%d{HH:mm:ss.SSS} [%thread] %logger{36} %-5level -%kvp- %msg%n" />
+
+  <logger name="space.sadfox.owlook.base" level="WARN" />
+
+  <appender name="STDOUT" class="ConsoleAppender">
+    <encoder class="PatternLayoutEncoder">
+      <pattern>${SIMPLE_PATTERN}</pattern>
+    </encoder>
+  </appender>
+
+  <appender name="FILE" class="FileAppender">
+    <file>logs/runtime-${bySecond}.log</file>
+    <append>true</append>
+    <encoder class="PatternLayoutEncoder">
+      <pattern>${SIMPLE_PATTERN}</pattern>
+    </encoder>
+  </appender>
+
+  <root
+    level="debug">
+    <appender-ref ref="STDOUT" />
+    <appender-ref ref="FILE" />
+  </root>
+</configuration>
